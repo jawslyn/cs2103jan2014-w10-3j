@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class Task {
   enum Importance {
-    LOW, MEDIUM, HIGH
+    HIGH, MEDIUM, LOW
   }
 
   enum Status {
@@ -44,7 +44,7 @@ public class Task {
 
   @Override
   public String toString() {
-    return String.valueOf(id);
+    return String.valueOf(id) + title;
   }
 
   public Integer getId() {
