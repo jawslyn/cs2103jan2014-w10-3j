@@ -5,11 +5,11 @@ package goku;
  * action with G.O.K.U.
  */
 public final class Command {
-  enum Type {
+  public enum Type {
     ADD, DISPLAY, EDIT, DELETE, SEARCH
   };
 
-  enum SortOrder {
+  public enum SortOrder {
     EARLIEST_DEADLINE_FIRST, HIGHEST_PRIORITY_FIRST
   }
 
