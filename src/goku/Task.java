@@ -19,8 +19,7 @@ public class Task {
   private Integer id;
   private String title;
   private Date deadline;
-  private Date startDate;
-  private Date endDate;
+  private DateRange period;
   private String[] tags;
   private String notes;
   private Importance importance;
@@ -30,12 +29,14 @@ public class Task {
     this.id = ++count;
   }
 
+  /*
+   * This constructor is used to clone a task
+   */
   public Task(Task task) {
     id = task.id;
     title = task.title;
     deadline = task.deadline;
-    startDate = task.startDate;
-    endDate = task.endDate;
+    period = task.period;
     tags = task.tags;
     notes = task.notes;
     importance = task.importance;
@@ -68,19 +69,23 @@ public class Task {
   }
 
   public Date getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(Date startDate) {
-    this.startDate = startDate;
+    return period.getStartDate();
   }
 
   public Date getEndDate() {
-    return endDate;
+    return period.getEndDate();
   }
 
-  public void setEndDate(Date endDate) {
-    this.endDate = endDate;
+  public DateRange getDateRange() {
+    return period;
+  }
+
+  public void setPeriod(Date startDate, Date endDate) {
+    setPeriod(new DateRange(startDate, endDate));
+  }
+
+  public void setPeriod(DateRange period) {
+    this.period = period;
   }
 
   public String[] getTags() {
