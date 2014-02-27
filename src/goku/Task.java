@@ -6,13 +6,11 @@ import java.util.Date;
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
  */
+
 public class Task {
+
   enum Importance {
     HIGH, MEDIUM, LOW
-  }
-
-  enum Status {
-    INCOMPLETE, COMPLETED
   }
 
   private static Integer count = 0;
@@ -23,7 +21,7 @@ public class Task {
   private String[] tags;
   private String notes;
   private Importance importance;
-  private Status status;
+  private boolean isComplete;
 
   public Task() {
     this.id = ++count;
@@ -40,84 +38,7 @@ public class Task {
     tags = task.tags;
     notes = task.notes;
     importance = task.importance;
-    status = task.status;
-  }
-
-  @Override
-  public String toString() {
-    return String.valueOf(id) + title;
-  }
-
-  public Integer getId() {
-    return id;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public Date getDeadline() {
-    return deadline;
-  }
-
-  public void setDeadline(Date deadline) {
-    this.deadline = deadline;
-  }
-
-  public Date getStartDate() {
-    return period.getStartDate();
-  }
-
-  public Date getEndDate() {
-    return period.getEndDate();
-  }
-
-  public DateRange getDateRange() {
-    return period;
-  }
-
-  public void setPeriod(Date startDate, Date endDate) {
-    setPeriod(new DateRange(startDate, endDate));
-  }
-
-  public void setPeriod(DateRange period) {
-    this.period = period;
-  }
-
-  public String[] getTags() {
-    return tags;
-  }
-
-  public void setTags(String[] tags) {
-    this.tags = tags;
-  }
-
-  public String getNotes() {
-    return notes;
-  }
-
-  public void setNotes(String notes) {
-    this.notes = notes;
-  }
-
-  public Importance getImportance() {
-    return importance;
-  }
-
-  public void setImportance(Importance importance) {
-    this.importance = importance;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
+    isComplete = false;
   }
 
   @Override
@@ -130,6 +51,83 @@ public class Task {
       return id.equals(aTask.id);
     }
     return false;
+  }
+
+  public DateRange getDateRange() {
+    return period;
+  }
+
+  public Date getDeadline() {
+    return deadline;
+  }
+
+  public Date getEndDate() {
+    return period.getEndDate();
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public Importance getImportance() {
+    return importance;
+  }
+
+  public String getNotes() {
+    return notes;
+  }
+
+  public Date getStartDate() {
+    return period.getStartDate();
+  }
+
+  public boolean getStatus() {
+    return isComplete;
+  }
+
+  public String[] getTags() {
+    return tags;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setDeadline(Date deadline) {
+    this.deadline = deadline;
+  }
+
+  public void setImportance(Importance importance) {
+    this.importance = importance;
+  }
+
+  public void setNotes(String notes) {
+    this.notes = notes;
+  }
+
+  public void setPeriod(Date startDate, Date endDate) {
+    setPeriod(new DateRange(startDate, endDate));
+  }
+
+  public void setPeriod(DateRange period) {
+    this.period = period;
+  }
+
+  public void setStatus(boolean status) {
+    isComplete = status;
+  }
+
+  public void setTags(String[] tags) {
+    this.tags = tags;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(id) + title;
   }
 
 }
