@@ -1,48 +1,50 @@
 package goku;
 
+import java.util.ArrayList;
+
 public class Result {
   private boolean isSuccess;
   private String successMsg;
   private String errorMsg;
-  private Task[] tasks;
+  private ArrayList<Task> tasks;
 
   public Result(boolean isSuccess, String successMsg, String errorMsg,
-      Task[] tasks) {
+      ArrayList<Task> tasks) {
     this.isSuccess = isSuccess;
     this.setSuccessMsg(successMsg);
     this.setErrorMsg(errorMsg);
     this.setTasks(tasks);
   }
 
-  public boolean isSuccess() {
-    return isSuccess;
-  }
-
-  public void setSuccess(boolean isSuccess) {
-    this.isSuccess = isSuccess;
+  public String getErrorMsg() {
+    return errorMsg;
   }
 
   public String getSuccessMsg() {
     return successMsg;
   }
 
-  public void setSuccessMsg(String successMsg) {
-    this.successMsg = successMsg;
+  public ArrayList<Task> getTasks() {
+    return tasks;
   }
 
-  public String getErrorMsg() {
-    return errorMsg;
+  public boolean isSuccess() {
+    return isSuccess;
   }
 
   public void setErrorMsg(String errorMsg) {
     this.errorMsg = errorMsg;
   }
 
-  public Task[] getTasks() {
-    return tasks;
+  public void setSuccess(boolean isSuccess) {
+    this.isSuccess = isSuccess;
   }
 
-  public void setTasks(Task[] tasks) {
+  public void setSuccessMsg(String successMsg) {
+    this.successMsg = successMsg;
+  }
+
+  public void setTasks(ArrayList<Task> tasks) {
     this.tasks = tasks;
   }
 }
