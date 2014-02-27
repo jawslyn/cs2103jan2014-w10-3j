@@ -1,6 +1,5 @@
 package goku;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /*
@@ -11,9 +10,7 @@ class GOKU {
 
   private static ArrayList<Task> allTasks = new ArrayList<Task>();
 
-  private static Command cmd = new Command(null, null, null);
-
-  private static void executeCommand(Command command) {
+  public static void executeCommand(Command command) {
     switch (command.getType()) {
 
       case ADD :
@@ -51,12 +48,7 @@ class GOKU {
     return allTasks;
   }
 
-  public static void main(String[] args) throws IOException {
-    executeCommand(cmd);
-  }
-
-  public GOKU(Command command) {
-    cmd = command;
+  public GOKU() {
   }
 
 }
