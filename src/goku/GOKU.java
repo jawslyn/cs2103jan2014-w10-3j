@@ -50,15 +50,91 @@ class GOKU {
     return incomplete;
   }
   
-  
-  private void display(ArrayList<Task> taskList) {
-    for (int i = 0; i < taskList.size(); i++) {
-      System.out.printf(DISPLAYED, i + 1, taskList.get(i).getTitle());
-    }
+  private void displayAll(ArrayList<Task> taskList) {
+	  for (Task task : taskList) {
+		  
+	  }	  
   }
   
+private void executeCommand(Command command) {
+	switch(command.getType()) {
+	
+	case ADD:
+		addTask(command.getTask());
+		break;
+	case DELETE:
+		deleteTask(command.getTask());
+		break;
+	}
+}
+
+private void addTask(Task task) {
+	allTasks.add(task);
+		
+}
+
+private void deleteTask(Task task) {
+	for (int i = 0; i < allTasks.size(); i++) {
+		if (allTasks.get(i) == task) {
+			allTasks.remove(i);
+		}
+		
+	}
+}
+
+private void displayAll(Command command) {
+	displayComplete(command);
+	displayIncomplete(command);
+}
+
+private void displayComplete(Command command) {
+	for (int i = 0; i < allTasks.size(); i++) {
+		if (allTasks.get(i).getStatus()) {
+			display(allTasks.get(i));
+		}
+	}
+}
+
+private void displayIncomplete(Command command) {
+	for (int i = 0; i < allTasks.size(); i++) {
+		if !(allTasks.get(i).getStatus()) {
+			display(allTasks.get(i));
+		}
+	}
+}
 
 
+
+private void searchTitle(Command command) {
+	for (int i = 0; i < allTasks.size(); i++) {
+		if (allTasks.get(i).getTitle().contains(command.getTask().getTitle())){
+			display(allTasks.get(i));
+		}
+	}
+}
+
+private void searchTag(Command command) {
+	String tempString = command.getTask().getTags().toString();
+	for (int i = 0; i < allTasks.size(); i++) {
+		String[] tempArray = allTasks.get(i).getTags();
+		for (int j = 0; j < tempArray.length; j++) {
+			if (tempArray[j].contains(tempString)){
+			display(allTasks.get(i));
+			}
+		}
+	}
+}
+
+
+private void display(Task task) {
+	System.out.printf(DISPLAYED, task.getId(), task.getTitle());
+}
+
+  private void display(ArrayList<Task> taskList) {
+    for (int i = 0; i < taskList.size(); i++) {
+      System.out.printf(DISPLAYED, taskList.get(i).getId(), taskList.get(i).getTitle());
+    }
+  }
 }
 
 
