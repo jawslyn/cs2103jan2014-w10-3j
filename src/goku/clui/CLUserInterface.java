@@ -9,57 +9,54 @@ import goku.Task;
 import java.util.Scanner;
 
 /**
- * user interface that acts as the intermediate component being user interface
- * and the main logic of GOKU
+ * User interface that acts as the intermediate component between the user
+ * interface and the main logic of GOKU.
  * 
  * @author jchiam
  */
 public class CLUserInterface implements UserInterface {
-
-  /*** GLOBAL VARIABLES ***/
-  private Task toDo = null;
-  private static Type commandType = null;
-  private static SortOrder sortOrder = null;
-
   /*** STRING CONSTANTS ***/
   private static String INPUT_ERROR = "Input cannot be recognised.";
 
-  private CLUIParser parser = new CLUIParser();
-  private Scanner sc = new Scanner(System.in);
-  private String input = "";
+  private CLUIParser parser;
+  private Scanner sc;
+  private String input;
+
+  public CLUserInterface() {
+    parser = new CLUIParser();
+    sc = new Scanner(System.in);
+    input = "";
+  }
 
   public CLUIParser getParser() {
     return this.parser;
   }
 
   /**
-   * Method: getUserInput
-   * 
-   * @param input
-   *          string
-   * @return Command object Gets parser to modify necessary global variables
-   *         then create Command object
+   * @return string that user entered
    */
   @Override
   public String getUserInput() {
     return sc.nextLine();
   }
 
+  /**
+   * @param input
+   *          string that a user has entered
+   * @return a command representing that the user wants to do
+   */
   @Override
   public Command makeCommand(String input) {
-    // Parse, creates task modifies necessary Command object parameters
-    toDo = parser.parseString(input);
-
-    if (sortOrder == null) {
-      return new Command(input, commandType, toDo);
-    } else {
-      return new Command(input, commandType, toDo, sortOrder);
-    }
+    return parser.parseToCommand(input);
   }
 
   @Override
   public void feedBack(Result result) {
-    // TODO Auto-generated method stub
+    if (result.isSuccess()) {
+      System.out.println(result.getSuccessMsg());
+    } else {
+      System.out.println(result.getErrorMsg());
+    }
   }
 
   /**
@@ -71,12 +68,25 @@ public class CLUserInterface implements UserInterface {
   protected class CLUIParser implements Parser {
 
     /** GLOBAL VARIABLES **/
+    private Task toDo = null;
+    private Type commandType = null;
+    private SortOrder sortOrder = null;
     String restOfInput = new String(); // string that holds remaining
                                        // unprocessed input
 
+    /*
+     * Parses
+     */
+    public Command parseToCommand(String input) {
+      Task toDo = parser.parseString(input);
+      if (sortOrder == null) {
+        return new Command(input, commandType, toDo);
+      } else {
+        return new Command(input, commandType, toDo, sortOrder);
+      }
+    }
+
     /**
-     * Method: parseString
-     * 
      * @param input
      *          string to be parsed
      * @return created task
@@ -247,7 +257,6 @@ public class CLUserInterface implements UserInterface {
           cmdType = Command.Type.SEARCH;
           break;
         default :
-          feedBack(new Result(false, null, INPUT_ERROR, null));
           return null;
       }
       return cmdType;
