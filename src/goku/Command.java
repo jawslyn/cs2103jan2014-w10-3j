@@ -6,7 +6,7 @@ package goku;
  */
 public final class Command {
   public enum Type {
-    ADD, DISPLAY, EDIT, DELETE, SEARCH
+    ADD, DISPLAY, EDIT, DELETE, SEARCH, STOP
   };
 
   public enum SortOrder {
@@ -43,5 +43,9 @@ public final class Command {
 
   public Task getTask() {
     return task;
+  }
+
+  public boolean isStopCommand() {
+    return this.type == Type.STOP;
   }
 }

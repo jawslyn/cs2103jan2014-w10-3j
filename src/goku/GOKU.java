@@ -15,7 +15,8 @@ class GOKU {
 
       case ADD :
         Add add = new Add();
-        add.addTask(command.getTask());
+        add.setCommand(command);
+        add.doIt();
         break;
       case DELETE :
         Delete delete = new Delete();
