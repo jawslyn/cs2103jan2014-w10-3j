@@ -14,4 +14,10 @@ public abstract class Action {
   String getErrorMsg(Object... args) {
     return String.format(FAILURE_MSG, args);
   }
+
+  public void setCommand(Command command) {
+    this.command = command;
+  }
+
+  public abstract void construct();
 }

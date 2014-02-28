@@ -12,17 +12,28 @@ class Display extends Action {
   private static final String MSG_EMPTY = "there are no tasks";
   private static final String MSG_SUCCESS = "displaying list of task:";
   private static final String MSG_FAILURE = "unable to display";
+  private boolean displayAll = false;
+  private Date byDeadline;
 
-  public Display() {
-
+  /*
+   * Called by ActionFactory on all actions to build the needed objects for this
+   * Action
+   */
+  @Override
+  public void construct() {
+    if (command.getTask() == null) {
+      displayAll = true;
+    } else {
+      byDeadline = command.getTask().getDeadline();
+    }
   }
 
   @Override
   Result doIt() {
-    if (command.getTask().getDeadline() != null) {
-      return displayDate();
-    } else {
+    if (displayAll) {
       return displayAll();
+    } else {
+      return displayDate();
     }
   }
 
@@ -54,7 +65,7 @@ class Display extends Action {
       return makeEmptyListResult();
     }
 
-    Date deadline = new Date();
+    Date deadline = byDeadline;
 
     ArrayList<Task> result = new ArrayList<Task>();
     for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
@@ -81,6 +92,7 @@ class Display extends Action {
     return new Result(true, null, null, result);
   }
 
+  @Override
   public void setCommand(Command command) {
     this.command = command;
   }

@@ -7,8 +7,20 @@ package goku;
 class Delete extends Action {
   private static final String SUCCESS_MSG = "deleted \"%s\"";
   private static final String FAILURE_MSG = "fail to delete \"%s\"";
+  private Task task;
 
-  public Delete() {
+  /*
+   * Called by ActionFactory on all actions to build the needed objects for this
+   * Action
+   */
+  @Override
+  public void construct() {
+    this.task = command.getTask();
+  }
+
+  @Override
+  Result doIt() {
+    return deleteTask(command.getTask());
   }
 
   public Result deleteTask(Task task) {
@@ -17,18 +29,8 @@ class Delete extends Action {
         GOKU.getAllTasks().remove(i);
       }
     }
-
     return new Result(true, getSuccessMsg(task.getTitle()), null,
         GOKU.getAllTasks());
-  }
-
-  @Override
-  Result doIt() {
-    return deleteTask(command.getTask());
-  }
-
-  public void setCommand(Command command) {
-    this.command = command;
   }
 
 }

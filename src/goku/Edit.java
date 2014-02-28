@@ -7,52 +7,54 @@ import java.util.ArrayList;
  * analogous to real life tasks which the user wishes to note down.
  */
 class Edit extends Action {
+  private final String MSG_SUCCESS = "edited task";
+  private final String MSG_FAILURE = "unable to edit";
 
-  public Edit() {
-
-  }
+  private int taskId;
+  private Task taskWithEdits;
 
   @Override
   Result doIt() {
     return updateTask();
   }
 
+  /*
+   * Called by ActionFactory on all actions to build the needed objects for this
+   * Action
+   */
+  @Override
+  public void construct() {
+    // TODO Auto-generated method stub
+    taskWithEdits = command.getTask();
+    taskId = taskWithEdits.getId();
+  }
+
   public Result updateTask() {
-    int ID = command.getTask().getId();
     ArrayList<Task> result = new ArrayList<Task>();
     for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i).getId() == ID) {
+      if (GOKU.getAllTasks().get(i).getId() == taskId) {
         result.add(GOKU.getAllTasks().get(i));
-        if (command.getTask().getTitle() != null) {
-          GOKU.getAllTasks().get(i).setTitle(command.getTask().getTitle());
+        if (taskWithEdits.getTitle() != null) {
+          GOKU.getAllTasks().get(i).setTitle(taskWithEdits.getTitle());
         }
-        if (command.getTask().getDeadline() != null) {
+        if (taskWithEdits.getDeadline() != null) {
+          GOKU.getAllTasks().get(i).setDeadline(taskWithEdits.getDeadline());
+        }
+        if (taskWithEdits.getDateRange() != null) {
+          GOKU.getAllTasks().get(i).setPeriod(taskWithEdits.getDateRange());
+        }
+        if (taskWithEdits.getTags() != null) {
+          GOKU.getAllTasks().get(i).setTags(taskWithEdits.getTags());
+        }
+        if (taskWithEdits.getNotes() != null) {
+          GOKU.getAllTasks().get(i).setNotes(taskWithEdits.getNotes());
+        }
+        if (taskWithEdits.getImportance() != null) {
           GOKU.getAllTasks().get(i)
-              .setDeadline(command.getTask().getDeadline());
-        }
-        if (command.getTask().getDateRange() != null) {
-          GOKU.getAllTasks().get(i).setPeriod(command.getTask().getDateRange());
-        }
-        if (command.getTask().getTags() != null) {
-          GOKU.getAllTasks().get(i).setTags(command.getTask().getTags());
-        }
-        if (command.getTask().getNotes() != null) {
-          GOKU.getAllTasks().get(i).setNotes(command.getTask().getNotes());
-        }
-        if (command.getTask().getImportance() != null) {
-          GOKU.getAllTasks().get(i)
-              .setImportance(command.getTask().getImportance());
+              .setImportance(taskWithEdits.getImportance());
         }
       }
-
     }
-
     return new Result(true, null, null, result);
-
   }
-
-  public void setCommand(Command command) {
-    this.command = command;
-  }
-
 }

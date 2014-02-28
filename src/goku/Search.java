@@ -7,23 +7,29 @@ import java.util.ArrayList;
  * analogous to real life tasks which the user wishes to note down.
  */
 class Search extends Action {
+  private Task taskToSearchFor;
+
+  /*
+   * Called by ActionFactory on all actions to build the needed objects for this
+   * Action
+   */
+  @Override
+  public void construct() {
+    taskToSearchFor = command.getTask();
+  }
 
   @Override
   Result doIt() {
-    if (command.getTask().getTitle() != null) {
+    if (taskToSearchFor.getTitle() != null) {
       return searchTitle();
     } else {
       return searchTag();
     }
   }
 
-  public void setCommand(Command command) {
-    this.command = command;
-  }
-
   public Result searchTag() {
     ArrayList<Task> result = new ArrayList<Task>();
-    String tempString = command.getTask().getTags().toString();
+    String tempString = taskToSearchFor.getTags().toString();
     for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
       String[] tempArray = GOKU.getAllTasks().get(i).getTags();
       for (String element : tempArray) {
@@ -40,7 +46,7 @@ class Search extends Action {
     ArrayList<Task> result = new ArrayList<Task>();
     for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
       if (GOKU.getAllTasks().get(i).getTitle()
-          .contains(command.getTask().getTitle())) {
+          .contains(taskToSearchFor.getTitle())) {
         result.add(GOKU.getAllTasks().get(i));
       }
     }

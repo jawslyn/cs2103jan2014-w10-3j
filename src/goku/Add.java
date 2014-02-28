@@ -7,25 +7,26 @@ package goku;
 class Add extends Action {
   private static final String SUCCESS_MSG = "added \"%s\"";
   private static final String FAILURE_MSG = "fail add \"%s\"";
+  private Task task;
 
-  public Add() {
-
+  /*
+   * Called by ActionFactory on all actions to build the needed objects for this
+   * Action
+   */
+  @Override
+  public void construct() {
+    task = command.getTask();
   }
 
-  public void setCommand(Command c) {
-    this.command = c;
+  @Override
+  Result doIt() {
+    return addTask(task);
   }
 
   public Result addTask(Task task) {
     GOKU.getAllTasks().add(task);
     return new Result(true, getSuccessMsg(SUCCESS_MSG, task.getTitle()), null,
         GOKU.getAllTasks());
-  }
-
-  @Override
-  Result doIt() {
-    Task task = command.getTask();
-    return addTask(task);
   }
 
 }

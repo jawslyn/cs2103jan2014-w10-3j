@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class GokuMain {
   static UserInterface ui;
   static boolean shouldRun = true;
+  static GOKU goku = new GOKU();
 
   public static void main(String[] args) {
     setUserInterface(args);
@@ -39,9 +40,7 @@ public class GokuMain {
   }
 
   private static Result executeCommand(Command c) {
-    GOKU.executeCommand(c);
-    // TODO Auto-generated method stub
-    return null;
+    return goku.executeCommand(c);
   }
 
   private static void promptUserToContinue() {
