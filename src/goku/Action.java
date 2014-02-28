@@ -5,6 +5,7 @@ public abstract class Action {
   Command command;
   String SUCCESS_MSG;
   String FAILURE_MSG;
+  TaskList list = GOKU.getTaskList();
 
   abstract Result doIt();
 
