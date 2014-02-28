@@ -17,7 +17,7 @@ public class DateUtil {
     return compareDayMonthYear(aDate, otherDate) == 0;
   }
 
-  public static boolean dateEarlierThanOrSameAs(Date aDate, Date otherDate) {
+  public static boolean dateIsEarlierThanOrSameAs(Date aDate, Date otherDate) {
     return compareDayMonthYear(aDate, otherDate) <= 0;
   }
 
@@ -31,6 +31,10 @@ public class DateUtil {
 
   public static boolean dateTimeIsSameAs(Date aDate, Date otherDate) {
     return aDate.equals(otherDate);
+  }
+
+  public static boolean dateTimeIsEarlierThanOrSameAs(Date aDate, Date otherDate) {
+    return aDate.before(otherDate);
   }
 
   /*
