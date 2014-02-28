@@ -9,6 +9,7 @@ import java.util.ArrayList;
 class GOKU {
 
   private static ArrayList<Task> allTasks = new ArrayList<Task>();
+  private static TaskList _list = new TaskList();
 
   public Result executeCommand(Command command) {
     Action action = ActionFactory.buildAction(command);
@@ -18,6 +19,10 @@ class GOKU {
 
   public static ArrayList<Task> getAllTasks() {
     return allTasks;
+  }
+
+  public static TaskList getTaskList() {
+    return _list;
   }
 
 }
