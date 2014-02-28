@@ -28,14 +28,4 @@ class Add extends Action {
     return addTask(task);
   }
 
-  @Override
-  String getSuccessMsg(Object... args) {
-    return String.format(SUCCESS_MSG, args);
-  }
-
-  @Override
-  String getErrorMsg(Object... args) {
-    return String.format(FAILURE_MSG, args);
-  }
-
 }

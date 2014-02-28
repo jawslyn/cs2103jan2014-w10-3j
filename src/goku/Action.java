@@ -2,10 +2,16 @@ package goku;
 
 public abstract class Action {
   Command command;
+  String SUCCESS_MSG;
+  String FAILURE_MSG;
 
   abstract Result doIt();
 
-  abstract String getSuccessMsg(Object... args);
+  String getSuccessMsg(Object... args) {
+    return String.format(SUCCESS_MSG, args);
+  }
 
-  abstract String getErrorMsg(Object... args);
+  String getErrorMsg(Object... args) {
+    return String.format(FAILURE_MSG, args);
+  }
 }

@@ -27,16 +27,6 @@ class Delete extends Action {
     return deleteTask(command.getTask());
   }
 
-  @Override
-  String getSuccessMsg(Object... args) {
-    return String.format(SUCCESS_MSG, args);
-  }
-
-  @Override
-  String getErrorMsg(Object... args) {
-    return String.format(FAILURE_MSG, args);
-  }
-
   public void setCommand(Command command) {
     this.command = command;
   }
