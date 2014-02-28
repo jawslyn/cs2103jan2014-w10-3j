@@ -5,8 +5,9 @@ package goku;
  * analogous to real life tasks which the user wishes to note down.
  */
 class Add extends Action {
-  private static final String SUCCESS_MSG = "added \"%s\"";
-  private static final String FAILURE_MSG = "fail add \"%s\"";
+  private static final String MSG_SUCCESS = "Added: \"%s\"";
+  private static final String ERR_FAIL = "Fail to add: \"%s\"";
+  private static final String ERR_TASK_NO_NAME = "Task must have a name!";
   private Task task;
 
   /*
@@ -19,14 +20,40 @@ class Add extends Action {
   }
 
   @Override
-  Result doIt() {
-    return addTask(task);
+  public Result doIt() {
+    if (!task.isValid()) {
+      return unableToAddTaskWithoutName();
+    } else {
+      return addTask();
+    }
+
   }
 
-  public Result addTask(Task task) {
-    GOKU.getAllTasks().add(task);
-    return new Result(true, getSuccessMsg(SUCCESS_MSG, task.getTitle()), null,
-        GOKU.getAllTasks());
+  private Result addTask() {
+    boolean success = GOKU.getAllTasks().add(task);
+    if (success) {
+      return successAddTask();
+    } else {
+      return failedToAddTask();
+    }
   }
 
+  private Result successAddTask() {
+    Result result = Result.makeSuccessResult();
+    result.setSuccessMsg(String.format(MSG_SUCCESS, task.getTitle()));
+    result.setTasks(GOKU.getAllTasks());
+    return result;
+  }
+
+  private Result unableToAddTaskWithoutName() {
+    Result result = Result.makeFailureResult();
+    result.setErrorMsg(ERR_TASK_NO_NAME);
+    return result;
+  }
+
+  private Result failedToAddTask() {
+    Result result = Result.makeFailureResult();
+    result.setErrorMsg(String.format(ERR_FAIL, task.getTitle()));
+    return result;
+  }
 }
