@@ -41,6 +41,57 @@ public class Task {
 		isComplete = false;
 	}
 
+  /*
+   * A Task MUST have a title, else it will not be stored.
+   */
+  public boolean isValid() {
+    return (this.title != null);
+  }
+
+  public boolean titleMatches(Task otherTask) {
+    if (getTitle() == null || otherTask.getTitle() == null) {
+      return false;
+    }
+    String aTitle = getTitle().toLowerCase();
+    String otherTitle = otherTask.getTitle().toLowerCase();
+    return aTitle.contains(otherTitle);
+  }
+
+  public boolean tagsMatch(Task otherTask) {
+    String[] otherTags = otherTask.getTags();
+    for (String otherTag : otherTags) {
+      for (String tag : tags) {
+        if (otherTag.equalsIgnoreCase(tag)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public boolean isDueBefore(Date date) {
+    return DateUtil.dateTimeIsEarlierThanOrSameAs(deadline, date);
+  }
+
+  public boolean isDueBefore(Task task) {
+    return DateUtil.dateTimeIsEarlierThanOrSameAs(deadline, task.getDeadline());
+  }
+
+  public boolean inPeriod(Date date) {
+    return DateUtil.dateTimeIsEarlierThan(date, getEndDate())
+        && DateUtil.dateTimeIsLaterThan(date, getStartDate());
+  }
+
+  public void updateWith(Task otherTask) {
+    title = otherTask.title == null ? title : otherTask.title;
+    deadline = otherTask.deadline == null ? deadline : otherTask.deadline;
+    period = otherTask.period == null ? period : otherTask.period;
+    tags = otherTask.tags == null ? tags : otherTask.tags;
+    notes = otherTask.notes == null ? notes : otherTask.notes;
+    importance = otherTask.importance == null ? importance
+        : otherTask.importance;
+  }
+
 	@Override
 	public boolean equals(Object anObject) {
 		if (anObject == null) {

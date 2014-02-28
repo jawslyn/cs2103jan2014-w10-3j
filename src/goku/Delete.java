@@ -1,31 +1,58 @@
 package goku;
 
-import java.io.IOException;
-
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
  */
-class Delete {
-  private static final String DELETED = "deleted \"%s\"";
+class Delete extends Action {
+  private static final String MSG_SUCCESS = "Deleted \"%s\"";
+  private static final String ERR_FAILURE = "Many matches found for \"%s\".";
+  private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
+  private Task task;
 
-  public static void main(String[] args) throws IOException {
-
+  /*
+   * Called by ActionFactory on all actions to build the needed objects for this
+   * Action
+   */
+  @Override
+  public void construct() {
+    this.task = command.getTask();
   }
 
-  public Delete() {
-
+  @Override
+  Result doIt() {
+    return deleteTask();
   }
 
-  public Result deleteTask(Task task) {
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i) == task) {
-        GOKU.getAllTasks().remove(i);
-      }
+  public Result deleteTask() {
+    boolean success;
+    success = tryDeleteById();
+    if (success) {
+      return new Result(true, String.format(MSG_SUCCESS, task.getId()
+          .toString()), null, null);
     }
+    if (task.getTitle() == null) {
+      return new Result(false, null, String.format(ERR_NOT_FOUND, task.getId()
+          .toString()), null);
+    }
+    TaskList possibleDeletion = list.deleteTaskByTitle(task);
+    if (possibleDeletion.size() == 0) {
+      return new Result(true, String.format(MSG_SUCCESS, task.getTitle()),
+          null, null);
+    } else {
+      return new Result(false, null,
+          String.format(ERR_FAILURE, task.getTitle()), possibleDeletion);
+    }
+  }
 
-    return new Result(true, String.format(DELETED, task.getTitle()), null,
-        GOKU.getAllTasks());
+  private TaskList tryDeleteByTitle() {
+    TaskList possibleDeletion = list.deleteTaskByTitle(task);
+    return possibleDeletion;
+  }
+
+  private boolean tryDeleteById() {
+    Task deleted = list.deleteTaskById(task.getId());
+    return deleted != null;
   }
 
 }

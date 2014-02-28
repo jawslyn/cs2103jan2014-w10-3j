@@ -1,81 +1,81 @@
 package goku;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Date;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class DisplayTest {
-  Display display = new Display();
-  private static final String EMPTY = "there are no tasks";
+  TaskList list;
+
+  @Before
+  public void setup() {
+    list = GOKU.getTaskList();
+  }
+
+  @After
+  public void cleanUp() {
+    GOKU.getTaskList().clear();
+  }
 
   @Test
   public void displayAll_returnsAllTasks() throws Exception {
-    GOKU.getAllTasks().clear();
-
     Task a = new Task();
-    Task b = new Task();
-
     a.setTitle("hello");
+    Task b = new Task();
     b.setTitle("byebye");
+    int idA = a.getId();
+    int idB = b.getId();
+    list.addTask(a);
+    list.addTask(b);
 
-    GOKU.getAllTasks().add(a);
-    GOKU.getAllTasks().add(b);
+    Command command = makeDisplayCommandWithTask("display", null);
+    Action display = ActionFactory.buildAction(command);
+    Result actual = display.doIt();
 
-    Result actual = display.displayAll();
-    Result result = new Result(true, null, null, GOKU.getAllTasks());
-    assertEquals(result.getSuccessMsg(), actual.getSuccessMsg());
-    assertEquals(result.getErrorMsg(), actual.getErrorMsg());
-    assertEquals(result.isSuccess(), actual.isSuccess());
-    assertEquals(result.getTasks(), actual.getTasks());
+    assertEquals(2, actual.getTasks().size());
+    assertTrue(actual.isSuccess());
+    assertEquals("hello", actual.getTasks().getTaskById(idA).getTitle());
+    assertEquals("byebye", actual.getTasks().getTaskById(idB).getTitle());
+  }
 
+  private Command makeDisplayCommandWithTask(String source, Task task) {
+    return new Command(source, Command.Type.DISPLAY, task);
   }
 
   @Test
-  public void displayAll_returnsErrorWhenNoTasks() throws Exception {
-    GOKU.getAllTasks().clear();
-
-    Result actual = display.displayAll();
-    Result result = new Result(false, null, EMPTY, null);
-    assertEquals(result.getSuccessMsg(), actual.getSuccessMsg());
-    assertEquals(result.getErrorMsg(), actual.getErrorMsg());
-    assertEquals(result.isSuccess(), actual.isSuccess());
-    assertEquals(result.getTasks(), actual.getTasks());
-
-  }
-
-  @Test
-  public void displayDate_returnsTasksWithSameDate() throws Exception {
-    GOKU.getAllTasks().clear();
-
+  public void displayDate_returnsTasksDueBeforeDeadline() throws Exception {
     Task a = new Task();
     Task b = new Task();
     Task c = new Task();
 
-    a.setDeadline(new Date());
-    b.setDeadline(new Date(3));
-    c.setDeadline(a.getDeadline());
+    int idA = a.getId();
+
+    Date aDate = DateUtil.makeDate(1, 1);
+    Date otherDate = DateUtil.makeDate(3, 1);
+    Date deadline = DateUtil.makeDate(3, 1);
+
+    a.setDeadline(aDate);
+    b.setDeadline(otherDate);
+    c.setDeadline(deadline);
 
     a.setTitle("hello");
     b.setTitle("byebye");
-    c.setTitle("world");
+    c.setTitle("DEADLINE");
 
-    GOKU.getAllTasks().add(a);
-    GOKU.getAllTasks().add(b);
-    GOKU.getAllTasks().add(c);
+    list.addTask(a);
+    list.addTask(b);
 
-    ArrayList<Task> resultList = new ArrayList<Task>();
-    resultList.add(a);
-    resultList.add(c);
-    Result actual = display.displayDate(a);
-    Result result = new Result(true, null, null, resultList);
-    assertEquals(result.getSuccessMsg(), actual.getSuccessMsg());
-    assertEquals(result.getErrorMsg(), actual.getErrorMsg());
-    assertEquals(result.isSuccess(), actual.isSuccess());
-    assertEquals(result.getTasks(), actual.getTasks());
+    Command command = makeDisplayCommandWithTask("display", c);
+    Action display = ActionFactory.buildAction(command);
+    Result actual = display.doIt();
 
+    assertTrue(actual.isSuccess());
+    assertEquals(1, actual.getTasks().size());
+    assertEquals("hello", actual.getTasks().getTaskById(idA).getTitle());
   }
-
 }

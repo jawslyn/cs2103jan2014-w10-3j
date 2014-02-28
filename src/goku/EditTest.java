@@ -1,18 +1,29 @@
 package goku;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class EditTest {
-  Edit edit = new Edit();
+  TaskList list;
+
+  @Before
+  public void setup() {
+    list = GOKU.getTaskList();
+  }
+
+  @After
+  public void cleanUp() {
+    GOKU.getTaskList().clear();
+  }
 
   @Test
-  public void updateTask_returnsUpdatedResult() throws Exception {
-    GOKU.getAllTasks().clear();
-
+  public void editTask_returnsEditedResult() throws Exception {
     Task a = new Task();
 
     a.setTitle("hello");
@@ -22,26 +33,28 @@ public class EditTest {
     a.setTags(aTags);
     a.setNotes("a's notes");
 
-    Task b = a;
+    int idA = a.getId();
+
+    Task b = new Task(a);
     b.setTitle("byebye");
-    b.setDeadline(new Date(1));
-    b.setPeriod(new Date(2), new Date(3));
+    b.setDeadline(new Date());
+    b.setPeriod(new Date(), new Date());
     String[] bTags = { "here", "there" };
     b.setTags(bTags);
     b.setNotes("b's notes");
 
-    GOKU.getAllTasks().add(a);
+    list.addTask(a);
 
-    Result actual = edit.updateTask(b);
-    Task actualTask = actual.getTasks().get(0);
+    Command command = makeEditCommandWithTask("add", b);
+    Action edit = ActionFactory.buildAction(command);
 
-    assertEquals(actualTask.getTitle(), b.getTitle());
-    assertEquals(actualTask.getDeadline(), b.getDeadline());
-    assertEquals(actualTask.getDateRange(), b.getDateRange());
-    String[] actualTags = actualTask.getTags();
-    assertEquals(actualTags[0], bTags[0]);
-    assertEquals(actualTags[1], bTags[1]);
-    assertEquals(actualTask.getNotes(), b.getNotes());
+    Result result = edit.doIt();
+    Task editedTask = list.getTaskById(idA);
+    assertTrue(result.isSuccess());
+    assertEquals("byebye", editedTask.getTitle());
+  }
 
+  private Command makeEditCommandWithTask(String source, Task task) {
+    return new Command(source, Command.Type.EDIT, task);
   }
 }

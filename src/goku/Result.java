@@ -1,19 +1,28 @@
 package goku;
 
-import java.util.ArrayList;
 
 public class Result {
+  private static final String MSG_DEFAULT_SUCCESS = "Success!";
+  private static final String MSG_DEFAULT_FAILURE = "Failed.";
   private boolean isSuccess;
   private String successMsg;
   private String errorMsg;
-  private ArrayList<Task> tasks;
+  private TaskList tasks;
 
   public Result(boolean isSuccess, String successMsg, String errorMsg,
-      ArrayList<Task> tasks) {
+      TaskList tasks) {
     this.isSuccess = isSuccess;
     this.setSuccessMsg(successMsg);
     this.setErrorMsg(errorMsg);
     this.setTasks(tasks);
+  }
+
+  public static Result makeSuccessResult() {
+    return new Result(true, MSG_DEFAULT_SUCCESS, null, null);
+  }
+
+  public static Result makeFailureResult() {
+    return new Result(false, null, MSG_DEFAULT_FAILURE, null);
   }
 
   public String getErrorMsg() {
@@ -24,7 +33,7 @@ public class Result {
     return successMsg;
   }
 
-  public ArrayList<Task> getTasks() {
+  public TaskList getTasks() {
     return tasks;
   }
 
@@ -44,7 +53,7 @@ public class Result {
     this.successMsg = successMsg;
   }
 
-  public void setTasks(ArrayList<Task> tasks) {
+  public void setTasks(TaskList tasks) {
     this.tasks = tasks;
   }
 }

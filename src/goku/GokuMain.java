@@ -8,35 +8,59 @@ import java.util.Scanner;
 public class GokuMain {
   static UserInterface ui;
   static boolean shouldRun = true;
+  static GOKU goku = new GOKU();
 
   public static void main(String[] args) {
-    ui = makeUserInterface(args);
+    setUserInterface(args);
     runTillExit();
   }
 
-  private static UserInterface makeUserInterface(String[] args) {
-    if (args.length < 1 || args[0].equalsIgnoreCase("cli")) {
-    } else if (args[0].equalsIgnoreCase("gui")) {
-      System.out
-          .println("GUI not implemented yet, shall fire up CLI instead. Press Enter");
-      String nextLine = new Scanner(System.in).nextLine();
+  private static void setUserInterface(String[] args) {
+    if (shouldRunCli(args)) {
+      ui = new CLUserInterface();
+    } else if (shouldRunGui(args)) {
+      printImplementedGuiMsg();
+      promptUserToContinue();
+      ui = new CLUserInterface();
+    } else {
+      System.exit(0);
     }
-    return new CLUserInterface();
   }
 
   private static void runTillExit() {
-    System.out.println("HI");
     while (shouldRun) {
       Command c = ui.makeCommand(ui.getUserInput());
-      Result result = executeCommand(c);
-      ui.feedBack(result);
+      if (c.isStopCommand()) {
+        shouldRun = false;
+      } else {
+        Result result = executeCommand(c);
+        ui.feedBack(result);
+      }
     }
   }
 
   private static Result executeCommand(Command c) {
-    GOKU.executeCommand(c);
-    // TODO Auto-generated method stub
-    return null;
+    return goku.executeCommand(c);
+  }
+
+  private static void promptUserToContinue() {
+    Scanner sc = new Scanner(System.in);
+    sc.nextLine();
+    sc.close();
+
+  }
+
+  private static void printImplementedGuiMsg() {
+    System.out
+        .println("GUI not implemented yet, shall fire up CLI instead. Press Enter");
+  }
+
+  private static boolean shouldRunGui(String[] args) {
+    return args[0].equalsIgnoreCase("gui");
+  }
+
+  private static boolean shouldRunCli(String[] args) {
+    return args.length < 1 || args[0].equalsIgnoreCase("cli");
   }
 
   public void stop() {

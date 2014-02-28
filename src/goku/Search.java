@@ -1,47 +1,40 @@
 package goku;
 
-import java.io.IOException;
-import java.util.ArrayList;
 
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
  */
-class Search {
+class Search extends Action {
+  private static final String MSG_SUCCESS = "Found tasks!";
+  private Task taskToSearchFor;
 
-  public static void main(String[] args) throws IOException {
-
+  /*
+   * Called by ActionFactory on all actions to build the needed objects for this
+   * Action
+   */
+  @Override
+  public void construct() {
+    taskToSearchFor = command.getTask();
   }
 
-  public Search() {
-
-  }
-
-  public Result searchTag(Command command) {
-    ArrayList<Task> result = new ArrayList<Task>();
-    String tempString = command.getTask().getTags().toString();
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      String[] tempArray = GOKU.getAllTasks().get(i).getTags();
-      for (String element : tempArray) {
-        if (element.contains(tempString)) {
-          result.add(GOKU.getAllTasks().get(i));
-        }
-      }
+  @Override
+  Result doIt() {
+    if (taskToSearchFor.getTitle() != null) {
+      return searchTitle();
+    } else {
+      return searchTag();
     }
-
-    return new Result(true, null, null, result);
   }
 
-  public Result searchTitle(Command command) {
-    ArrayList<Task> result = new ArrayList<Task>();
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i).getTitle()
-          .contains(command.getTask().getTitle())) {
-        result.add(GOKU.getAllTasks().get(i));
-      }
-    }
+  public Result searchTag() {
+    TaskList foundTasks = list.findTaskByTags(taskToSearchFor);
+    return new Result(true, MSG_SUCCESS, null, foundTasks);
+  }
 
-    return new Result(true, null, null, result);
+  public Result searchTitle() {
+    TaskList foundTasks = list.findTaskByTitle(taskToSearchFor);
+    return new Result(true, MSG_SUCCESS, null, foundTasks);
   }
 
 }
