@@ -41,6 +41,13 @@ public class Task {
     isComplete = false;
   }
 
+  /*
+   * A Task MUST have a title, else it will not be stored.
+   */
+  public boolean isValid() {
+    return (this.title != null);
+  }
+
   @Override
   public boolean equals(Object anObject) {
     if (anObject == null) {
