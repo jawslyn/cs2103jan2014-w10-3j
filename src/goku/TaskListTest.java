@@ -124,6 +124,44 @@ public class TaskListTest {
   }
 
   @Test
+  public void findTaskByDeadLine_multipleMatches_returnsListWithMultipleMatches()
+      throws Exception {
+    Task aTask = makeTaskWithTitleAndDeadline("abc", 3, 8, 2014);
+    Task otherTask = makeTaskWithTitleAndDeadline("def", 4, 8, 2014);
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    Task dueTask = makeTaskWithTitleAndDeadline("123", 5, 8, 2014);
+    returnList = list.findTaskByDeadline(dueTask);
+    assertReturnListIsSize(2);
+  }
+
+  @Test
+  public void findTaskByDeadLine_uniqueMatch_returnsListWithOneMatch()
+      throws Exception {
+    Task aTask = makeTaskWithTitleAndDeadline("abc", 3, 8, 2014);
+    Task otherTask = makeTaskWithTitleAndDeadline("def", 5, 8, 2014);
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    Task dueTask = makeTaskWithTitleAndDeadline("123", 4, 8, 2014);
+    returnList = list.findTaskByDeadline(dueTask);
+    assertReturnListIsSize(1);
+  }
+
+  @Test
+  public void findTaskByDeadLine_noMatch_returnsEmptyList() throws Exception {
+    Task aTask = makeTaskWithTitleAndDeadline("abc", 3, 8, 2014);
+    Task otherTask = makeTaskWithTitleAndDeadline("def", 5, 8, 2014);
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    Task dueTask = makeTaskWithTitleAndDeadline("123", 2, 8, 2014);
+    returnList = list.findTaskByDeadline(dueTask);
+    assertReturnListIsSize(0);
+  }
+
+  @Test
   public void deleteTaskById_idNotFound_doesNotChangeList() throws Exception {
     Task aTask = makeTaskWithTitle("abc");
     Task otherTask = makeTaskWithTitle("abcdef");
@@ -201,6 +239,13 @@ public class TaskListTest {
     Task t = new Task();
     t.setTitle(title);
     t.setTags(tags);
+    return t;
+  }
+
+  private Task makeTaskWithTitleAndDeadline(String title, int d, int m, int y) {
+    Task t = new Task();
+    t.setTitle(title);
+    t.setDeadline(DateUtil.makeDate(d, m, y));
     return t;
   }
 

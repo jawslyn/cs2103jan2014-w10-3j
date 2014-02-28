@@ -43,7 +43,13 @@ public class TaskList {
   }
 
   public TaskList findTaskByDeadline(Task toFind) {
-    return null;
+    TaskList matches = new TaskList();
+    for (Task task : _list) {
+      if (task.isDueBefore(toFind)) {
+        matches.addTask(task);
+      }
+    }
+    return matches;
 
   }
 
