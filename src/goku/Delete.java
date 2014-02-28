@@ -5,8 +5,8 @@ package goku;
  * analogous to real life tasks which the user wishes to note down.
  */
 class Delete extends Action {
-  private static final String SUCCESS_MSG = "deleted \"%s\"";
-  private static final String FAILURE_MSG = "fail to delete \"%s\"";
+  private static final String MSG_SUCCESS = "Deleted \"%s\"";
+  private static final String ERR_FAILURE = "Failed to delete \"%s\"";
   private Task task;
 
   /*
@@ -29,7 +29,7 @@ class Delete extends Action {
         GOKU.getAllTasks().remove(i);
       }
     }
-    return new Result(true, getSuccessMsg(task.getTitle()), null,
+    return new Result(true, String.format(MSG_SUCCESS, task.getTitle()), null,
         GOKU.getAllTasks());
   }
 
