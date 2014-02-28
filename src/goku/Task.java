@@ -49,6 +49,9 @@ public class Task {
   }
 
   public boolean titleMatches(Task otherTask) {
+    if (getTitle() == null || otherTask.getTitle() == null) {
+      return false;
+    }
     String aTitle = getTitle().toLowerCase();
     String otherTitle = otherTask.getTitle().toLowerCase();
     return aTitle.contains(otherTitle);
@@ -77,6 +80,16 @@ public class Task {
   public boolean inPeriod(Date date) {
     return DateUtil.dateTimeIsEarlierThan(date, getEndDate())
         && DateUtil.dateTimeIsLaterThan(date, getStartDate());
+  }
+
+  public void updateWith(Task otherTask) {
+    title = otherTask.title == null ? title : otherTask.title;
+    deadline = otherTask.deadline == null ? deadline : otherTask.deadline;
+    period = otherTask.period == null ? period : otherTask.period;
+    tags = otherTask.tags == null ? tags : otherTask.tags;
+    notes = otherTask.notes == null ? notes : otherTask.notes;
+    importance = otherTask.importance == null ? importance
+        : otherTask.importance;
   }
 
   @Override
