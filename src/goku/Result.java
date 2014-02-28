@@ -3,6 +3,8 @@ package goku;
 import java.util.ArrayList;
 
 public class Result {
+  private static final String MSG_DEFAULT_SUCCESS = "Success!";
+  private static final String MSG_DEFAULT_FAILURE = "Failed.";
   private boolean isSuccess;
   private String successMsg;
   private String errorMsg;
@@ -14,6 +16,14 @@ public class Result {
     this.setSuccessMsg(successMsg);
     this.setErrorMsg(errorMsg);
     this.setTasks(tasks);
+  }
+
+  public static Result makeSuccessResult() {
+    return new Result(true, MSG_DEFAULT_SUCCESS, null, null);
+  }
+
+  public static Result makeFailureResult() {
+    return new Result(false, null, MSG_DEFAULT_FAILURE, null);
   }
 
   public String getErrorMsg() {
