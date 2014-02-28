@@ -31,7 +31,7 @@ public class SearchTest {
     GOKU.getAllTasks().add(b);
     GOKU.getAllTasks().add(c);
 
-    Result actual = search.searchTag(a);
+    Result actual = search.searchTag();
     ArrayList<Task> resultList = new ArrayList<Task>();
     resultList.add(a);
     resultList.add(c);
@@ -59,7 +59,7 @@ public class SearchTest {
     GOKU.getAllTasks().add(b);
     GOKU.getAllTasks().add(c);
 
-    Result actual = search.searchTitle(a);
+    Result actual = search.searchTitle();
     ArrayList<Task> resultList = new ArrayList<Task>();
     resultList.add(a);
     resultList.add(c);

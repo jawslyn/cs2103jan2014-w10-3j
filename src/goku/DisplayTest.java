@@ -38,12 +38,11 @@ public class DisplayTest {
     GOKU.getAllTasks().clear();
 
     Result actual = display.displayAll();
-    Result result = new Result(false, null, EMPTY, null);
+    Result result = new Result(true, EMPTY, null, new ArrayList<Task>());
     assertEquals(result.getSuccessMsg(), actual.getSuccessMsg());
     assertEquals(result.getErrorMsg(), actual.getErrorMsg());
     assertEquals(result.isSuccess(), actual.isSuccess());
     assertEquals(result.getTasks(), actual.getTasks());
-
   }
 
   @Test
@@ -69,7 +68,7 @@ public class DisplayTest {
     ArrayList<Task> resultList = new ArrayList<Task>();
     resultList.add(a);
     resultList.add(c);
-    Result actual = display.displayDate(a);
+    Result actual = display.displayDate();
     Result result = new Result(true, null, null, resultList);
     assertEquals(result.getSuccessMsg(), actual.getSuccessMsg());
     assertEquals(result.getErrorMsg(), actual.getErrorMsg());
