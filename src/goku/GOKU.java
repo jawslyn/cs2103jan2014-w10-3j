@@ -20,7 +20,9 @@ class GOKU {
         break;
       case DELETE :
         Delete delete = new Delete();
-        delete.deleteTask(command.getTask());
+        delete.setCommand(command);
+        delete.doIt();
+        // delete.deleteTask(command.getTask());
         break;
       case DISPLAY :
         Display display = new Display();

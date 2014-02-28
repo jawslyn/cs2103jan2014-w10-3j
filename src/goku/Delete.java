@@ -1,20 +1,14 @@
 package goku;
 
-import java.io.IOException;
-
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
  */
-class Delete {
-  private static final String DELETED = "deleted \"%s\"";
-
-  public static void main(String[] args) throws IOException {
-
-  }
+class Delete extends Action {
+  private static final String DELETE_SUCCESS = "deleted \"%s\"";
+  private static final String DELETE_FAILURE = "fail to delete \"%s\"";
 
   public Delete() {
-
   }
 
   public Result deleteTask(Task task) {
@@ -24,8 +18,27 @@ class Delete {
       }
     }
 
-    return new Result(true, String.format(DELETED, task.getTitle()), null,
-        GOKU.getAllTasks());
+    return new Result(true, String.format(DELETE_SUCCESS, task.getTitle()),
+        null, GOKU.getAllTasks());
+  }
+
+  @Override
+  Result doIt() {
+    return deleteTask(command.getTask());
+  }
+
+  @Override
+  String getSuccessMsg(String msg, Object... args) {
+    return String.format(msg, args);
+  }
+
+  @Override
+  String getErrorMsg(String msg, Object... args) {
+    return String.format(msg, args);
+  }
+
+  public void setCommand(Command command) {
+    this.command = command;
   }
 
 }
