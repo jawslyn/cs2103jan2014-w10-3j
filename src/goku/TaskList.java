@@ -13,6 +13,11 @@ public class TaskList {
     return _list.add(task);
   }
 
+  /*
+   * @param id
+   * 
+   * @returns the task with specified id
+   */
   public Task getTaskById(int id) {
     for (Task task : _list) {
       if (task.getId() == id) {
@@ -20,6 +25,26 @@ public class TaskList {
       }
     }
     return null;
+  }
+
+  public TaskList getAllCompleted() {
+    TaskList result = new TaskList();
+    for (Task task : _list) {
+      if (task.getStatus()) {
+        result.addTask(task);
+      }
+    }
+    return result;
+  }
+
+  public TaskList getAllIncomplete() {
+    TaskList result = new TaskList();
+    for (Task task : _list) {
+      if (!task.getStatus()) {
+        result.addTask(task);
+      }
+    }
+    return result;
   }
 
   public TaskList findTaskByTitle(Task toFind) {
@@ -53,12 +78,16 @@ public class TaskList {
 
   }
 
+  public Task deleteTaskByIndex(int index) {
+    return _list.remove(index);
+  }
+
   public Task deleteTaskById(int id) {
     int index = getIndexOfTaskById(id);
     if (index < 0) {
       return null;
     } else {
-      return _list.remove(index);
+      return deleteTaskByIndex(index);
     }
   }
 
@@ -73,6 +102,10 @@ public class TaskList {
 
   public TaskList getAll() {
     return this;
+  }
+
+  public void clear() {
+    _list.clear();
   }
 
   private TaskList deleteTask(TaskList matches) {
