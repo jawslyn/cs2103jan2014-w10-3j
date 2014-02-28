@@ -66,6 +66,19 @@ public class Task {
     return false;
   }
 
+  public boolean isDueBefore(Date date) {
+    return DateUtil.dateEarlierThanOrSameAs(deadline, date);
+  }
+
+  public boolean isDueBefore(Task task) {
+    return DateUtil.dateEarlierThanOrSameAs(deadline, task.getDeadline());
+  }
+
+  public boolean inPeriod(Date date) {
+    return DateUtil.dateTimeIsEarlierThan(date, getEndDate())
+        && DateUtil.dateTimeIsLaterThan(date, getStartDate());
+  }
+
   @Override
   public boolean equals(Object anObject) {
     if (anObject == null) {
