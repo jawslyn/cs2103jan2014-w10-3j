@@ -1,23 +1,23 @@
 package goku;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
  */
-class Edit {
-
-  public static void main(String[] args) throws IOException {
-
-  }
+class Edit extends Action {
 
   public Edit() {
 
   }
 
-  public Result updateTask(Command command) {
+  @Override
+  Result doIt() {
+    return updateTask();
+  }
+
+  public Result updateTask() {
     int ID = command.getTask().getId();
     ArrayList<Task> result = new ArrayList<Task>();
     for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
@@ -49,6 +49,10 @@ class Edit {
 
     return new Result(true, null, null, result);
 
+  }
+
+  public void setCommand(Command command) {
+    this.command = command;
   }
 
 }

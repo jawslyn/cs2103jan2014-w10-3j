@@ -41,7 +41,8 @@ class GOKU {
         break;
       case EDIT :
         Edit edit = new Edit();
-        edit.updateTask(command);
+        edit.setCommand(command);
+        edit.doIt();
         break;
     }
   }

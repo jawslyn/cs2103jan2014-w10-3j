@@ -32,7 +32,7 @@ public class EditTest {
 
     GOKU.getAllTasks().add(a);
 
-    Result actual = edit.updateTask(b);
+    Result actual = edit.updateTask();
     Task actualTask = actual.getTasks().get(0);
 
     assertEquals(actualTask.getTitle(), b.getTitle());
