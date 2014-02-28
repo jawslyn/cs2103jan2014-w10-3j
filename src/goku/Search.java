@@ -1,12 +1,12 @@
 package goku;
 
-import java.util.ArrayList;
 
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
  */
 class Search extends Action {
+  private static final String MSG_SUCCESS = "Found tasks!";
   private Task taskToSearchFor;
 
   /*
@@ -28,30 +28,13 @@ class Search extends Action {
   }
 
   public Result searchTag() {
-    ArrayList<Task> result = new ArrayList<Task>();
-    String tempString = taskToSearchFor.getTags().toString();
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      String[] tempArray = GOKU.getAllTasks().get(i).getTags();
-      for (String element : tempArray) {
-        if (element.contains(tempString)) {
-          result.add(GOKU.getAllTasks().get(i));
-        }
-      }
-    }
-
-    return new Result(true, null, null, result);
+    TaskList foundTasks = list.findTaskByTags(taskToSearchFor);
+    return new Result(true, MSG_SUCCESS, null, foundTasks);
   }
 
   public Result searchTitle() {
-    ArrayList<Task> result = new ArrayList<Task>();
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i).getTitle()
-          .contains(taskToSearchFor.getTitle())) {
-        result.add(GOKU.getAllTasks().get(i));
-      }
-    }
-
-    return new Result(true, null, null, result);
+    TaskList foundTasks = list.findTaskByTitle(taskToSearchFor);
+    return new Result(true, MSG_SUCCESS, null, foundTasks);
   }
 
 }

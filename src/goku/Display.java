@@ -1,6 +1,5 @@
 package goku;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 /*
@@ -38,67 +37,27 @@ class Display extends Action {
   }
 
   public Result displayAll() {
-    if (GOKU.getAllTasks().isEmpty()) {
-      return makeEmptyListResult();
-    }
-
-    return new Result(true, null, null, GOKU.getAllTasks());
+    return new Result(true, null, null, list);
   }
 
   public Result displayComplete() {
-    if (GOKU.getAllTasks().isEmpty()) {
-      return makeEmptyListResult();
-    }
-
-    ArrayList<Task> result = new ArrayList<Task>();
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i).getStatus() == true) {
-        result.add(GOKU.getAllTasks().get(i));
-      }
-    }
-
-    return new Result(true, null, null, result);
+    return new Result(true, null, null, list.getAllCompleted());
   }
 
   public Result displayDate() {
-    if (GOKU.getAllTasks().isEmpty()) {
-      return makeEmptyListResult();
-    }
-
     Date deadline = byDeadline;
-
-    ArrayList<Task> result = new ArrayList<Task>();
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i).getDeadline().equals(deadline)) {
-        result.add(GOKU.getAllTasks().get(i));
-      }
-    }
-
+    Task t = new Task();
+    t.setDeadline(deadline);
+    TaskList result = list.findTaskByDeadline(t);
     return new Result(true, null, null, result);
   }
 
   public Result displayIncomplete(Command command) {
-    if (GOKU.getAllTasks().isEmpty()) {
-      return makeEmptyListResult();
-    }
-
-    ArrayList<Task> result = new ArrayList<Task>();
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i).getStatus() == false) {
-        result.add(GOKU.getAllTasks().get(i));
-      }
-    }
-
-    return new Result(true, null, null, result);
+    return new Result(true, null, null, list.getAllIncomplete());
   }
 
   @Override
   public void setCommand(Command command) {
     this.command = command;
   }
-
-  private Result makeEmptyListResult() {
-    return new Result(true, MSG_EMPTY, null, GOKU.getAllTasks());
-  }
-
 }

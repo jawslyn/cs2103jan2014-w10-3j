@@ -6,7 +6,8 @@ package goku;
  */
 class Delete extends Action {
   private static final String MSG_SUCCESS = "Deleted \"%s\"";
-  private static final String ERR_FAILURE = "Failed to delete \"%s\"";
+  private static final String ERR_FAILURE = "Many matches found for \"%s\".";
+  private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
   private Task task;
 
   /*
@@ -20,17 +21,38 @@ class Delete extends Action {
 
   @Override
   Result doIt() {
-    return deleteTask(command.getTask());
+    return deleteTask();
   }
 
-  public Result deleteTask(Task task) {
-    for (int i = 0; i < GOKU.getAllTasks().size(); i++) {
-      if (GOKU.getAllTasks().get(i) == task) {
-        GOKU.getAllTasks().remove(i);
-      }
+  public Result deleteTask() {
+    boolean success;
+    success = tryDeleteById();
+    if (success) {
+      return new Result(true, String.format(MSG_SUCCESS, task.getId()
+          .toString()), null, null);
     }
-    return new Result(true, String.format(MSG_SUCCESS, task.getTitle()), null,
-        GOKU.getAllTasks());
+    if (task.getTitle() == null) {
+      return new Result(false, null, String.format(ERR_NOT_FOUND, task.getId()
+          .toString()), null);
+    }
+    TaskList possibleDeletion = list.deleteTaskByTitle(task);
+    if (possibleDeletion.size() == 0) {
+      return new Result(true, String.format(MSG_SUCCESS, task.getTitle()),
+          null, null);
+    } else {
+      return new Result(false, null,
+          String.format(ERR_FAILURE, task.getTitle()), possibleDeletion);
+    }
+  }
+
+  private TaskList tryDeleteByTitle() {
+    TaskList possibleDeletion = list.deleteTaskByTitle(task);
+    return possibleDeletion;
+  }
+
+  private boolean tryDeleteById() {
+    Task deleted = list.deleteTaskById(task.getId());
+    return deleted != null;
   }
 
 }

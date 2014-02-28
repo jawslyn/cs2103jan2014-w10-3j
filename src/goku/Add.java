@@ -10,6 +10,8 @@ class Add extends Action {
   private static final String ERR_TASK_NO_NAME = "Task must have a name!";
   private Task task;
 
+  // private TaskList list = GOKU.getTaskList();
+
   /*
    * Called by ActionFactory on all actions to build the needed objects for this
    * Action
@@ -30,7 +32,7 @@ class Add extends Action {
   }
 
   private Result addTask() {
-    boolean success = GOKU.getAllTasks().add(task);
+    boolean success = list.addTask(task);
     if (success) {
       return successAddTask();
     } else {
@@ -41,7 +43,7 @@ class Add extends Action {
   private Result successAddTask() {
     Result result = Result.makeSuccessResult();
     result.setSuccessMsg(String.format(MSG_SUCCESS, task.getTitle()));
-    result.setTasks(GOKU.getAllTasks());
+    result.setTasks(list);
     return result;
   }
 
