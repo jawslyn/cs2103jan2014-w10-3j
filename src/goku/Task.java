@@ -48,6 +48,24 @@ public class Task {
     return (this.title != null);
   }
 
+  public boolean titleMatches(Task otherTask) {
+    String aTitle = getTitle().toLowerCase();
+    String otherTitle = otherTask.getTitle().toLowerCase();
+    return aTitle.contains(otherTitle);
+  }
+
+  public boolean tagsMatch(Task otherTask) {
+    String[] otherTags = otherTask.getTags();
+    for (String otherTag : otherTags) {
+      for (String tag : tags) {
+        if (otherTag.equalsIgnoreCase(tag)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   @Override
   public boolean equals(Object anObject) {
     if (anObject == null) {
