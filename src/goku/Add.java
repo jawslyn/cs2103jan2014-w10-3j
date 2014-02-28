@@ -5,8 +5,8 @@ package goku;
  * analogous to real life tasks which the user wishes to note down.
  */
 class Add extends Action {
-  private static final String SUCCESS_ADD = "added \"%s\"";
-  private static final String FAILURE_ADD = "fail add \"%s\"";
+  private static final String SUCCESS_MSG = "added \"%s\"";
+  private static final String FAILURE_MSG = "fail add \"%s\"";
 
   public Add() {
 
@@ -17,29 +17,25 @@ class Add extends Action {
   }
 
   public Result addTask(Task task) {
-    // ArrayList<Task> list = GOKU.getAllTasks();
-    // list.add(task);
     GOKU.getAllTasks().add(task);
-    return new Result(true, getSuccessMsg(SUCCESS_ADD, task.getTitle()), null,
+    return new Result(true, getSuccessMsg(SUCCESS_MSG, task.getTitle()), null,
         GOKU.getAllTasks());
-
   }
 
   @Override
   Result doIt() {
     Task task = command.getTask();
-
     return addTask(task);
   }
 
   @Override
-  String getSuccessMsg(String msg, Object... args) {
-    return String.format(SUCCESS_ADD, args);
+  String getSuccessMsg(Object... args) {
+    return String.format(SUCCESS_MSG, args);
   }
 
   @Override
-  String getErrorMsg(String msg, Object... args) {
-    return String.format(FAILURE_ADD, args);
+  String getErrorMsg(Object... args) {
+    return String.format(FAILURE_MSG, args);
   }
 
 }

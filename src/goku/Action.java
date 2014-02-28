@@ -5,7 +5,7 @@ public abstract class Action {
 
   abstract Result doIt();
 
-  abstract String getSuccessMsg(String msg, Object... args);
+  abstract String getSuccessMsg(Object... args);
 
-  abstract String getErrorMsg(String msg, Object... args);
+  abstract String getErrorMsg(Object... args);
 }
