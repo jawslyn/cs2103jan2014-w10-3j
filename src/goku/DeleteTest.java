@@ -94,9 +94,9 @@ public class DeleteTest {
     b.setTitle("byebye");
     c.setTitle("world");
 
-    GOKU.getAllTasks().add(a);
-    GOKU.getAllTasks().add(b);
-    GOKU.getAllTasks().add(c);
+    GOKU.getTaskList().addTask(a);
+    GOKU.getTaskList().addTask(b);
+    GOKU.getTaskList().addTask(c);
 
     // Result actual = delete.deleteTask(b);
     // Result result = new Result(true, String.format(DELETED, "byebye"), null,
