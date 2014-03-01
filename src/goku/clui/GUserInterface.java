@@ -1,39 +1,46 @@
 package goku.clui;
 
 import goku.Command;
+import goku.GOKU;
+import goku.ObservableTaskList;
 import goku.Result;
+import goku.autocomplete.WordAutocomplete;
 
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.LayoutStyle;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.text.BadLocationException;
 
 public class GUserInterface extends JFrame implements UserInterface,
-    DocumentListener {
-
+    DocumentListener, ListDataListener {
+  private GOKU goku;
   private JLabel jLabel1;
   private JScrollPane jScrollPane1;
   private JTextArea textArea;
+  private JList listArea;
+  private ObservableTaskList list;
+  private WordAutocomplete autoComplete;
 
   private static final String COMMIT_ACTION = "commit";
 
@@ -41,20 +48,34 @@ public class GUserInterface extends JFrame implements UserInterface,
     INSERT, COMPLETION
   };
 
-  private final List<String> words;
+  private List<String> words;
   private Mode mode = Mode.INSERT;
+  private Parser parser = new GUIParser();
 
-  public GUserInterface() {
-    super("TextAreaDemo");
-    initComponents();
+  public GUserInterface(GOKU goku) {
+    super("G.O.K.U.");
+    this.goku = goku;
+    list = (ObservableTaskList) goku.getTaskList();
+    list.addListDataListener(this);
 
-    textArea.getDocument().addDocumentListener(this);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    Container contentPane = this.getContentPane();
+    setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-    InputMap im = textArea.getInputMap();
-    ActionMap am = textArea.getActionMap();
-    im.put(KeyStroke.getKeyStroke("ENTER"), COMMIT_ACTION);
-    am.put(COMMIT_ACTION, new CommitAction());
+    setLabel();
 
+    setInputArea();
+
+    setListArea();
+
+    this.pack();
+    this.setVisible(true);
+
+    setCompletionWords();
+  }
+
+  private void setCompletionWords() {
+    autoComplete = new WordAutocomplete();
     words = new ArrayList<String>(5);
     words.add("spark");
     words.add("special");
@@ -63,76 +84,45 @@ public class GUserInterface extends JFrame implements UserInterface,
     words.add("swing");
   }
 
-  private void initComponents() {
-    jLabel1 = new JLabel("Try typing 'spectacular' or 'Swing'...");
+  private void setListArea() {
+    // String[] data = { "hi", "bye" };
+    ArrayList<String> data = new ArrayList<String>();
+    data.add("HI");
+    data.add("BYE");
+    listArea = new JList(); // data has type Object[]
+    listArea.setModel(list);
+    listArea.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    listArea.setLayoutOrientation(JList.VERTICAL);
+    listArea.setVisibleRowCount(-1);
 
+    JScrollPane listScroller = new JScrollPane(listArea);
+    listScroller.setPreferredSize(new Dimension(250, 80));
+    getContentPane().add(listScroller);
+  }
+
+  private void setInputArea() {
     textArea = new JTextArea();
-    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     textArea.setColumns(20);
     textArea.setLineWrap(true);
-    textArea.setRows(5);
     textArea.setWrapStyleWord(true);
+    getContentPane().add(textArea);
 
-    jScrollPane1 = new JScrollPane(textArea);
+    textArea.getDocument().addDocumentListener(this);
 
-    GroupLayout layout = new GroupLayout(getContentPane());
-    getContentPane().setLayout(layout);
+    InputMap im = textArea.getInputMap();
+    ActionMap am = textArea.getActionMap();
+    im.put(KeyStroke.getKeyStroke("ENTER"), COMMIT_ACTION);
+    am.put(COMMIT_ACTION, new CommitAction());
+  }
 
-    // Create a parallel group for the horizontal axis
-    ParallelGroup hGroup = layout
-        .createParallelGroup(GroupLayout.Alignment.LEADING);
-    // Create a sequential and a parallel groups
-    SequentialGroup h1 = layout.createSequentialGroup();
-    ParallelGroup h2 = layout
-        .createParallelGroup(GroupLayout.Alignment.TRAILING);
-    // Add a scroll panel and a label to the parallel group h2
-    h2.addComponent(jScrollPane1, GroupLayout.Alignment.LEADING,
-        GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE);
-    h2.addComponent(jLabel1, GroupLayout.Alignment.LEADING,
-        GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE);
-
-    // Add a container gap to the sequential group h1
-    h1.addContainerGap();
-    // Add the group h2 to the group h1
-    h1.addGroup(h2);
-    h1.addContainerGap();
-    // Add the group h1 to hGroup
-    hGroup.addGroup(Alignment.TRAILING, h1);
-    // Create the horizontal group
-    layout.setHorizontalGroup(hGroup);
-
-    // Create a parallel group for the vertical axis
-    ParallelGroup vGroup = layout
-        .createParallelGroup(GroupLayout.Alignment.LEADING);
-    // Create a sequential group
-    SequentialGroup v1 = layout.createSequentialGroup();
-    // Add a container gap to the sequential group v1
-    v1.addContainerGap();
-    // Add a label to the sequential group v1
-    v1.addComponent(jLabel1);
-    v1.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED);
-    // Add scroll panel to the sequential group v1
-    v1.addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 100,
-        Short.MAX_VALUE);
-    v1.addContainerGap();
-    // Add the group v1 to vGroup
-    vGroup.addGroup(v1);
-    // Create the vertical group
-    layout.setVerticalGroup(vGroup);
-    pack();
-
+  private void setLabel() {
+    jLabel1 = new JLabel("Preim implementation of GUI for G.O.K.U.");
+    getContentPane().add(jLabel1);
   }
 
   @Override
-  public Command getUserInput(String input) {
+  public void feedBack(Result result) {
     // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String feedBack(Result result) {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
@@ -162,26 +152,22 @@ public class GUserInterface extends JFrame implements UserInterface,
         break;
       }
     }
-    if (pos - w < 2) {
-      // Too few chars
-      return;
-    }
+    // if (pos - w < 2) {
+    // // Too few chars
+    // return;
+    // }
 
     String prefix = content.substring(w + 1).toLowerCase();
-    int n = Collections.binarySearch(words, prefix);
-    if (n < 0 && -n <= words.size()) {
-      String match = words.get(-n - 1);
-      if (match.startsWith(prefix)) {
-        // A completion is found
-        String completion = match.substring(pos - w);
-        // We cannot modify Document from within notification,
-        // so we submit a task that does the change later
-        SwingUtilities.invokeLater(new CompletionTask(completion, pos + 1));
-      }
-    } else {
-      // Nothing found
+
+    List<String> completions = autoComplete.complete(prefix);
+    if (completions.size() == 0) {
       mode = Mode.INSERT;
+    } else {
+      String match = completions.get(0);
+      String completion = match.substring(pos - w);
+      SwingUtilities.invokeLater(new CompletionTask(completion, pos + 1));
     }
+
   }
 
   @Override
@@ -217,20 +203,69 @@ public class GUserInterface extends JFrame implements UserInterface,
         textArea.setCaretPosition(pos + 1);
         mode = Mode.INSERT;
       } else {
-        textArea.replaceSelection("\n");
+        String input = textArea.getText();
+        Command c = makeCommand(input);
+        System.out.println(c.toString());
+        Result result = goku.executeCommand(c);
+        feedBack(result);
+        textArea.setText("");
+        // textArea.replaceSelection("\n");
       }
     }
   }
 
   public static void main(String args[]) {
+    GOKU goku = new GOKU();
+    goku.setTaskList(new ObservableTaskList());
+    GUserInterface gui = new GUserInterface(goku);
+    gui.run();
+  }
+
+  @Override
+  public Command makeCommand(String input) {
+    return parser.parseToCommand(input);
+  }
+
+  @Override
+  public String getUserInput() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void contentsChanged(ListDataEvent e) {
+  }
+
+  @Override
+  public void intervalAdded(ListDataEvent e) {
+  }
+
+  @Override
+  public void intervalRemoved(ListDataEvent e) {
+  }
+
+  @Override
+  public void run() {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        // Turn off metal's use of bold fonts
         UIManager.put("swing.boldMetal", Boolean.FALSE);
-        new GUserInterface().setVisible(true);
+        setVisible(true);
       }
     });
+
   }
 
+  /**
+   * Parser that deals with String input from user to extract necessary
+   * information to create Command object
+   * 
+   * @author jchiam
+   */
+  // TODO
+  protected class GUIParser extends Parser {
+    public GUIParser() {
+      super();
+    }
+  }
 }
