@@ -1,8 +1,9 @@
 package goku;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class TaskList {
+public class TaskList implements Iterable<Task> {
   private ArrayList<Task> _list;
 
   public TaskList() {
@@ -123,5 +124,10 @@ public class TaskList {
 
   private Task getTaskByIndex(int index) {
     return _list.get(index);
+  }
+
+  @Override
+  public Iterator<Task> iterator() {
+    return _list.listIterator();
   }
 }
