@@ -33,7 +33,7 @@ public class DisplayTest {
     list.addTask(a);
     list.addTask(b);
 
-    Command command = makeDisplayCommandWithTask("display", null);
+    Command command = makeDisplayCommandWithTask("display", new Task());
     Action display = ActionFactory.buildAction(command);
     Result actual = display.doIt();
 

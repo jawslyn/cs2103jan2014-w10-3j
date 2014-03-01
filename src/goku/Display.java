@@ -20,10 +20,10 @@ class Display extends Action {
    */
   @Override
   public void construct() {
-    if (command.getTask() == null) {
-      displayAll = true;
-    } else {
+    if (command.getTask().getDeadline() != null) {
       byDeadline = command.getTask().getDeadline();
+    } else {
+      displayAll = true;
     }
   }
 
@@ -37,11 +37,11 @@ class Display extends Action {
   }
 
   public Result displayAll() {
-    return new Result(true, null, null, list);
+    return new Result(true, MSG_SUCCESS, null, list);
   }
 
   public Result displayComplete() {
-    return new Result(true, null, null, list.getAllCompleted());
+    return new Result(true, MSG_SUCCESS, null, list.getAllCompleted());
   }
 
   public Result displayDate() {
@@ -53,7 +53,7 @@ class Display extends Action {
   }
 
   public Result displayIncomplete(Command command) {
-    return new Result(true, null, null, list.getAllIncomplete());
+    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
   }
 
   @Override
