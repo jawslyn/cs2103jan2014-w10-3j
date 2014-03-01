@@ -3,6 +3,7 @@ package goku.clui;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import goku.Command;
+import goku.GOKU;
 import goku.Task;
 
 import java.io.ByteArrayOutputStream;
@@ -19,16 +20,18 @@ import org.junit.Test;
 public class CLUserInterfaceTest {
 
   /** GLOBAL TEST VARIABLES AND OBJECTS **/
+  GOKU goku;
+  CLUserInterface ui;
   Parser parser;
-  UserInterface ui;
   String[] tags;
   ByteArrayOutputStream outContent;
   String NEWLINE = System.lineSeparator();
 
   @Before
   public void initObjects() {
-    parser = new CLUserInterface().getParser();
-    ui = new CLUserInterface();
+    goku = new GOKU();
+    ui = new CLUserInterface(goku);
+    parser = ui.getParser();
     parser.restOfInput = new String();
     tags = new String[10];
   }

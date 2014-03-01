@@ -1,13 +1,11 @@
 package goku.clui;
 
 import goku.Command;
-import goku.Command.SortOrder;
-import goku.Command.Type;
+import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
 
-import java.util.Date;
 import java.util.ListIterator;
 import java.util.Scanner;
 
@@ -18,14 +16,31 @@ import java.util.Scanner;
  * @author jchiam
  */
 public class CLUserInterface implements UserInterface {
-  private CLUIParser parser;
+  Parser parser;
+  private GOKU goku;
   private Scanner sc;
   private String input;
 
-  public CLUserInterface() {
+  public CLUserInterface(GOKU goku) {
+    goku = goku;
     parser = new CLUIParser();
     sc = new Scanner(System.in);
     input = "";
+  }
+
+  @Override
+  public void run() {
+    boolean shouldRun = true;
+    while (shouldRun) {
+      Command c = makeCommand(getUserInput());
+      if (c.isStopCommand()) {
+        shouldRun = false;
+      } else {
+        Result result = goku.executeCommand(c);
+        feedBack(result);
+      }
+    }
+
   }
 
   public Parser getParser() {
@@ -78,57 +93,8 @@ public class CLUserInterface implements UserInterface {
    */
   // TODO
   protected class CLUIParser extends Parser {
-
     public CLUIParser() {
       super();
     }
-
-    /** GLOBAL VARIABLES **/
-    private Type commandType = null;
-    private SortOrder sortOrder = null;
-    private String[] taskTags = new String[10]; // holds 10 tags at most
-    private Date taskDeadline = null;
-
-    // unprocessed input
-
-    /*
-     * Parses
-     */
-    public Command parseToCommand(String input) {
-      Task toDo = parser.parseString(input);
-      if (sortOrder == null) {
-        return new Command(input, commandType, toDo);
-      } else {
-        return new Command(input, commandType, toDo, sortOrder);
-      }
-    }
-
-    /**
-     * Method: parseString
-     * 
-     * @param input
-     *          string to be parsed
-     * @return created task
-     */
-    @Override
-    public Task parseString(String input) {
-
-      String firstWord = splitCmdAndParam(input);
-
-      commandType = determineCommandType(firstWord);
-
-      sortOrder = determineSortOrder();
-
-      // PULL OUT NECESSARY INFO FOR TASK
-      // 3. remainder as title
-
-      taskTags = extractTags();
-
-      taskDeadline = extractDeadline();
-
-      return createTask(false, taskDeadline, taskTags, restOfInput);
-    }
-
   }
-
 }
