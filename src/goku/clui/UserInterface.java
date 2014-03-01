@@ -12,6 +12,10 @@ import goku.Result;
  **/
 public interface UserInterface {
 
+  /*** STRING CONSTANTS ***/
+  public static final String INPUT_ERROR = "Input cannot be recognised.";
+  public static final String DATE_ERROR = "Invalid date(s).";
+
   /**
    * Method: getUserInput
    * 

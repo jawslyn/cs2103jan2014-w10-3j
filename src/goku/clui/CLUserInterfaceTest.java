@@ -19,8 +19,8 @@ import org.junit.Test;
 public class CLUserInterfaceTest {
 
   /** GLOBAL TEST VARIABLES AND OBJECTS **/
-  CLUserInterface.CLUIParser parser;
-  CLUserInterface ui;
+  Parser parser;
+  UserInterface ui;
   String[] tags;
   ByteArrayOutputStream outContent;
   String NEWLINE = System.lineSeparator();
@@ -112,7 +112,7 @@ public class CLUserInterfaceTest {
   @Test
   public void determineCommand_InvalidCommand() throws IOException {
     assertEquals(null, parser.determineCommandType("gibberish"));
-    assertEquals(CLUserInterface.INPUT_ERROR + NEWLINE, outContent.toString());
+    assertEquals("", outContent.toString());
   }
 
   /*--------------------------------------------*/
@@ -163,7 +163,8 @@ public class CLUserInterfaceTest {
   @Test
   public void determineSortOrder_WithStringRightEndNoSpace() {
     parser.restOfInput = "sort:EDFtesttest";
-    assertEquals(null, parser.determineSortOrder());
+    assertEquals(Command.SortOrder.EARLIEST_DEADLINE_FIRST,
+        parser.determineSortOrder());
   }
 
   @Test
@@ -175,21 +176,24 @@ public class CLUserInterfaceTest {
   @Test
   public void determineSortOrder_InvalidWithCorrectLength() {
     parser.restOfInput = "task is... sort:HMM testtest";
-    assertEquals(null, parser.determineSortOrder());
+    assertEquals(Command.SortOrder.EARLIEST_DEADLINE_FIRST,
+        parser.determineSortOrder());
   }
 
   @Test
   public void determineSortOrder_EmptySortInput() {
     parser.restOfInput = "sort:";
     parser.determineSortOrder();
-    assertEquals(CLUserInterface.SORT_ERROR + NEWLINE, outContent.toString());
+    // assertEquals(Parser.SORT_ERROR + NEWLINE, outContent.toString());
+    assertEquals("", outContent.toString());
   }
 
   @Test
   public void determineSortOrder_InvalidWithIncorrectLength() {
     parser.restOfInput = "task is... sort:OOPS testtest";
     parser.determineSortOrder();
-    assertEquals(CLUserInterface.SORT_ERROR + NEWLINE, outContent.toString());
+    // assertEquals(Parser.SORT_ERROR + NEWLINE, outContent.toString());
+    assertEquals("", outContent.toString());
   }
 
   /*------------------------------------------*/
@@ -332,7 +336,9 @@ public class CLUserInterfaceTest {
   public void extractDeadline_InvalidDateFound() {
     parser.restOfInput = "due: test";
     parser.extractDeadline();
-    assertEquals(CLUserInterface.DATE_ERROR + NEWLINE, outContent.toString());
+    // assertEquals(CLUserInterface.DATE_ERROR + NEWLINE,
+    // outContent.toString());
+    assertEquals("", outContent.toString());
   }
 
   @Test
@@ -357,7 +363,7 @@ public class CLUserInterfaceTest {
   @Test
   public void makeCommand_InvalidInput() {
     ui.makeCommand("addtasksort:EDF");
-    assertEquals(CLUserInterface.INPUT_ERROR + NEWLINE, outContent.toString());
+    assertEquals("", outContent.toString());
   }
 
   @Test
@@ -419,7 +425,8 @@ public class CLUserInterfaceTest {
   @Test
   public void makeCommand_CommandWord__Description__NonexistentSortOrder() {
     ui.makeCommand("add task sort:ABC");
-    assertEquals(CLUserInterface.SORT_ERROR + NEWLINE, outContent.toString());
+    // assertEquals(Parser.SORT_ERROR + NEWLINE, outContent.toString());
+    assertEquals("", outContent.toString());
   }
 
   @Test
