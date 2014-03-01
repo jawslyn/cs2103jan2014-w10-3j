@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class WordAutocomplete {
-  private static final List<String> DEFAULT_CORPUS = new ArrayList<String>();
+  private final List<String> DEFAULT_CORPUS = makeDefaultCorpus();
   private List<String> corpus;
 
   public WordAutocomplete() {
@@ -68,6 +68,14 @@ public class WordAutocomplete {
    */
   private int getInsertionPoint(int index) {
     return -(index + 1);
+  }
+
+  private List<String> makeDefaultCorpus() {
+    List<String> defaultCorpus = new ArrayList<String>();
+    defaultCorpus.add("add");
+    defaultCorpus.add("view");
+    defaultCorpus.add("edit");
+    return defaultCorpus;
   }
 
   private void setDefaultCorpus() {
