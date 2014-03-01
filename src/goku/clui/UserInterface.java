@@ -35,4 +35,6 @@ public interface UserInterface {
    */
   void feedBack(Result result);
 
+  void run();
+
 }

@@ -1,6 +1,8 @@
 package goku.clui;
 
 import goku.Command;
+import goku.Command.SortOrder;
+import goku.Command.Type;
 import goku.Task;
 
 import java.text.ParseException;
@@ -18,14 +20,14 @@ public abstract class Parser {
 
   protected String restOfInput = new String();
 
-  /**
-   * Method: parseString
-   * 
-   * @param input
-   *          command string
-   * @return Task object
-   */
-  abstract Task parseString(String input);
+  /** GLOBAL VARIABLES **/
+  protected Type commandType = null;
+
+  protected SortOrder sortOrder = null;
+
+  protected String[] taskTags = new String[10];
+
+  protected Date taskDeadline = null;
 
   /**
    * Method: determineCommandType
@@ -333,5 +335,39 @@ public abstract class Parser {
     toDo.setTitle(title);
 
     return toDo;
+  }
+
+  /**
+   * Method: parseString
+   * 
+   * @param input
+   *          string to be parsed
+   * @return created task
+   */
+  public Task parseString(String input) {
+
+    String firstWord = splitCmdAndParam(input);
+
+    commandType = determineCommandType(firstWord);
+
+    sortOrder = determineSortOrder();
+
+    // PULL OUT NECESSARY INFO FOR TASK
+    // 3. remainder as title
+
+    taskTags = extractTags();
+
+    taskDeadline = extractDeadline();
+
+    return createTask(false, taskDeadline, taskTags, restOfInput);
+  }
+
+  public Command parseToCommand(String input) {
+    Task toDo = parseString(input);
+    if (sortOrder == null) {
+      return new Command(input, commandType, toDo);
+    } else {
+      return new Command(input, commandType, toDo, sortOrder);
+    }
   }
 }
