@@ -122,7 +122,7 @@ public class TaskList implements Iterable<Task> {
     return _list.indexOf(getTaskById(id));
   }
 
-  private Task getTaskByIndex(int index) {
+  protected Task getTaskByIndex(int index) {
     return _list.get(index);
   }
 
@@ -130,4 +130,5 @@ public class TaskList implements Iterable<Task> {
   public Iterator<Task> iterator() {
     return _list.listIterator();
   }
+
 }
