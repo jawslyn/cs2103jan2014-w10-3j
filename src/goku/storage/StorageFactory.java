@@ -9,7 +9,7 @@ public class StorageFactory {
    * disk. This could possibly be expanded to include storage in the cloud, e.g.
    * Dropbox, Google Drive, as a form of backup.
    */
-  public Storage getDefaultStorage() {
+  public static Storage getDefaultStorage() {
     return new LocalFileStorage();
   }
 }

@@ -5,7 +5,10 @@ import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
+import goku.storage.Storage;
+import goku.storage.StorageFactory;
 
+import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Scanner;
 
@@ -20,12 +23,14 @@ public class CLUserInterface implements UserInterface {
   private GOKU goku;
   private Scanner sc;
   private String input;
+  private Storage storage;
 
   public CLUserInterface(GOKU goku) {
     this.goku = goku;
     parser = new CLUIParser();
     sc = new Scanner(System.in);
     input = "";
+    storage = StorageFactory.getDefaultStorage();
   }
 
   @Override
@@ -38,6 +43,14 @@ public class CLUserInterface implements UserInterface {
       } else {
         Result result = goku.executeCommand(c);
         feedBack(result);
+        try {
+          storage.saveAll(GOKU.getTaskList());
+          System.out.println("save all");
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+          System.out.println("e");
+        }
       }
     }
   }

@@ -1,5 +1,8 @@
 package goku.storage;
 
+import goku.Task;
+import goku.TaskList;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -33,7 +36,7 @@ public class LocalFileStorage implements Storage {
       throw new NullPointerException(ERR_NULL_STOREABLE);
     }
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-      bw.write(s.toStringFormat());
+      bw.write(s.toStorageFormat());
       bw.write(System.lineSeparator());
     }
   }
@@ -42,16 +45,30 @@ public class LocalFileStorage implements Storage {
    * Saves an array of Storeable into file
    */
   @Override
-  public void saveAll(Storeable[] array) throws IOException {
+  public void saveAllArr(Storeable[] array) throws IOException {
     if (array == null) {
       throw new NullPointerException(ERR_NULL_STOREABLE_ARRAY);
     }
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
       for (Storeable s : array) {
-        bw.write(s.toStringFormat());
+        bw.write(s.toStorageFormat());
         bw.write(System.lineSeparator());
       }
     }
+  }
+
+  @Override
+  public void saveAll(TaskList list) throws IOException {
+    if (list == null) {
+      throw new NullPointerException(ERR_NULL_STOREABLE_ARRAY);
+    }
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+      for (Task t : list) {
+        bw.write(t.toStorageFormat());
+        bw.write(System.lineSeparator());
+      }
+    }
+
   }
 
   @Override

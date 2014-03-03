@@ -13,7 +13,7 @@ public class MockStoreable implements Storeable {
   }
 
   @Override
-  public String toStringFormat() {
+  public String toStorageFormat() {
     return "" + this.id + " : " + this.title;
   }
 

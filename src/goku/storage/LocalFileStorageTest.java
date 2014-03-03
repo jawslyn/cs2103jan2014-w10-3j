@@ -33,13 +33,13 @@ public class LocalFileStorageTest {
 
   @Test(expected = NullPointerException.class)
   public void save_NullStoreableArray_throwsException() throws IOException {
-    storage.saveAll(null);
+    storage.saveAllArr(null);
   }
 
   @Test
   public void save_EmptyStoreableArray() throws Exception {
     MockStoreable[] mockArray = {};
-    storage.saveAll(mockArray);
+    storage.saveAllArr(mockArray);
     String expected = getStringRepresentation(mockArray);
     String actual = readAllFromFile();
     assertEquals(expected, actual);
@@ -58,7 +58,7 @@ public class LocalFileStorageTest {
   public void testSaveStoreableArray() throws FileNotFoundException,
       IOException {
     MockStoreable[] mockArray = makeMockStoreableArray();
-    storage.saveAll(mockArray);
+    storage.saveAllArr(mockArray);
     String expected = getStringRepresentation(mockArray);
     String actual = readAllFromFile();
     assertEquals(expected, actual);
@@ -69,7 +69,7 @@ public class LocalFileStorageTest {
   }
 
   private String getStringRepresentation(MockStoreable mockUnit) {
-    return mockUnit.toStringFormat() + System.lineSeparator();
+    return mockUnit.toStorageFormat() + System.lineSeparator();
   }
 
   private MockStoreable[] makeMockStoreableArray() {
@@ -82,7 +82,7 @@ public class LocalFileStorageTest {
   private String getStringRepresentation(MockStoreable[] mockArray) {
     StringBuilder sb = new StringBuilder();
     for (MockStoreable s : mockArray) {
-      sb.append(s.toStringFormat());
+      sb.append(s.toStorageFormat());
       sb.append(System.lineSeparator());
     }
     return sb.toString();

@@ -1,5 +1,7 @@
 package goku.storage;
 
+import goku.TaskList;
+
 import java.io.IOException;
 
 /*
@@ -8,7 +10,9 @@ import java.io.IOException;
 public interface Storage {
   public void save(Storeable s) throws IOException;
 
-  public void saveAll(Storeable[] array) throws IOException;
+  public void saveAllArr(Storeable[] array) throws IOException;
+
+  public void saveAll(TaskList list) throws IOException;
 
   public void delete();
 }
