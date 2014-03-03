@@ -1,4 +1,4 @@
-package goku.clui;
+package goku.ui;
 
 import goku.Command;
 import goku.Command.SortOrder;
@@ -15,7 +15,7 @@ import java.util.Date;
  * 
  * @author jchiam
  **/
-public abstract class Parser {
+public abstract class JParser {
   protected static String SORT_ERROR = "Invalid sort.";
 
   protected String restOfInput = new String();

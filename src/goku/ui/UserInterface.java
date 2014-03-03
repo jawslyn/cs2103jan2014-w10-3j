@@ -1,6 +1,5 @@
-package goku.clui;
+package goku.ui;
 
-import goku.Command;
 import goku.Result;
 
 /**
@@ -15,15 +14,6 @@ public interface UserInterface {
   /*** STRING CONSTANTS ***/
   public static final String INPUT_ERROR = "Input cannot be recognised.";
   public static final String DATE_ERROR = "Invalid date(s).";
-
-  /**
-   * Method: getUserInput
-   * 
-   * @param input
-   *          string from UI
-   * @return Command object
-   */
-  Command makeCommand(String input);
 
   String getUserInput();
 

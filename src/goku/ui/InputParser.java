@@ -1,4 +1,13 @@
-package goku.clui;
+package goku.ui;
+
+import goku.GOKU;
+import goku.action.Action;
+import goku.action.AddAction;
+import goku.action.DeleteAction;
+import goku.action.DisplayAction;
+import goku.action.EditAction;
+import goku.action.NoAction;
+import goku.action.SearchAction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,17 +15,24 @@ import java.util.List;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
-public class PParser {
+public class InputParser {
   public String[] addKeywords = { "add", "a" };
   public String[] deleteKeywords = { "delete", "d", "remove", "r" };
   public String[] editKeywords = { "edit", "e", "update", "u" };
   public String[] displayKeywords = { "display", "view", "show", "v", "s" };
   public String[] searchKeywords = { "search", "find", "f" };
+  public String[] exitKeywords = { "quit", "exit", "q" };
 
-  public AAction parse(String string) {
+  private GOKU goku;
+
+  public InputParser(GOKU goku) {
+    this.goku = goku;
+  }
+
+  public Action parse(String string) {
     Arrays.asList(addKeywords).contains("hi");
     if (string == null || string.isEmpty()) {
-      return new NoAction();
+      return new NoAction(goku);
     }
 
     // String[] tokens = string.split(" ");
@@ -31,48 +47,50 @@ public class PParser {
     if (Arrays.asList(addKeywords).contains(command)) {
       AddAction ADDACT = makeAddActionADD(params);
       if (ADDACT == null) {
-        return new NoAction();
+        return new NoAction(goku);
       }
       return ADDACT;
     } else if (Arrays.asList(deleteKeywords).contains(command)) {
       DeleteAction da = makeDeleteActionACT(params);
       if (da == null) {
-        return new NoAction();
+        return new NoAction(goku);
       }
       return da;
     } else if (Arrays.asList(editKeywords).contains(command)) {
       EditAction ea = makeEditActionACT(params);
       if (ea == null) {
-        return new NoAction();
+        return new NoAction(goku);
       }
       return ea;
     } else if (Arrays.asList(displayKeywords).contains(command)) {
       DisplayAction da = makeDisplayAction(params);
       if (da == null) {
-        return new NoAction();
+        return new NoAction(goku);
       }
       return da;
     } else if (Arrays.asList(searchKeywords).contains(command)) {
       SearchAction sa = makeSearchAction(params);
       if (sa == null) {
-        return new NoAction();
+        return new NoAction(goku);
       }
       return sa;
+    } else if (Arrays.asList(exitKeywords).contains(command)) {
+      return new ExitAction(goku);
     }
-    return new NoAction();
+    return new NoAction(goku);
   }
 
   private SearchAction makeSearchAction(String[] params) {
     if (params.length == 0) {
       return null;
     }
-    SearchAction sa = new SearchAction();
+    SearchAction sa = new SearchAction(goku);
     sa.title = Joiner.on(" ").join(params);
     return sa;
   }
 
   private DisplayAction makeDisplayAction(String[] params) {
-    DisplayAction da = new DisplayAction();
+    DisplayAction da = new DisplayAction(goku);
     return da;
   }
 
@@ -80,7 +98,7 @@ public class PParser {
     if (params.length < 2) {
       return null;
     }
-    EditAction ea = new EditAction();
+    EditAction ea = new EditAction(goku);
     try {
       int id = Integer.parseInt(params[0]);
       ea.id = id;
@@ -99,7 +117,7 @@ public class PParser {
     if (params.length == 0) {
       return null;
     }
-    DeleteAction da = new DeleteAction();
+    DeleteAction da = new DeleteAction(goku);
     if (params.length == 1) {
       try {
         int id = Integer.parseInt(params[0]);
@@ -117,7 +135,7 @@ public class PParser {
     if (params.length == 0) {
       return null;
     } else {
-      AddAction a = new AddAction();
+      AddAction a = new AddAction(goku);
       int indexOfBy = Arrays.asList(params).indexOf("by");
       if (indexOfBy >= 0) {
         if (indexOfBy + 1 < params.length) {

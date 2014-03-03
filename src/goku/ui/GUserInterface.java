@@ -1,9 +1,10 @@
-package goku.clui;
+package goku.ui;
 
-import goku.Command;
 import goku.GOKU;
 import goku.ObservableTaskList;
 import goku.Result;
+import goku.action.Action;
+import goku.action.DisplayAction;
 import goku.autocomplete.WordAutocomplete;
 
 import java.awt.Container;
@@ -50,7 +51,7 @@ public class GUserInterface extends JFrame implements UserInterface,
 
   private List<String> words;
   private Mode mode = Mode.INSERT;
-  private Parser parser = new GUIParser();
+  private InputParser pparser = new InputParser(goku);
 
   public GUserInterface(GOKU goku) {
     super("G.O.K.U.");
@@ -205,10 +206,17 @@ public class GUserInterface extends JFrame implements UserInterface,
         mode = Mode.INSERT;
       } else {
         String input = textArea.getText();
-        Command c = makeCommand(input);
-        System.out.println(c.toString());
-        Result result = goku.executeCommand(c);
-        feedBack(result);
+        // Command c = makeCommand(input);
+        Action action = pparser.parse(input);
+        if (action instanceof DisplayAction) {
+          System.out.println("DISPLAY");
+        } else {
+          Result result = action.doIt();
+          feedBack(result);
+        }
+        // System.out.println(c.toString());
+        // Result result = goku.executeCommand(c);
+        // feedBack(result);
         textArea.setText("");
         // textArea.replaceSelection("\n");
       }
@@ -220,11 +228,6 @@ public class GUserInterface extends JFrame implements UserInterface,
     goku.setTaskList(new ObservableTaskList());
     GUserInterface gui = new GUserInterface(goku);
     gui.run();
-  }
-
-  @Override
-  public Command makeCommand(String input) {
-    return parser.parseToCommand(input);
   }
 
   @Override
@@ -264,7 +267,7 @@ public class GUserInterface extends JFrame implements UserInterface,
    * @author jchiam
    */
   // TODO
-  protected class GUIParser extends Parser {
+  protected class GUIParser extends JParser {
     public GUIParser() {
       super();
     }

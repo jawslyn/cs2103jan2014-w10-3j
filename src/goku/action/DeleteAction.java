@@ -1,4 +1,9 @@
-package goku;
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
 
 /* Delete removes a task from GOKU.
  * It does so in 2 steps:
@@ -11,23 +16,20 @@ package goku;
  * 2c- If multiple matches,
  *      returns a failure Result with TaskList.size() > 1
  */
-class Delete extends Action {
+public class DeleteAction extends Action {
+  public DeleteAction(GOKU goku) {
+    super(goku);
+  }
+
   private static final String MSG_SUCCESS = "Deleted \"%s\"";
   private static final String ERR_FAILURE = "Many matches found for \"%s\".";
   private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
-  private Task task;
 
-  /*
-   * Called by ActionFactory on all actions to build the needed objects for this
-   * Action
-   */
-  @Override
-  public void construct() {
-    this.task = command.getTask();
-  }
+  public int id;
+  public String title;
 
   @Override
-  Result doIt() {
+  public Result doIt() {
     return deleteTask();
   }
 
@@ -35,30 +37,34 @@ class Delete extends Action {
     boolean success;
     success = tryDeleteById();
     if (success) {
-      return new Result(true, String.format(MSG_SUCCESS, task.getId()
-          .toString()), null, null);
+      return new Result(true, String.format(MSG_SUCCESS, id), null, null);
     }
-    if (task.getTitle() == null) {
-      return new Result(false, null, String.format(ERR_NOT_FOUND, task.getId()
-          .toString()), null);
+    if (title == null) {
+      return new Result(false, null, String.format(ERR_NOT_FOUND, id), null);
     }
+    Task task = new Task();
+    task.setTitle(title);
     TaskList possibleDeletion = list.deleteTaskByTitle(task);
     if (possibleDeletion.size() == 0) {
       return new Result(true, String.format(MSG_SUCCESS, task.getTitle()),
           null, null);
     } else {
-      return new Result(false, null,
-          String.format(ERR_FAILURE, task.getTitle()), possibleDeletion);
+      return new Result(false, null, String.format(ERR_FAILURE, title),
+          possibleDeletion);
     }
   }
 
   private TaskList tryDeleteByTitle() {
+    Task task = new Task();
+    task.setTitle(title);
     TaskList possibleDeletion = list.deleteTaskByTitle(task);
     return possibleDeletion;
   }
 
   private boolean tryDeleteById() {
-    Task deleted = list.deleteTaskById(task.getId());
+    // Task task = new Task();
+    // task.setTitle(title);
+    Task deleted = list.deleteTaskById(id);
     return deleted != null;
   }
 

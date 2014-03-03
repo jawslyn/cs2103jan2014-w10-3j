@@ -41,13 +41,6 @@ public class Task {
     isComplete = false;
   }
 
-  /*
-   * A Task MUST have a title, else it will not be stored.
-   */
-  public boolean isValid() {
-    return (this.title != null);
-  }
-
   public boolean titleMatches(Task otherTask) {
     if (getTitle() == null || otherTask.getTitle() == null) {
       return false;
@@ -178,7 +171,21 @@ public class Task {
 
   @Override
   public String toString() {
-    return String.valueOf(id) + title;
+    StringBuffer sb = new StringBuffer();
+    sb.append(String.valueOf(id));
+    sb.append(" ");
+    if (deadline != null) {
+      sb.append(deadline.toString());
+      sb.append(" ");
+    }
+    if (period != null) {
+      sb.append(period.getStartDate().toString());
+      sb.append("-");
+      sb.append(period.getEndDate().toString());
+      sb.append(" ");
+    }
+    sb.append(title);
+    return sb.toString();
   }
 
   public String toStorageFormat() {

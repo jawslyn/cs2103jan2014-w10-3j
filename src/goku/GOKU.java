@@ -6,7 +6,7 @@ package goku;
  */
 public class GOKU {
 
-  private static TaskList _list;
+  private TaskList _list;
 
   public GOKU() {
     _list = new TaskList();
@@ -16,13 +16,7 @@ public class GOKU {
     _list = list;
   }
 
-  public Result executeCommand(Command command) {
-    Action action = ActionFactory.buildAction(command);
-    Result result = action.doIt();
-    return result;
-  }
-
-  public static TaskList getTaskList() {
+  public TaskList getTaskList() {
     return _list;
   }
 

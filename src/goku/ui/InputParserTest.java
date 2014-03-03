@@ -1,19 +1,28 @@
-package goku.clui;
+package goku.ui;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import goku.GOKU;
+import goku.action.Action;
+import goku.action.AddAction;
+import goku.action.DeleteAction;
+import goku.action.DisplayAction;
+import goku.action.EditAction;
+import goku.action.NoAction;
+import goku.action.SearchAction;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PParserTest {
-  PParser p;
-  AAction a;
+public class InputParserTest {
+  InputParser p;
+  Action a;
 
   @Before
   public void setUp() throws Exception {
-    p = new PParser();
+    GOKU goku = new GOKU();
+    p = new InputParser(goku);
   }
 
   @After
@@ -127,5 +136,19 @@ public class PParserTest {
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertEquals("abc", sa.title);
+  }
+
+  @Test
+  public void parse_ExitAction() throws Exception {
+    ExitAction ea;
+
+    a = p.parse("exit");
+    assertTrue(a instanceof ExitAction);
+
+    a = p.parse("quit");
+    assertTrue(a instanceof ExitAction);
+
+    a = p.parse("q");
+    assertTrue(a instanceof ExitAction);
   }
 }
