@@ -22,7 +22,7 @@ public class CLUserInterface implements UserInterface {
   private String input;
 
   public CLUserInterface(GOKU goku) {
-    goku = goku;
+    this.goku = goku;
     parser = new CLUIParser();
     sc = new Scanner(System.in);
     input = "";
@@ -40,7 +40,6 @@ public class CLUserInterface implements UserInterface {
         feedBack(result);
       }
     }
-
   }
 
   public Parser getParser() {
