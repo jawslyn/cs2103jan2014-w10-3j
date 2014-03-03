@@ -55,6 +55,7 @@ public class GUserInterface extends JFrame implements UserInterface,
   public GUserInterface(GOKU goku) {
     super("G.O.K.U.");
     this.goku = goku;
+    goku.setTaskList(new ObservableTaskList());
     list = (ObservableTaskList) goku.getTaskList();
     list.addListDataListener(this);
 

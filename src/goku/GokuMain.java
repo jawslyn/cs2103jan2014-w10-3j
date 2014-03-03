@@ -19,7 +19,6 @@ public class GokuMain {
       ui = new CLUserInterface(goku);
     } else if (shouldRunGui(args)) {
       ui = new GUserInterface(goku);
-      goku.setTaskList(new ObservableTaskList());
     } else {
       System.exit(0);
     }

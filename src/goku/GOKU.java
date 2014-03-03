@@ -8,6 +8,10 @@ public class GOKU {
 
   private static TaskList _list;
 
+  public GOKU() {
+    _list = new TaskList();
+  }
+
   public void setTaskList(TaskList list) {
     _list = list;
   }
