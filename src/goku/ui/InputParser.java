@@ -18,13 +18,28 @@ import java.util.List;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
+/*
+ * InputParser parses an input String into an {@link Action}.
+ * The steps taken are:
+ * 1. Split the input into tokens. Each token is guaranteed to be
+ * non-empty and trimmed
+ * 2. The first token is checked to see if it is a command.
+ * This check is done by iterating through the arrays of keywords.
+ * 3. The appropriate subclass of Action is made using the
+ * makeXAction methods.
+ * 4. In the event when any of the Actions are null, a NoAction is returned.
+ * 
+ */
 public class InputParser {
-  public String[] addKeywords = { "add", "a" };
-  public String[] deleteKeywords = { "delete", "d", "remove", "r" };
-  public String[] editKeywords = { "edit", "e", "update", "u" };
-  public String[] displayKeywords = { "display", "view", "show", "v", "s" };
-  public String[] searchKeywords = { "search", "find", "f" };
-  public String[] exitKeywords = { "quit", "exit", "q" };
+  /*
+   * Keywords that are used to associate an input to a particular action.
+   */
+  private String[] addKeywords = { "add", "a" };
+  private String[] deleteKeywords = { "delete", "d", "remove", "r" };
+  private String[] editKeywords = { "edit", "e", "update", "u" };
+  private String[] displayKeywords = { "display", "view", "show", "v", "s" };
+  private String[] searchKeywords = { "search", "find", "f" };
+  private String[] exitKeywords = { "quit", "exit", "q" };
 
   private GOKU goku;
 
@@ -32,55 +47,61 @@ public class InputParser {
     this.goku = goku;
   }
 
-  public Action parse(String string) {
-    Arrays.asList(addKeywords).contains("hi");
-    if (string == null || string.isEmpty()) {
+  /*
+   * @return NoAction if the input cannot be parsed, else a subclass of Action
+   */
+  public Action parse(String input) {
+    Action action = null;
+
+    if (input == null || input.isEmpty()) {
       return new NoAction(goku);
     }
 
-    // String[] tokens = string.split(" ");
-    List<String> l = Splitter.on(' ').omitEmptyStrings().trimResults()
-        .splitToList(string);
-    String[] tokens = l.toArray(new String[l.size()]);
-
-    String command = tokens[0];
-    String[] params = tokens.length > 1 ? Arrays.copyOfRange(tokens, 1,
-        tokens.length) : new String[0];
+    List<String> inputList = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList(input);
+    String[] inputArray = inputList.toArray(new String[inputList.size()]);
+    String command = inputArray[0];
+    String[] params = inputArray.length > 1 ? Arrays.copyOfRange(inputArray, 1,
+        inputArray.length) : new String[0];
 
     if (Arrays.asList(addKeywords).contains(command)) {
-      AddAction ADDACT = makeAddAction(params);
-      if (ADDACT == null) {
-        return new NoAction(goku);
-      }
-      return ADDACT;
+      action = makeAddAction(params);
     } else if (Arrays.asList(deleteKeywords).contains(command)) {
-      DeleteAction da = makeDeleteAction(params);
-      if (da == null) {
-        return new NoAction(goku);
-      }
-      return da;
+      action = makeDeleteAction(params);
     } else if (Arrays.asList(editKeywords).contains(command)) {
-      EditAction ea = makeEditAction(params);
-      if (ea == null) {
-        return new NoAction(goku);
-      }
-      return ea;
+      action = makeEditAction(params);
     } else if (Arrays.asList(displayKeywords).contains(command)) {
-      DisplayAction da = makeDisplayAction(params);
-      if (da == null) {
-        return new NoAction(goku);
-      }
-      return da;
+      action = makeDisplayAction(params);
     } else if (Arrays.asList(searchKeywords).contains(command)) {
-      SearchAction sa = makeSearchAction(params);
-      if (sa == null) {
-        return new NoAction(goku);
-      }
-      return sa;
+      action = makeSearchAction(params);
     } else if (Arrays.asList(exitKeywords).contains(command)) {
-      return new ExitAction(goku);
+      action = new ExitAction(goku);
     }
-    return new NoAction(goku);
+    if (action == null) {
+      return new NoAction(goku);
+    }
+    return action;
+  }
+
+  /*
+   * Add expects to have parameters, minimally params[0] should be the title of
+   * the task.
+   * 
+   * @param params array of parameters that accompany the add action
+   * 
+   * @return null if no parameters are specified, else an AddAction with the
+   * title, due date, or deadline.
+   */
+  private AddAction makeAddAction(String[] params) {
+    if (params.length == 0) {
+      return null;
+    } else {
+      AddAction a = new AddAction(goku);
+      params = extractDeadline(params, a);
+      params = extractPeriod(params, a);
+      a.title = Joiner.on(" ").join(params);
+      return a;
+    }
   }
 
   private SearchAction makeSearchAction(String[] params) {
@@ -134,18 +155,6 @@ public class InputParser {
     return da;
   }
 
-  private AddAction makeAddAction(String[] params) {
-    if (params.length == 0) {
-      return null;
-    } else {
-      AddAction a = new AddAction(goku);
-      params = extractDeadline(params, a);
-      params = extractPeriod(params, a);
-      a.title = Joiner.on(" ").join(params);
-      return a;
-    }
-  }
-
   private String[] extractPeriod(String[] params, AddAction a) {
     int indexOfFrom = Arrays.asList(params).indexOf("from");
     int indexOfTo = Arrays.asList(params).indexOf("to");
@@ -171,11 +180,21 @@ public class InputParser {
     return params;
   }
 
+  /*
+   * A deadline is identified by the presence of the keyword "by".
+   * Assumption: the deadline is always at the end of the input,
+   * i.e. whatever follows "by" will parsed into a date.
+   * Valid inputs are ["by", "2pm", "tomorrow"] or ["by", "1:45pm"].
+   * When the parse is successful @param params is modified such that
+   * the parsed strings, including "by", is removed - essentially params
+   * is shortened.
+   */
   private String[] extractDeadline(String[] params, AddAction a) {
     int indexOfBy = Arrays.asList(params).indexOf("by");
     if (indexOfBy < 0) {
       return params;
     }
+    // get the rest of the params after "by"
     String[] candidates = Arrays.copyOfRange(params, indexOfBy + 1,
         params.length);
     DateTime parsed = DateUtil.parse(candidates);

@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import hirondelle.date4j.DateTime;
 
-import java.util.Date;
-
 import org.junit.Test;
 
 public class DateUtilTest {
@@ -19,6 +17,74 @@ public class DateUtilTest {
     assertTrue(DateUtil.looksLikeTime("1:45am"));
     assertTrue(DateUtil.looksLikeTime("1:45pm"));
     assertTrue(DateUtil.looksLikeTime("1.45am"));
+  }
+
+  @Test
+  public void looksLikeDate_success() throws Exception {
+    assertTrue(DateUtil.looksLikeDay("sUn"));
+    assertTrue(DateUtil.looksLikeDay("Mon"));
+    assertTrue(DateUtil.looksLikeDay("tuE"));
+    assertTrue(DateUtil.looksLikeDay("wED"));
+    assertTrue(DateUtil.looksLikeDay("THur"));
+    assertTrue(DateUtil.looksLikeDay("fRi"));
+    assertTrue(DateUtil.looksLikeDay("Sat"));
+    assertTrue(DateUtil.looksLikeDay("SuNday"));
+    assertTrue(DateUtil.looksLikeDay("monday"));
+    assertTrue(DateUtil.looksLikeDay("tuesday"));
+    assertTrue(DateUtil.looksLikeDay("WedNesDay"));
+    assertTrue(DateUtil.looksLikeDay("Thursday"));
+    assertTrue(DateUtil.looksLikeDay("Friday"));
+    assertTrue(DateUtil.looksLikeDay("saturDAY"));
+    assertTrue(DateUtil.looksLikeDay("tOdAy"));
+    assertTrue(DateUtil.looksLikeDay("toMORRow"));
+    assertTrue(DateUtil.looksLikeDay("tMr"));
+    assertTrue(DateUtil.looksLikeDay("tmL"));
+    assertTrue(DateUtil.looksLikeDate("4/3"));
+    assertTrue(DateUtil.looksLikeDate("4/3/12"));
+    assertTrue(DateUtil.looksLikeDate("4-3"));
+    assertTrue(DateUtil.looksLikeDate("4-3-12"));
+  }
+
+  @Test
+  public void parseDay_success() throws Exception {
+    DateTime now = DateUtil.getNow();
+    DateTime result, expected;
+
+    expected = now.plusDays(1);
+    result = DateUtil.parseDay("toMOrrow");
+    assertTrue(expected.isSameDayAs(result));
+    result = DateUtil.parseDay("tMl");
+    assertTrue(expected.isSameDayAs(result));
+    result = DateUtil.parseDay("tMr");
+    assertTrue(expected.isSameDayAs(result));
+
+    result = DateUtil.parseDay("todaY");
+    assertTrue(now.isSameDayAs(result));
+
+    result = DateUtil.parseDay("monday");
+    assertTrue(now.isSameDayAs(result));
+
+  }
+
+  @Test
+  public void parseDate_success() throws Exception {
+    DateTime now = DateUtil.getNow(), actual, expected;
+
+    actual = DateUtil.parseDate("4/3");
+    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4/3/12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4-3");
+    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4-3-12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
   }
 
   @Test
@@ -62,61 +128,6 @@ public class DateUtilTest {
   }
 
   @Test
-  public void parseDay_success() throws Exception {
-    DateTime now = DateUtil.getNow();
-    DateTime result, expected;
-    result = DateUtil.parseDay("tomorrow");
-    expected = now.plusDays(1);
-    assertTrue(expected.isSameDayAs(result));
-  }
-
-  @Test
-  public void looksLikeDate_success() throws Exception {
-    assertTrue(DateUtil.looksLikeDay("sUn"));
-    assertTrue(DateUtil.looksLikeDay("Mon"));
-    assertTrue(DateUtil.looksLikeDay("tuE"));
-    assertTrue(DateUtil.looksLikeDay("wED"));
-    assertTrue(DateUtil.looksLikeDay("THur"));
-    assertTrue(DateUtil.looksLikeDay("fRi"));
-    assertTrue(DateUtil.looksLikeDay("Sat"));
-    assertTrue(DateUtil.looksLikeDay("SuNday"));
-    assertTrue(DateUtil.looksLikeDay("monday"));
-    assertTrue(DateUtil.looksLikeDay("tuesday"));
-    assertTrue(DateUtil.looksLikeDay("WedNesDay"));
-    assertTrue(DateUtil.looksLikeDay("Thursday"));
-    assertTrue(DateUtil.looksLikeDay("Friday"));
-    assertTrue(DateUtil.looksLikeDay("saturDAY"));
-    assertTrue(DateUtil.looksLikeDay("tOdAy"));
-    assertTrue(DateUtil.looksLikeDay("toMORRow"));
-    assertTrue(DateUtil.looksLikeDay("tMr"));
-    assertTrue(DateUtil.looksLikeDay("tmL"));
-    assertTrue(DateUtil.looksLikeDate("4/3"));
-    assertTrue(DateUtil.looksLikeDate("4/3/12"));
-    assertTrue(DateUtil.looksLikeDate("4-3"));
-    assertTrue(DateUtil.looksLikeDate("4-3-12"));
-  }
-
-  @Test
-  public void parseDate_success() throws Exception {
-    DateTime now = DateUtil.getNow(), actual, expected;
-
-    actual = DateUtil.parseDate("4/3");
-    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
-    assertTrue(expected.isSameDayAs(actual));
-
-    actual = DateUtil.parseDate("4/3/12");
-    expected = DateTime.forDateOnly(2012, 3, 4);
-    assertTrue(expected.isSameDayAs(actual));
-
-    actual = DateUtil.parseDate("4-3");
-    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
-    assertTrue(expected.isSameDayAs(actual));
-    actual = DateUtil.parseDate("4-3-12");
-    expected = DateTime.forDateOnly(2012, 3, 4);
-    assertTrue(expected.isSameDayAs(actual));
-  }
-
-  @Test
   public void getNearestDateToWeekday_success() {
     DateTime start, nearest, result;
     start = DateTime.forDateOnly(2014, 3, 4);
@@ -136,7 +147,7 @@ public class DateUtilTest {
   }
 
   @Test
-  public void mergDateAndTime_success() throws Exception {
+  public void mergeDateAndTime_success() throws Exception {
     DateTime date = null, time = null, result, expected;
     date = DateTime.forDateOnly(2014, 3, 4);
     expected = DateTime.forDateOnly(2014, 3, 4);
@@ -157,20 +168,4 @@ public class DateUtilTest {
     result = DateUtil.mergeDateAndTime(date, time);
     assertEquals(expected, result);
   }
-
-  @Test
-  public void makeDates() throws Exception {
-    Date aDate = DateUtil.makeDate(1, 8);
-    int[] dmy = DateUtil.getDayMonthYear(aDate);
-    assertEquals(1, dmy[0]);
-    assertEquals(8, dmy[1]);
-    assertEquals(2014, dmy[2]);
-
-    Date otherDate = DateUtil.makeDate(1, 8, 2011);
-    int[] otherDmy = DateUtil.getDayMonthYear(otherDate);
-    assertEquals(1, otherDmy[0]);
-    assertEquals(8, otherDmy[1]);
-    assertEquals(2011, otherDmy[2]);
-  }
-
 }
