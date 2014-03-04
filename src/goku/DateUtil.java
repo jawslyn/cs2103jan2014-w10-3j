@@ -223,7 +223,7 @@ public class DateUtil {
       date = getNow();
     }
     if (time == null) {
-      time = DateTime.forTimeOnly(0, 0, 0, 0);
+      time = DateTime.forTimeOnly(23, 59, 0, 0);
     }
     return new DateTime(date.getYear(), date.getMonth(), date.getDay(),
         time.getHour(), time.getMinute(), time.getSecond(),
