@@ -1,5 +1,7 @@
 package goku.ui;
 
+import goku.DateRange;
+import goku.DateUtil;
 import goku.GOKU;
 import goku.action.Action;
 import goku.action.AddAction;
@@ -8,6 +10,7 @@ import goku.action.DisplayAction;
 import goku.action.EditAction;
 import goku.action.NoAction;
 import goku.action.SearchAction;
+import hirondelle.date4j.DateTime;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,19 +48,19 @@ public class InputParser {
         tokens.length) : new String[0];
 
     if (Arrays.asList(addKeywords).contains(command)) {
-      AddAction ADDACT = makeAddActionADD(params);
+      AddAction ADDACT = makeAddAction(params);
       if (ADDACT == null) {
         return new NoAction(goku);
       }
       return ADDACT;
     } else if (Arrays.asList(deleteKeywords).contains(command)) {
-      DeleteAction da = makeDeleteActionACT(params);
+      DeleteAction da = makeDeleteAction(params);
       if (da == null) {
         return new NoAction(goku);
       }
       return da;
     } else if (Arrays.asList(editKeywords).contains(command)) {
-      EditAction ea = makeEditActionACT(params);
+      EditAction ea = makeEditAction(params);
       if (ea == null) {
         return new NoAction(goku);
       }
@@ -94,7 +97,7 @@ public class InputParser {
     return da;
   }
 
-  private EditAction makeEditActionACT(String[] params) {
+  private EditAction makeEditAction(String[] params) {
     if (params.length < 2) {
       return null;
     }
@@ -103,7 +106,7 @@ public class InputParser {
       int id = Integer.parseInt(params[0]);
       ea.id = id;
       String[] taskParams = Arrays.copyOfRange(params, 1, params.length);
-      AddAction aaa = makeAddActionADD(taskParams);
+      AddAction aaa = makeAddAction(taskParams);
       ea.deadline = aaa.deadline;
       ea.from = aaa.from;
       ea.to = aaa.to;
@@ -113,7 +116,7 @@ public class InputParser {
     return ea;
   }
 
-  private DeleteAction makeDeleteActionACT(String[] params) {
+  private DeleteAction makeDeleteAction(String[] params) {
     if (params.length == 0) {
       return null;
     }
@@ -131,61 +134,56 @@ public class InputParser {
     return da;
   }
 
-  private AddAction makeAddActionADD(String[] params) {
+  private AddAction makeAddAction(String[] params) {
     if (params.length == 0) {
       return null;
     } else {
       AddAction a = new AddAction(goku);
-      int indexOfBy = Arrays.asList(params).indexOf("by");
-      if (indexOfBy >= 0) {
-        if (indexOfBy + 1 < params.length) {
-          // by is a keyword, we expect a date-like to follow, but if it doesnt
-          // by is treated as non-keyword
-          String deadline = params[indexOfBy + 1];
-          a.deadline = deadline;
-          params = Arrays.copyOf(params, params.length - 2);
-        }
-      }
-      int indexOfFrom = Arrays.asList(params).indexOf("from");
-      int indexOfTo = Arrays.asList(params).indexOf("to");
-      if (indexOfFrom >= 0 && indexOfTo >= 0) {
-        if (indexOfTo + 1 < params.length) {
-          String from = params[indexOfFrom + 1];
-          String to = params[indexOfTo + 1];
-          a.from = from;
-          a.to = to;
-          params = Arrays.copyOf(params, params.length - 4);
-        }
-      }
+      params = extractDeadline(params, a);
+      params = extractPeriod(params, a);
       a.title = Joiner.on(" ").join(params);
       return a;
     }
   }
 
-  private void makeEditAction(String[] params, EditAction ea) {
-    try {
-      int id = Integer.parseInt(params[0]);
-      ea.id = id;
-      String[] taskParams = Arrays.copyOfRange(params, 1, params.length);
-      AddAction aaa = makeAddActionADD(taskParams);
-      ea.deadline = aaa.deadline;
-      ea.from = aaa.from;
-      ea.to = aaa.to;
-      ea.title = aaa.title;
-    } catch (NumberFormatException e) {
+  private String[] extractPeriod(String[] params, AddAction a) {
+    int indexOfFrom = Arrays.asList(params).indexOf("from");
+    int indexOfTo = Arrays.asList(params).indexOf("to");
+    if (indexOfFrom >= 0 && indexOfTo >= 0) {
+      if (indexOfTo + 1 < params.length) {
+        String[] startCandidates = Arrays.copyOfRange(params, indexOfFrom + 1,
+            indexOfTo);
+        DateTime start = DateUtil.parse(startCandidates);
+
+        String[] endCandidates = Arrays.copyOfRange(params, indexOfTo + 1,
+            params.length);
+        DateTime end = DateUtil.parse(endCandidates);
+        if (start != null && end != null) {
+          a.from = Joiner.on(" ").join(startCandidates);
+          a.to = Joiner.on(" ").join(endCandidates);
+          DateRange dr = new DateRange(DateUtil.toDate(start),
+              DateUtil.toDate(end));
+          a.period = dr;
+          params = Arrays.copyOfRange(params, 0, indexOfFrom);
+        }
+      }
     }
+    return params;
   }
 
-  private void makeDeleteAction(String[] params, DeleteAction da) {
-    if (params.length == 1) {
-      try {
-        int id = Integer.parseInt(params[0]);
-        da.id = id;
-      } catch (NumberFormatException e) {
-        da.title = params[0];
-      }
-    } else {
-      da.title = Joiner.on(" ").join(params);
+  private String[] extractDeadline(String[] params, AddAction a) {
+    int indexOfBy = Arrays.asList(params).indexOf("by");
+    if (indexOfBy < 0) {
+      return params;
     }
+    String[] candidates = Arrays.copyOfRange(params, indexOfBy + 1,
+        params.length);
+    DateTime parsed = DateUtil.parse(candidates);
+    if (parsed != null) {
+      a.dline = DateUtil.toDate(parsed);
+      a.deadline = Joiner.on(" ").join(candidates);
+      params = Arrays.copyOfRange(params, 0, indexOfBy);
+    }
+    return params;
   }
 }

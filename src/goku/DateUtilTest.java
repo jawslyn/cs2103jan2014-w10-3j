@@ -1,12 +1,163 @@
 package goku;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import hirondelle.date4j.DateTime;
 
 import java.util.Date;
 
 import org.junit.Test;
 
 public class DateUtilTest {
+
+  @Test
+  public void looksLikeTime_success() throws Exception {
+    assertTrue(DateUtil.looksLikeTime("1:45"));
+    assertTrue(DateUtil.looksLikeTime("1.45"));
+    assertTrue(DateUtil.looksLikeTime("13:45"));
+    assertTrue(DateUtil.looksLikeTime("1pm"));
+    assertTrue(DateUtil.looksLikeTime("1:45am"));
+    assertTrue(DateUtil.looksLikeTime("1:45pm"));
+    assertTrue(DateUtil.looksLikeTime("1.45am"));
+  }
+
+  @Test
+  public void parseTime_success() throws Exception {
+    DateTime date, expected;
+
+    date = DateUtil.parseTime("1:45");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1.45");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("13:45");
+    expected = DateTime.forTimeOnly(13, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1pm");
+    expected = DateTime.forTimeOnly(13, 0, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1:45am");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1:45pm");
+    expected = DateTime.forTimeOnly(13, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1.45am");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+  }
+
+  @Test
+  public void parseDay_success() throws Exception {
+    DateTime now = DateUtil.getNow();
+    DateTime result, expected;
+    result = DateUtil.parseDay("tomorrow");
+    expected = now.plusDays(1);
+    assertTrue(expected.isSameDayAs(result));
+  }
+
+  @Test
+  public void looksLikeDate_success() throws Exception {
+    assertTrue(DateUtil.looksLikeDay("sUn"));
+    assertTrue(DateUtil.looksLikeDay("Mon"));
+    assertTrue(DateUtil.looksLikeDay("tuE"));
+    assertTrue(DateUtil.looksLikeDay("wED"));
+    assertTrue(DateUtil.looksLikeDay("THur"));
+    assertTrue(DateUtil.looksLikeDay("fRi"));
+    assertTrue(DateUtil.looksLikeDay("Sat"));
+    assertTrue(DateUtil.looksLikeDay("SuNday"));
+    assertTrue(DateUtil.looksLikeDay("monday"));
+    assertTrue(DateUtil.looksLikeDay("tuesday"));
+    assertTrue(DateUtil.looksLikeDay("WedNesDay"));
+    assertTrue(DateUtil.looksLikeDay("Thursday"));
+    assertTrue(DateUtil.looksLikeDay("Friday"));
+    assertTrue(DateUtil.looksLikeDay("saturDAY"));
+    assertTrue(DateUtil.looksLikeDay("tOdAy"));
+    assertTrue(DateUtil.looksLikeDay("toMORRow"));
+    assertTrue(DateUtil.looksLikeDay("tMr"));
+    assertTrue(DateUtil.looksLikeDay("tmL"));
+    assertTrue(DateUtil.looksLikeDate("4/3"));
+    assertTrue(DateUtil.looksLikeDate("4/3/12"));
+    assertTrue(DateUtil.looksLikeDate("4-3"));
+    assertTrue(DateUtil.looksLikeDate("4-3-12"));
+  }
+
+  @Test
+  public void parseDate_success() throws Exception {
+    DateTime now = DateUtil.getNow(), actual, expected;
+
+    actual = DateUtil.parseDate("4/3");
+    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4/3/12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4-3");
+    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+    actual = DateUtil.parseDate("4-3-12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+  }
+
+  @Test
+  public void getNearestDateToWeekday_success() {
+    DateTime start, nearest, result;
+    start = DateTime.forDateOnly(2014, 3, 4);
+    result = DateUtil.getNearestDateToWeekday(start, 2);
+    nearest = DateTime.forDateOnly(2014, 3, 10);
+    assertTrue(nearest.isSameDayAs(result));
+
+    start = DateTime.forDateOnly(2014, 3, 4);
+    result = DateUtil.getNearestDateToWeekday(start, start.getWeekDay());
+    nearest = DateTime.forDateOnly(2014, 3, 11);
+    assertTrue(nearest.isSameDayAs(result));
+
+    start = DateTime.forDateOnly(2014, 3, 31);
+    result = DateUtil.getNearestDateToWeekday(start, start.getWeekDay() + 1);
+    nearest = DateTime.forDateOnly(2014, 4, 1);
+    assertTrue(nearest.isSameDayAs(result));
+  }
+
+  @Test
+  public void mergDateAndTime_success() throws Exception {
+    DateTime date = null, time = null, result, expected;
+    date = DateTime.forDateOnly(2014, 3, 4);
+    expected = DateTime.forDateOnly(2014, 3, 4);
+    result = DateUtil.mergeDateAndTime(date, null);
+    assertTrue(expected.isSameDayAs(result));
+
+    time = DateTime.forTimeOnly(12, 13, 14, 0);
+    expected = DateUtil.getNow();
+    result = DateUtil.mergeDateAndTime(null, time);
+    assertTrue(expected.isSameDayAs(result));
+    assertTrue(result.getHour() == 12);
+    assertTrue(result.getMinute() == 13);
+    assertTrue(result.getSecond() == 14);
+
+    date = DateTime.forDateOnly(2014, 3, 4);
+    time = DateTime.forTimeOnly(12, 13, 14, 0);
+    expected = new DateTime(2014, 3, 4, 12, 13, 14, 0);
+    result = DateUtil.mergeDateAndTime(date, time);
+    assertEquals(expected, result);
+  }
+
   @Test
   public void makeDates() throws Exception {
     Date aDate = DateUtil.makeDate(1, 8);
@@ -20,47 +171,6 @@ public class DateUtilTest {
     assertEquals(1, otherDmy[0]);
     assertEquals(8, otherDmy[1]);
     assertEquals(2011, otherDmy[2]);
-  }
-
-  @Test
-  public void compareDayMonthYear() {
-    Date aDate;
-    Date otherDate;
-
-    /* All return 0 */
-    aDate = DateUtil.makeDate(1, 8, 2011);
-    otherDate = DateUtil.makeDate(1, 8, 2011);
-    assertEquals(0, DateUtil.compareDayMonthYear(aDate, otherDate));
-
-    aDate = DateUtil.makeDate(31, 8, 2016);
-    otherDate = DateUtil.makeDate(31, 8, 2016);
-    assertEquals(0, DateUtil.compareDayMonthYear(aDate, otherDate));
-
-    /* All return -1 */
-    aDate = DateUtil.makeDate(1, 8, 2010);
-    otherDate = DateUtil.makeDate(1, 8, 2011);
-    assertEquals(-1, DateUtil.compareDayMonthYear(aDate, otherDate));
-
-    aDate = DateUtil.makeDate(1, 7, 2011);
-    otherDate = DateUtil.makeDate(1, 8, 2011);
-    assertEquals(-1, DateUtil.compareDayMonthYear(aDate, otherDate));
-
-    aDate = DateUtil.makeDate(1, 8, 2011);
-    otherDate = DateUtil.makeDate(2, 8, 2011);
-    assertEquals(-1, DateUtil.compareDayMonthYear(aDate, otherDate));
-
-    /* All return 1 */
-    aDate = DateUtil.makeDate(1, 8, 2012);
-    otherDate = DateUtil.makeDate(1, 8, 2011);
-    assertEquals(1, DateUtil.compareDayMonthYear(aDate, otherDate));
-
-    aDate = DateUtil.makeDate(1, 9, 2011);
-    otherDate = DateUtil.makeDate(1, 8, 2011);
-    assertEquals(1, DateUtil.compareDayMonthYear(aDate, otherDate));
-
-    aDate = DateUtil.makeDate(2, 8, 2011);
-    otherDate = DateUtil.makeDate(1, 8, 2011);
-    assertEquals(1, DateUtil.compareDayMonthYear(aDate, otherDate));
   }
 
 }
