@@ -186,8 +186,10 @@ public class Task {
     }
     
     if (period != null) {
-      sb.append(" | Period: ");
-      sb.append(period);
+      sb.append(" | From: ");
+      sb.append(period.getStartDate());
+      sb.append(" To: ");
+      sb.append(period.getEndDate());
     }
     
     sb.append(" | Status: ");
