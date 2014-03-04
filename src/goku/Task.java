@@ -167,19 +167,42 @@ public class Task {
   public void setTitle(String title) {
     this.title = title;
   }
-  
+
   public void setId(int id) {
-	  this.id = id;
+    this.id = id;
   }
 
   @Override
   public String toString() {
-	  Gson gson = new Gson();
-	  
-    return gson.toJson(this);
+    StringBuffer sb = new StringBuffer();
+    sb.append("ID: ");
+    sb.append(id);
+    sb.append(" | Title: ");
+    sb.append(title);
+    
+    if (deadline != null) {
+      sb.append(" | Deadline: ");
+      sb.append(deadline);
+    }
+    
+    if (period != null) {
+      sb.append(" | Period: ");
+      sb.append(period);
+    }
+    
+    sb.append(" | Status: ");
+    if (isComplete) {
+      sb.append("done");
+    } else {
+      sb.append("not done");
+    }
+    
+    return sb.toString();
   }
 
   public String toStorageFormat() {
-    return toString();
+    Gson gson = new Gson();
+
+    return gson.toJson(this);
   }
 }
