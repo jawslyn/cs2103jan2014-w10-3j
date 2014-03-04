@@ -13,7 +13,6 @@ public class DisplayAction extends Action {
   private static final String MSG_SUCCESS = "displaying list of task:";
   private static final String MSG_FAILURE = "unable to display";
   private boolean displayAll = false;
-  private TaskList list;
   Date byDeadline;
 
   public DisplayAction(GOKU goku) {
@@ -22,8 +21,7 @@ public class DisplayAction extends Action {
 
   @Override
   public Result doIt() {
-    // TODO Auto-generated method stub
-    return null;
+    return displayAll();
   }
 
   public Result displayAll() {

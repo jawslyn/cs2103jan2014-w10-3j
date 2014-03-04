@@ -24,6 +24,7 @@ public class TaskListDisplayerTest {
     list.addTask(c);
     list.addTask(d);
     tld.display(list);
+    tld.display(list);
   }
 
   private Task makeTaskWithDeadline(String title, int daysAway) {

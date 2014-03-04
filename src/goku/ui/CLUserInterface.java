@@ -42,7 +42,7 @@ public class CLUserInterface implements UserInterface {
       if (action instanceof ExitAction) {
         return;
       } else if (action instanceof DisplayAction) {
-        printTaskList(goku.getTaskList());
+        printTaskList(action.doIt().getTasks());
       } else {
         Result result = action.doIt();
         feedBack(result);
@@ -70,15 +70,18 @@ public class CLUserInterface implements UserInterface {
 
   @Override
   public void feedBack(Result result) {
+    if (result == null) {
+      return;
+    }
     if (result.isSuccess()) {
       System.out.println(result.getSuccessMsg());
       if (result.getTasks() != null) {
-        printTaskList(result.getTasks());
+        // printTaskList(result.getTasks());
       }
     } else {
       System.out.println(result.getErrorMsg());
       if (result.getTasks() != null) {
-        printTaskList(result.getTasks());
+        // printTaskList(result.getTasks());
       }
     }
   }
