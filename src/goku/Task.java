@@ -63,16 +63,16 @@ public class Task {
   }
 
   public boolean isDueBefore(Date date) {
-    return DateUtil.dateTimeIsEarlierThanOrSameAs(deadline, date);
+    return DateUtil.isEarlierThan(deadline, date);
   }
 
   public boolean isDueBefore(Task task) {
-    return DateUtil.dateTimeIsEarlierThanOrSameAs(deadline, task.getDeadline());
+    return DateUtil.isEarlierThan(deadline, task.getDeadline());
   }
 
   public boolean inPeriod(Date date) {
-    return DateUtil.dateTimeIsEarlierThan(date, getEndDate())
-        && DateUtil.dateTimeIsLaterThan(date, getStartDate());
+    return DateUtil.isEarlierThan(date, getEndDate())
+        && DateUtil.isLaterThan(date, getStartDate());
   }
 
   public void updateWith(Task otherTask) {

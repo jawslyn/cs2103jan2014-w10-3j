@@ -1,9 +1,12 @@
 package goku.action;
 
+import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
+
+import java.util.Date;
 
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
@@ -12,13 +15,14 @@ import goku.TaskList;
 public class AddAction extends Action {
   private static final String MSG_SUCCESS = "Added: \"%s\"";
   private static final String ERR_FAIL = "Fail to add: \"%s\"";
-  private static final String ERR_TASK_NO_NAME = "Task must have a name!";
 
   public String title;
   public String deadline;
   public String from;
   public String to;
   public TaskList list;
+  public Date dline;
+  public DateRange period;
 
   public AddAction(GOKU goku) {
     super(goku);
