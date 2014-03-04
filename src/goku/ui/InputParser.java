@@ -96,47 +96,47 @@ public class InputParser {
     if (params.length == 0) {
       return null;
     } else {
-      AddAction a = new AddAction(goku);
-      params = extractDeadline(params, a);
-      params = extractPeriod(params, a);
-      a.title = Joiner.on(" ").join(params);
-      return a;
+      AddAction addAction = new AddAction(goku);
+      params = extractDeadline(params, addAction);
+      params = extractPeriod(params, addAction);
+      addAction.title = Joiner.on(" ").join(params);
+      return addAction;
     }
   }
 
-  private SearchAction makeSearchAction(String[] params) {
-    if (params.length == 0) {
-      return null;
-    }
-    SearchAction sa = new SearchAction(goku);
-    sa.title = Joiner.on(" ").join(params);
-    return sa;
-  }
-
-  private DisplayAction makeDisplayAction(String[] params) {
-    DisplayAction da = new DisplayAction(goku);
-    return da;
-  }
-
+  /*
+   * EditAction requires minimally 2 parameters
+   * 1) id for task to edit
+   * 2) an edit, which could be the title, deadline, period etc.
+   * It decides what the new edits for the task should be by calling AddAction,
+   * We are making use of AddAction's parsing capability and not duplicating the work.
+   * 
+   * @return null if we cannot decide which task to edit
+   */
   private EditAction makeEditAction(String[] params) {
     if (params.length < 2) {
       return null;
     }
-    EditAction ea = new EditAction(goku);
+    EditAction editAction = new EditAction(goku);
     try {
       int id = Integer.parseInt(params[0]);
-      ea.id = id;
+      editAction.id = id;
       String[] taskParams = Arrays.copyOfRange(params, 1, params.length);
       AddAction aaa = makeAddAction(taskParams);
-      ea.deadline = aaa.deadline;
-      ea.from = aaa.from;
-      ea.to = aaa.to;
-      ea.title = aaa.title;
+      editAction.deadline = aaa.deadline;
+      editAction.from = aaa.from;
+      editAction.to = aaa.to;
+      editAction.title = aaa.title;
     } catch (NumberFormatException e) {
     }
-    return ea;
+    return editAction;
   }
 
+  /*
+   * Delete can take in a single parameter which can be parsed into an integer,
+   * this is then assumed to be the ID of the Task to be deleted.
+   * Else the inputs will be taken as the title of the task to be deleted.
+   */
   private DeleteAction makeDeleteAction(String[] params) {
     if (params.length == 0) {
       return null;
@@ -155,6 +155,35 @@ public class InputParser {
     return da;
   }
 
+  /*
+   * All inputs to search are taken to be the title of the Task to find
+   */
+  private SearchAction makeSearchAction(String[] params) {
+    if (params.length == 0) {
+      return null;
+    }
+    SearchAction sa = new SearchAction(goku);
+    sa.title = Joiner.on(" ").join(params);
+    return sa;
+  }
+
+  private DisplayAction makeDisplayAction(String[] params) {
+    DisplayAction da = new DisplayAction(goku);
+    return da;
+  }
+
+  /*
+   * A period is identified by the presence of the keywords "from" and "to".
+   * Assumption: the period is always at the end of the input,
+   * 
+   * i.e. whatever follows "from" will parsed into a date representing the start,
+   * and what follows "to" will be parsed into a date representing the end.
+   * 
+   * Valid inputs are ["from", "2pm 12/2", "to" "3pm 12/2"].
+   * When the parse is successful @param params is modified such that
+   * the parsed strings, including "from" and "to", is removed - essentially params
+   * is shortened.
+   */
   private String[] extractPeriod(String[] params, AddAction a) {
     int indexOfFrom = Arrays.asList(params).indexOf("from");
     int indexOfTo = Arrays.asList(params).indexOf("to");
@@ -167,6 +196,7 @@ public class InputParser {
         String[] endCandidates = Arrays.copyOfRange(params, indexOfTo + 1,
             params.length);
         DateTime end = DateUtil.parse(endCandidates);
+
         if (start != null && end != null) {
           a.from = Joiner.on(" ").join(startCandidates);
           a.to = Joiner.on(" ").join(endCandidates);
