@@ -17,23 +17,28 @@ import goku.TaskList;
  *      returns a failure Result with TaskList.size() > 1
  */
 public class DeleteAction extends Action {
-  public DeleteAction(GOKU goku) {
-    super(goku);
-  }
-
   private static final String MSG_SUCCESS = "Deleted \"%s\"";
   private static final String ERR_FAILURE = "Many matches found for \"%s\".";
   private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
 
   public int id;
+
   public String title;
 
-  @Override
-  public Result doIt() {
-    return deleteTask();
+  public DeleteAction(GOKU goku) {
+    super(goku);
+  }
+
+  public void addToUndoList() {
+    TaskList beforeAddList = new TaskList();
+    for (Task t : list.getArrayList()) {
+      beforeAddList.addUndoTask(t);
+    }
+    goku.getUndoList().offer(beforeAddList);
   }
 
   public Result deleteTask() {
+    addToUndoList();
     boolean success;
     success = tryDeleteById();
     if (success) {
@@ -54,11 +59,9 @@ public class DeleteAction extends Action {
     }
   }
 
-  private TaskList tryDeleteByTitle() {
-    Task task = new Task();
-    task.setTitle(title);
-    TaskList possibleDeletion = list.deleteTaskByTitle(task);
-    return possibleDeletion;
+  @Override
+  public Result doIt() {
+    return deleteTask();
   }
 
   private boolean tryDeleteById() {
@@ -66,6 +69,13 @@ public class DeleteAction extends Action {
     // task.setTitle(title);
     Task deleted = list.deleteTaskById(id);
     return deleted != null;
+  }
+
+  private TaskList tryDeleteByTitle() {
+    Task task = new Task();
+    task.setTitle(title);
+    TaskList possibleDeletion = list.deleteTaskByTitle(task);
+    return possibleDeletion;
   }
 
 }
