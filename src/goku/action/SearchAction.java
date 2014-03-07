@@ -38,8 +38,9 @@ public class SearchAction extends Action {
 	}
 	
 	public Result searchByDeadline() {
-		
-		
+		Task task = new Task();
+		task.setDeadline(dline);
+		TaskList foundTasks = list.findTaskByDeadline(task);
 		return new Result(true, MSG_SUCCESS, null, foundTasks);
 	}
 
