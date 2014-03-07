@@ -45,7 +45,7 @@ public class SearchAction extends Action {
 		if(foundTasks.size() != 0) {
 			return new Result(true, MSG_SUCCESS, null, foundTasks);
 		} else {
-			return new Result(false, MSG_FAIL, null, null);
+			return new Result(false, null, MSG_FAIL, null);
 		}
 	}
 

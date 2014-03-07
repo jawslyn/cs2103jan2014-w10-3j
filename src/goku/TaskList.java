@@ -16,6 +16,10 @@ public class TaskList implements Iterable<Task> {
 		task.setId(++count);
 		return _list.add(task);
 	}
+	
+	public boolean appendTask(Task task) {
+		return _list.add(task);
+	}
 
 	public void addUndoTask(Task task) {
 		_list.add(task);
@@ -55,8 +59,11 @@ public class TaskList implements Iterable<Task> {
 	public TaskList findTaskByDeadline(Task toFind) {
 		TaskList matches = new TaskList();
 		for (Task task : _list) {
+			if (task.getDeadline()==null) {
+				continue;
+			}
 			if (task.isDueBefore(toFind)) {
-				matches.addTask(task);
+				matches.appendTask(task);
 			}
 		}
 		return matches;
@@ -67,7 +74,7 @@ public class TaskList implements Iterable<Task> {
 		TaskList matches = new TaskList();
 		for (Task task : _list) {
 			if (task.tagsMatch(toFind)) {
-				matches.addTask(task);
+				matches.appendTask(task);
 			}
 		}
 		return matches;
@@ -77,7 +84,7 @@ public class TaskList implements Iterable<Task> {
 		TaskList matches = new TaskList();
 		for (Task task : _list) {
 			if (task.titleMatches(toFind)) {
-				matches.addTask(task);
+				matches.appendTask(task);
 			}
 		}
 		return matches;

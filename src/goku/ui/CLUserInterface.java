@@ -80,12 +80,12 @@ public class CLUserInterface implements UserInterface {
 		if (result.isSuccess()) {
 			System.out.println(result.getSuccessMsg());
 			if (result.getTasks() != null) {
-				// printTaskList(result.getTasks());
+				printTaskList(result.getTasks());
 			}
 		} else {
 			System.out.println(result.getErrorMsg());
 			if (result.getTasks() != null) {
-				printTaskList(result.getTasks());
+				// printTaskList(result.getTasks());
 			}
 		}
 	}
