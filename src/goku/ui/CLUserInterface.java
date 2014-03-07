@@ -5,6 +5,7 @@ import goku.Result;
 import goku.TaskList;
 import goku.action.Action;
 import goku.action.DisplayAction;
+import goku.action.SearchAction;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
 
@@ -18,76 +19,79 @@ import java.util.Scanner;
  * @author jchiam
  */
 public class CLUserInterface implements UserInterface {
-  private GOKU goku;
-  private Scanner sc;
-  private Storage storage;
-  private InputParser parser;
+	private GOKU goku;
+	private Scanner sc;
+	private Storage storage;
+	private InputParser parser;
 
-  public CLUserInterface(GOKU goku) {
-    this.goku = goku;
-    sc = new Scanner(System.in);
-    storage = StorageFactory.getDefaultStorage();
-    parser = new InputParser(goku);
-  }
+	public CLUserInterface(GOKU goku) {
+		this.goku = goku;
+		sc = new Scanner(System.in);
+		storage = StorageFactory.getDefaultStorage();
+		parser = new InputParser(goku);
+	}
 
-  @Override
-  public void run() {
-    loop();
-    System.out.println("Thanks for using G.O.K.U.!");
-  }
+	@Override
+	public void run() {
+		loop();
+		System.out.println("Thanks for using G.O.K.U.!");
+	}
 
-  public void loop() {
-    while (true) {
-      Action action = parser.parse(getUserInput());
-      if (action instanceof ExitAction) {
-        return;
-      } else if (action instanceof DisplayAction) {
-        printTaskList(action.doIt().getTasks());
-      } else {
-        Result result = action.doIt();
-        feedBack(result);
-        save();
-      }
-    }
-  }
+	public void loop() {
+		while (true) {
+			Action action = parser.parse(getUserInput());
+			if (action instanceof ExitAction) {
+				return;
+			} else if (action instanceof DisplayAction) {
+				printTaskList(action.doIt().getTasks());
+			} else if (action instanceof SearchAction) {
+				Result result = action.doIt();
+				feedBack(result);
+			} else {
+				Result result = action.doIt();
+				feedBack(result);
+				save();
+			}
+		}
+	}
 
-  public void save() {
-    try {
-      storage.saveAll(goku.getTaskList());
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Error saving tasks.");
-    }
-  }
+	public void save() {
+		try {
+			storage.saveAll(goku.getTaskList());
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Error saving tasks.");
+		}
+	}
 
-  /**
-   * @return string that user entered
-   */
-  @Override
-  public String getUserInput() {
-    return sc.nextLine();
-  }
+	/**
+	 * @return string that user entered
+	 */
+	@Override
+	public String getUserInput() {
+		return sc.nextLine();
+	}
 
-  @Override
-  public void feedBack(Result result) {
-    if (result == null) {
-      return;
-    }
-    if (result.isSuccess()) {
-      System.out.println(result.getSuccessMsg());
-      if (result.getTasks() != null) {
-        // printTaskList(result.getTasks());
-      }
-    } else {
-      System.out.println(result.getErrorMsg());
-      if (result.getTasks() != null) {
-        // printTaskList(result.getTasks());
-      }
-    }
-  }
+	@Override
+	public void feedBack(Result result) {
+		if (result == null) {
+			return;
+		}
+		if (result.isSuccess()) {
+			System.out.println(result.getSuccessMsg());
+			if (result.getTasks() != null) {
+				// printTaskList(result.getTasks());
+			}
+		} else {
+			System.out.println(result.getErrorMsg());
+			if (result.getTasks() != null) {
+				printTaskList(result.getTasks());
+			}
+		}
+	}
 
-  public void printTaskList(TaskList list) {
-    TaskListDisplayer tld = new TaskListDisplayer(System.out);
-    tld.display(list);
-  }
+	public void printTaskList(TaskList list) {
+		TaskListDisplayer tld = new TaskListDisplayer(System.out);
+		tld.display(list);
+	}
 }

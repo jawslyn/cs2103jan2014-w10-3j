@@ -29,6 +29,7 @@ public class SearchAction extends Action {
 	}
 
 	private static final String MSG_SUCCESS = "Found tasks!";
+	private static final String MSG_FAIL = "No relevant tasks.";
 
 	public Result searchTitle() {
 		Task task = new Task();
@@ -41,11 +42,18 @@ public class SearchAction extends Action {
 		Task task = new Task();
 		task.setDeadline(dline);
 		TaskList foundTasks = list.findTaskByDeadline(task);
-		return new Result(true, MSG_SUCCESS, null, foundTasks);
+		if(foundTasks.size() != 0) {
+			return new Result(true, MSG_SUCCESS, null, foundTasks);
+		} else {
+			return new Result(false, MSG_FAIL, null, null);
+		}
 	}
 
 	@Override
 	public Result doIt() {
+		if(dline != null) {
+			return searchByDeadline();
+		}
 		return searchTitle();
 	}
 
