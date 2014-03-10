@@ -33,6 +33,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.text.BadLocationException;
 
+/**
+ * @author ZhiAn
+ * 
+ */
 public class GUserInterface extends JFrame implements UserInterface,
     DocumentListener, ListDataListener {
   private GOKU goku;
@@ -258,18 +262,5 @@ public class GUserInterface extends JFrame implements UserInterface,
       }
     });
 
-  }
-
-  /**
-   * Parser that deals with String input from user to extract necessary
-   * information to create Command object
-   * 
-   * @author jchiam
-   */
-  // TODO
-  protected class GUIParser extends JParser {
-    public GUIParser() {
-      super();
-    }
   }
 }
