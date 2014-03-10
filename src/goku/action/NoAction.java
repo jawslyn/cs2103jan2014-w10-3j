@@ -4,6 +4,7 @@ import goku.GOKU;
 import goku.Result;
 
 public class NoAction extends Action {
+  private static final String MSG_NONE = "Command invalid";
 
   public NoAction(GOKU goku) {
     super(goku);
@@ -11,7 +12,6 @@ public class NoAction extends Action {
 
   @Override
   public Result doIt() {
-    return null;
+    return new Result(true, MSG_NONE, null, null);
   }
-
 }
