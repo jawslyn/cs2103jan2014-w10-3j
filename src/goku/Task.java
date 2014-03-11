@@ -135,7 +135,7 @@ public class Task {
     return period.getStartDate();
   }
 
-  public boolean getStatus() {
+  public Boolean getStatus() {
     return isComplete;
   }
 

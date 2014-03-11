@@ -32,6 +32,10 @@ public class DisplayAction extends Action {
     return new Result(true, MSG_SUCCESS, null, list.getAllCompleted());
   }
 
+  public Result displayIncomplete() {
+    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
+  }
+  
   public Result displayDate() {
     Date deadline = byDeadline;
     Task t = new Task();
