@@ -13,5 +13,4 @@ public class ExitAction extends Action {
   public Result doIt() {
     return null;
   }
-
 }

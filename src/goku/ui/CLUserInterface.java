@@ -54,13 +54,14 @@ public class CLUserInterface implements UserInterface {
       } catch (MakeActionException e) {
         System.out.println(e.getMessage());
       }
+      if (action instanceof ExitAction) {
+        return;
+      } 
     }
   }
 
   private void doAction(Action action) {
-    if (action instanceof ExitAction) {
-      return;
-    } else if (action instanceof DisplayAction) {
+      if (action instanceof DisplayAction) {
       printTaskList(action.doIt().getTasks());
     } else if (action instanceof SearchAction) {
       Result result = action.doIt();
