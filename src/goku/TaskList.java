@@ -115,7 +115,7 @@ public class TaskList implements Iterable<Task> {
   public TaskList getAllIncomplete() {
     TaskList result = new TaskList();
     for (Task task : _list) {
-      if (!task.getStatus()) {
+      if ((task.getStatus()) == null || !task.getStatus()) {
         result.addTask(task);
       }
     }
