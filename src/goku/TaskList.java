@@ -70,7 +70,7 @@ public class TaskList implements Iterable<Task> {
       if (task.getDeadline() == null) {
         continue;
       }
-      if (task.isDueBefore(toFind)) {
+      if (task.isDueOn(toFind)) {
         matches.appendTask(task);
       }
     }

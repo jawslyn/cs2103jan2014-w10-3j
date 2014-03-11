@@ -62,6 +62,14 @@ public class Task {
     return false;
   }
 
+  public boolean isDueOn(Date date) {
+    return DateUtil.isEarlierOrOn(deadline, date);
+  }
+
+  public boolean isDueOn(Task task) {
+    return DateUtil.isEarlierOrOn(deadline, task.getDeadline());
+  } 
+  
   public boolean isDueBefore(Date date) {
     return DateUtil.isEarlierThan(deadline, date);
   }
