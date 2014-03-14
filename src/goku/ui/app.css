@@ -1,0 +1,102 @@
+.page {
+	-fx-background-image: url("bg.jpg");
+	-fx-background-color: linear-gradient(to bottom,
+		rgba(255,214,94,1) 0%,
+		rgba(254,191,4,1) 100%)
+}
+
+.input-field {
+	-fx-background-radius: 5;
+	-fx-background-color: linear-gradient(to bottom,
+		rgba(43,43,43,1) 0%,
+		rgba(79,79,79,0.8) 5%,
+		rgba(145,145,145,0.45) 10%,
+		rgba(0,0,0,0.2) 50%,
+		rgba(0,0,0,0.2) 90%,
+		rgba(79,79,79,0.8) 98%,
+		rgba(43,43,43,1.0) 100%),
+	 linear-gradient(to right,
+		rgba(43,43,43,0.7) 0%,
+		rgba(0,0,0,0.2) 0.5%,
+		rgba(0,0,0,0.1) 1%,
+		rgba(0,0,0,0.1) 99.5%,
+		rgba(0,0,0,0.2) 99.5%,
+		rgba(43,43,43,0.7) 100%);
+	-fx-text-fill: rgba(250,250,250,1);
+	-fx-font-size: 26;
+	-fx-padding: 5 20 5 20;
+}
+
+.task {
+}
+
+.task-title {
+	/*
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-padding: 2px;
+    -fx-font-weight: normal;
+    -fx-font-style: normal;
+    -fx-font-size: 24;
+    -fx-font-family: sans-serif;
+    */
+}
+
+.check-box {
+}
+
+.task-title:focused {
+}
+
+.task-deadline {
+}
+
+.task-period {
+	
+}
+
+.list-view {
+	-fx-background-color: rgba(0,0,0,0);
+}
+
+.list-view .list-cell {
+	-fx-background-radius: 15;
+	-fx-background-color: linear-gradient(
+		to bottom,
+		rgba(204,204,204,0) 0%,
+		rgba(204,204,204,0) 8%,
+		rgba(238,238,238,1) 10%,
+		rgba(238,238,238,1) 80%,
+		rgba(204,204,204,1) 81%,
+		rgba(204,204,204,1) 93%,
+		rgba(204,204,204,0) 100%);
+    -fx-font-size: 22;
+    -fx-padding: 15 20 15 40;
+}
+
+.list-view .list-cell:focused {
+	-fx-background-color: linear-gradient(
+		to bottom,
+		rgba(0,0,0,0) 0%,
+		rgba(0,0,0,0) 12%,
+		rgba(238,238,238,1) 12%,
+		rgba(238,238,238,1) 84%,
+		rgba(204,204,204,1) 92.5%,
+		rgba(204,204,204,1) 93%,
+		rgba(0,0,0,0) 100%);
+	-fx-text-fill: black;
+	-fx-border-color:blue;
+    -fx-padding: 18 20 12 40;
+}
+
+
+.list-view .list-cell:focused .task-cell .label {
+	-fx-text-fill: black;
+}
+
+.feedback-field {
+	-fx-background-radius: 5;
+	-fx-background-color: linear-gradient(to bottom,rgba(43,43,43,1) 0%, rgba(79,79,79,0.8) 2%, rgba(145,145,145,0.45) 10%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.05) 98%, rgba(0,0,0,0.65) 100%);
+	-fx-text-fill: rgba(220,60,80,1);
+	-fx-font-size: 16;
+	-fx-padding: 5 20 5 10;
+}

@@ -1,15 +1,22 @@
 package goku;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class TaskList implements Iterable<Task> {
   private static Integer count = 0;
 
-  private ArrayList<Task> _list;
+  // private ArrayList<Task> _list;
+  private ObservableList<Task> _list;
+
+  public ObservableList<Task> getObservable() {
+    return _list;
+  }
 
   public TaskList() {
-    _list = new ArrayList<Task>();
+    _list = FXCollections.observableArrayList();
   }
 
   public int addTask(Task task) {
@@ -122,8 +129,10 @@ public class TaskList implements Iterable<Task> {
     return result;
   }
 
-  public ArrayList<Task> getArrayList() {
+  public ObservableList<Task> getArrayList() {
     return _list;
+    // return (ArrayList<Task>) Arrays
+    // .asList(_list.toArray(new Task[_list.size()]));
   }
 
   private int getIndexOfTaskById(int id) {

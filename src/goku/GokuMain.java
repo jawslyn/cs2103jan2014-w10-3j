@@ -1,10 +1,11 @@
 package goku;
 
 import goku.ui.CLUserInterface;
-import goku.ui.GUserInterface;
+import goku.ui.FXGUI;
 import goku.ui.UserInterface;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -18,10 +19,11 @@ public class GokuMain {
     try {
       TaskList tasklist = tryToLoadFile();
       goku.setTaskList(tasklist);
+    } catch (FileNotFoundException e) {
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
+
     ui = setUserInterface(args);
     ui.run();
   }
@@ -42,9 +44,9 @@ public class GokuMain {
 
   private static UserInterface setUserInterface(String[] args) {
     if (shouldRunGui(args)) {
-      return new GUserInterface(goku);
-    } else {
       return new CLUserInterface(goku);
+    } else {
+      return new FXGUI(goku);
     }
   }
 

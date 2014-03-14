@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?scenebuilder-classpath-element ../../goku?>
+
+<AnchorPane id="AnchorPane" fx:id="page" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="page" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="goku.ui.GokuController">
+  <children>
+    <VBox prefHeight="400.0" prefWidth="600.0" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <children>
+        <HBox alignment="CENTER_LEFT" fillHeight="true" prefHeight="-1.0" prefWidth="600.0" spacing="40.0" style="" VBox.vgrow="NEVER">
+          <children>
+            <TextField id="input-field" fx:id="inputField" cache="false" onKeyPressed="#inputFieldKeyPress" opacity="1.0" prefWidth="236.0" style="" styleClass="input-field" text="add " HBox.hgrow="ALWAYS">
+              <HBox.margin>
+                <Insets />
+              </HBox.margin>
+            </TextField>
+          </children>
+          <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+          </padding>
+          <VBox.margin>
+            <Insets />
+          </VBox.margin>
+        </HBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+          <children>
+            <ListView fx:id="listView" editable="false" opacity="1.0" prefHeight="200.0" prefWidth="200.0" style="" VBox.vgrow="SOMETIMES">
+              <stylesheets>
+                <URL value="@app.css" />
+              </stylesheets>
+            </ListView>
+            <StackPane prefHeight="40.0" prefWidth="200.0">
+              <children>
+                <TextField fx:id="feedbackField" editable="false" focusTraversable="false" prefWidth="200.0" styleClass="feedback-field" text="" />
+              </children>
+            </StackPane>
+          </children>
+          <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" />
+          </padding>
+        </VBox>
+      </children>
+      <stylesheets>
+        <URL value="@app.css" />
+      </stylesheets>
+    </VBox>
+  </children>
+  <stylesheets>
+    <URL value="@app.css" />
+  </stylesheets>
+</AnchorPane>

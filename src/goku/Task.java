@@ -68,8 +68,8 @@ public class Task {
 
   public boolean isDueOn(Task task) {
     return DateUtil.isEarlierOrOn(deadline, task.getDeadline());
-  } 
-  
+  }
+
   public boolean isDueBefore(Date date) {
     return DateUtil.isEarlierThan(deadline, date);
   }
@@ -102,6 +102,9 @@ public class Task {
     }
     if (anObject instanceof Task) {
       Task aTask = (Task) anObject;
+      if (id == null || aTask.id == null) {
+        return false;
+      }
       return id.equals(aTask.id);
     }
     return false;
