@@ -1,8 +1,8 @@
 .page {
-	-fx-background-image: url("bg.jpg");
 	-fx-background-color: linear-gradient(to bottom,
 		rgba(255,214,94,1) 0%,
-		rgba(254,191,4,1) 100%)
+		rgba(254,191,4,1) 100%);
+	-fx-background-image: url("bg.png");
 }
 
 .input-field {
@@ -62,11 +62,11 @@
 	-fx-background-radius: 15;
 	-fx-background-color: linear-gradient(
 		to bottom,
-		rgba(204,204,204,0) 0%,
-		rgba(204,204,204,0) 8%,
-		rgba(238,238,238,1) 10%,
+		rgba(0,0,0,0) 0%,
+		rgba(0,0,0,0) 6%,
+		rgba(238,238,238,1) 8%,
 		rgba(238,238,238,1) 80%,
-		rgba(204,204,204,1) 81%,
+		rgba(204,204,204,1) 85%,
 		rgba(204,204,204,1) 93%,
 		rgba(204,204,204,0) 100%);
     -fx-font-size: 22;
@@ -74,24 +74,29 @@
 }
 
 .list-view .list-cell:focused {
+	-fx-background-radius: 20 15;
 	-fx-background-color: linear-gradient(
 		to bottom,
 		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 12%,
+		rgba(0,0,0,0) 10%,
 		rgba(238,238,238,1) 12%,
 		rgba(238,238,238,1) 84%,
-		rgba(204,204,204,1) 92.5%,
-		rgba(204,204,204,1) 93%,
-		rgba(0,0,0,0) 100%);
-	-fx-text-fill: black;
-	-fx-border-color:blue;
+		rgba(204,204,204,1) 89%,
+		rgba(204,204,204,1) 97%,
+		rgba(204,204,204,0) 100%);
+    -fx-font-size: 22;
     -fx-padding: 18 20 12 40;
+	-fx-text-fill: black;
 }
-
 
 .list-view .list-cell:focused .task-cell .label {
 	-fx-text-fill: black;
 }
+
+.list-view .list-cell:focused .label {
+	-fx-text-fill: black;
+}
+
 
 .feedback-field {
 	-fx-background-radius: 5;
