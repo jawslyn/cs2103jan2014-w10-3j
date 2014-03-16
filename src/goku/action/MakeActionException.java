@@ -1,4 +1,4 @@
-package goku.ui;
+package goku.action;
 
 @SuppressWarnings("serial")
 public class MakeActionException extends Exception {
