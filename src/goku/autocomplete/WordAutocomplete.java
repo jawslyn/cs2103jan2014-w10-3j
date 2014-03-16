@@ -1,6 +1,7 @@
 package goku.autocomplete;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,6 +76,11 @@ public class WordAutocomplete {
     defaultCorpus.add("add");
     defaultCorpus.add("view");
     defaultCorpus.add("edit");
+    defaultCorpus.addAll(Arrays
+        .asList((new String[] { "delete", "remove", "update", "done",
+            "complete", "do", "finish", "display", "view", "show", "search",
+            "find", "quit", "exit", "undo", "revert", "rollback" })));
+
     return defaultCorpus;
   }
 

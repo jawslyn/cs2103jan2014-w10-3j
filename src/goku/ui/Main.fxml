@@ -17,7 +17,7 @@
       <children>
         <HBox alignment="CENTER_LEFT" fillHeight="true" prefHeight="-1.0" prefWidth="600.0" spacing="40.0" style="" VBox.vgrow="NEVER">
           <children>
-            <TextField id="input-field" fx:id="inputField" cache="false" onKeyPressed="#inputFieldKeyPress" opacity="1.0" prefWidth="236.0" style="" styleClass="input-field" text="add " HBox.hgrow="ALWAYS">
+            <TextField id="input-field" fx:id="inputField" cache="false" opacity="1.0" prefWidth="236.0" style="" styleClass="input-field" HBox.hgrow="ALWAYS">
               <HBox.margin>
                 <Insets />
               </HBox.margin>
@@ -39,7 +39,7 @@
             </ListView>
             <StackPane prefHeight="40.0" prefWidth="200.0">
               <children>
-                <TextField fx:id="feedbackField" editable="false" focusTraversable="false" prefWidth="200.0" styleClass="feedback-field" text="" />
+                <TextField fx:id="feedbackField" editable="false" focusTraversable="false" prefWidth="200.0" styleClass="feedback-field" text="asdf" />
               </children>
             </StackPane>
           </children>

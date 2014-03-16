@@ -66,17 +66,8 @@ public class DeleteAction extends Action {
   }
 
   private boolean tryDeleteById() {
-    // Task task = new Task();
-    // task.setTitle(title);
     Task deleted = list.deleteTaskById(id);
     return deleted != null;
-  }
-
-  private TaskList tryDeleteByTitle() {
-    Task task = new Task();
-    task.setTitle(title);
-    TaskList possibleDeletion = list.deleteTaskByTitle(task);
-    return possibleDeletion;
   }
 
 }

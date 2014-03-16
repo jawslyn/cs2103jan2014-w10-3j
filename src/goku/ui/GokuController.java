@@ -8,11 +8,14 @@ import goku.action.DeleteAction;
 import goku.action.DisplayAction;
 import goku.action.ExitAction;
 import goku.action.SearchAction;
+import goku.autocomplete.WordAutocomplete;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
@@ -57,11 +60,28 @@ public class GokuController {
 
   private Storage storage;
 
+  private WordAutocomplete autoComplete;
+
+  private static enum Mode {
+    INSERT, COMPLETION
+  };
+
+  private List<String> words;
+  private Mode mode = Mode.INSERT;
+
   @FXML
   void initialize() {
     assert inputField != null : "fx:id=\"inputField\" was not injected: check your FXML file 'Main.fxml'.";
     assert listView != null : "fx:id=\"listView\" was not injected: check your FXML file 'Main.fxml'.";
     assert feedbackField != null : "fx:id=\"feedbackField\" was not injected: check your FXML file 'Main.fxml'.";
+
+    autoComplete = new WordAutocomplete();
+    words = new ArrayList<String>(5);
+    words.add("spark");
+    words.add("special");
+    words.add("spectacles");
+    words.add("spectacular");
+    words.add("swing");
 
     goku = FXGUI.getGokuInstance();
     if (goku == null) {
@@ -72,6 +92,73 @@ public class GokuController {
     tasks = goku.getObservable();
     listView.setItems(tasks);
     storage = StorageFactory.getDefaultStorage();
+
+    inputField.addEventFilter(KeyEvent.KEY_RELEASED,
+        new EventHandler<KeyEvent>() {
+          @Override
+          public void handle(KeyEvent event) {
+            if (event.getCode().isDigitKey() || event.getCode().isLetterKey()) {
+              int pos = inputField.getCaretPosition();
+              String content = inputField.getText();
+              int w;
+              for (w = pos - 1; w >= 0; w--) {
+                if (!Character.isLetter(content.charAt(w))) {
+                  break;
+                }
+              }
+              String prefix = content.substring(w + 1, pos).toLowerCase();
+              System.out.println("prefix: " + prefix);
+              List<String> completions = autoComplete.complete(prefix);
+              if (completions.size() == 0) {
+                mode = Mode.INSERT;
+              } else {
+                System.out.println("suggesting");
+                String match = completions.get(0);
+                System.out.println(match);
+                String completion = match.substring(pos - 1 - w);
+                // System.out.println(completion);
+                inputField.insertText(pos, completion);
+                inputField.selectRange(w + 1 + match.length(),
+                    w + 1 + prefix.length());
+                mode = Mode.COMPLETION;
+              }
+            }
+
+          }
+        });
+
+    inputField.addEventFilter(KeyEvent.KEY_PRESSED,
+        new EventHandler<KeyEvent>() {
+          @Override
+          public void handle(KeyEvent event) {
+            if (event.getCode() == KeyCode.ENTER) {
+              if (mode == Mode.COMPLETION) {
+                int pos = inputField.getLength();
+                inputField.insertText(pos, " ");
+                mode = Mode.INSERT;
+                inputField.end();
+                return;
+              } else {
+                Action action = null;
+                String input = null;
+                try {
+                  input = inputField.getText();
+                  action = parser.parse(input);
+                  if (action instanceof ExitAction) {
+                  }
+                  doAction(action);
+                } catch (MakeActionException e) {
+                  System.out.println(e.getMessage());
+                }
+                if (action instanceof ExitAction) {
+                  return;
+                }
+                inputField.setText("");
+                return;
+              }
+            }
+          }
+        });
 
     listView.setCellFactory(new Callback<ListView<Task>, ListCell<Task>>() {
       @Override
@@ -145,24 +232,6 @@ public class GokuController {
     }
   }
 
-  public void inputFieldKeyPress(KeyEvent event) {
-    if (event.getCode() == KeyCode.ENTER) {
-      Action action = null;
-      String input = null;
-      try {
-        input = inputField.getText();
-        action = parser.parse(input);
-        doAction(action);
-      } catch (MakeActionException e) {
-        System.out.println(e.getMessage());
-      }
-      if (action instanceof ExitAction) {
-        return;
-      }
-      inputField.setText("");
-    }
-  }
-
   private void doAction(Action action) {
     clearFeedback();
     if (action instanceof DisplayAction) {
@@ -209,11 +278,5 @@ public class GokuController {
       e.printStackTrace();
       System.out.println("Error saving tasks.");
     }
-  }
-
-  private Task makeTask(String title) {
-    Task aTask = new Task();
-    aTask.setTitle(title);
-    return aTask;
   }
 }

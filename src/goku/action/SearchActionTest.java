@@ -37,7 +37,6 @@ public class SearchActionTest {
     c.setTitle("hello");
 
     int idA = list.addTask(a);
-    int idB = list.addTask(b);
 
     SearchAction search = new SearchAction(goku);
     search.title = "hello";

@@ -100,8 +100,8 @@
 
 .feedback-field {
 	-fx-background-radius: 5;
-	-fx-background-color: linear-gradient(to bottom,rgba(43,43,43,1) 0%, rgba(79,79,79,0.8) 2%, rgba(145,145,145,0.45) 10%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.05) 98%, rgba(0,0,0,0.65) 100%);
-	-fx-text-fill: rgba(220,60,80,1);
+	-fx-background-color: linear-gradient(to bottom,rgba(43,43,43,1) 0%, rgba(79,79,79,0.8) 2%, rgba(145,145,145,0.65) 10%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.35) 98%, rgba(0,0,0,0.75) 100%);
+	-fx-text-fill: rgba(250,230,230,1);
 	-fx-font-size: 16;
 	-fx-padding: 5 20 5 10;
 }

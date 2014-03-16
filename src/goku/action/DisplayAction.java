@@ -9,10 +9,7 @@ import java.util.Date;
 
 public class DisplayAction extends Action {
 
-  private static final String MSG_EMPTY = "there are no tasks";
   private static final String MSG_SUCCESS = "displaying list of task:";
-  private static final String MSG_FAILURE = "unable to display";
-  private boolean displayAll = false;
   Date byDeadline;
 
   public DisplayAction(GOKU goku) {
@@ -35,7 +32,7 @@ public class DisplayAction extends Action {
   public Result displayIncomplete() {
     return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
   }
-  
+
   public Result displayDate() {
     Date deadline = byDeadline;
     Task t = new Task();
