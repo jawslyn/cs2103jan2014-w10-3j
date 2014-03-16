@@ -44,6 +44,9 @@ public class Task {
     }
     if (anObject instanceof Task) {
       Task aTask = (Task) anObject;
+      if (id == null || aTask.id == null) {
+        return false;
+      }
       return id.equals(aTask.id);
     }
     return false;

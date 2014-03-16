@@ -17,20 +17,11 @@ public class WordAutocompleteTest {
   private static final String PREFIX_WITH_COMPLETION_1 = "a";
   private static final String[] EXPECTED_COMPLETION_1_STRING = { "add",
       "assignment", "activity" };
-  private static final List<String> EXPECTED_COMPLETION_1 = Arrays
-      .asList(EXPECTED_COMPLETION_1_STRING);
-
   private static final String PREFIX_WITH_COMPLETION_2 = "A";
   private static final String[] EXPECTED_COMPLETION_2_STRING = { "add",
       "assignment", "activity" };
-  private static final List<String> EXPECTED_COMPLETION_2 = Arrays
-      .asList(EXPECTED_COMPLETION_2_STRING);
-
   private static final String PREFIX_WITH_COMPLETION_3 = "Ad";
   private static final String[] EXPECTED_COMPLETION_3_STRING = { "add" };
-  private static final List<String> EXPECTED_COMPLETION_3 = Arrays
-      .asList(EXPECTED_COMPLETION_3_STRING);
-
   private static final String PREFIX_WITHOUT_COMPLETION_1 = "i";
   private static final String PREFIX_WITHOUT_COMPLETION_2 = "dd";
 

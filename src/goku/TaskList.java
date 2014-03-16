@@ -1,178 +1,192 @@
 package goku;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 public class TaskList implements Iterable<Task> {
-	private static Integer count = 0;
+  private static Integer count = 0;
 
-	private ArrayList<Task> _list;
+  private ObservableList<Task> _list;
 
-	public TaskList() {
-		_list = new ArrayList<Task>();
-	}
+  public ObservableList<Task> getObservable() {
+    return _list;
+  }
 
-	public int addTask(Task task) {
-		task.setId(++count);
-		boolean success = _list.add(task);
-		return success ? task.getId() : -1;
-	}
+  public TaskList() {
+    _list = FXCollections.observableArrayList();
+  }
 
-	public boolean addTaskWithoutSettingId(Task task) {
-		if (getTaskById(task.getId()) == null) {
-			return _list.add(task);
-		}
-		return false;
-	}
+  public int addTask(Task task) {
+    task.setId(++count);
+    boolean success = _list.add(task);
+    return success ? task.getId() : -1;
+  }
 
-	public boolean appendTask(Task task) {
-		return _list.add(task);
-	}
+  public boolean addTaskWithoutSettingId(Task task) {
+    if (getTaskById(task.getId()) == null) {
+      return _list.add(task);
+    }
+    return false;
+  }
 
-	public void addUndoTask(Task task) {
-		_list.add(task);
-	}
+  public boolean appendTask(Task task) {
+    return _list.add(task);
+  }
 
-	public void clear() {
-		_list.clear();
-	}
+  public void addUndoTask(Task task) {
+    _list.add(task);
+  }
 
-	private TaskList deleteTask(TaskList matches) {
-		if (matches.size() == 1) {
-			deleteTaskById(matches.getTaskByIndex(0).getId());
-			return new TaskList();
-		} else {
-			return matches;
-		}
-	}
+  public void clear() {
+    _list.clear();
+  }
 
-	public Task deleteTaskById(int id) {
-		int index = getIndexOfTaskById(id);
-		if (index < 0) {
-			return null;
-		} else {
-			return deleteTaskByIndex(index);
-		}
-	}
+  private TaskList deleteTask(TaskList matches) {
+    if (matches.size() == 1) {
+      deleteTaskById(matches.getTaskByIndex(0).getId());
+      return new TaskList();
+    } else {
+      return matches;
+    }
+  }
 
-	public Task deleteTaskByIndex(int index) {
-		return _list.remove(index);
-	}
+  public Task deleteTaskById(int id) {
+    int index = getIndexOfTaskById(id);
+    if (index < 0) {
+      return null;
+    } else {
+      return deleteTaskByIndex(index);
+    }
+  }
 
-	public TaskList deleteTaskByTitle(Task toDelete) {
-		TaskList matches = findTaskByTitle(toDelete);
-		return deleteTask(matches);
-	}
+  public Task deleteTaskByIndex(int index) {
+    return _list.remove(index);
+  }
 
-	public TaskList findTaskByDeadline(Task toFind) {
-		TaskList matches = new TaskList();
-		for (Task task : _list) {
-			if (task.getDeadline() == null) {
-				continue;
-			}
-			if (task.isDueOn(toFind)) {
-				matches.appendTask(task);
-			}
-		}
-		return matches;
-	}
-	
-	public TaskList findTaskByPeriod(Task toFind) {
-		TaskList matches = new TaskList();
-		for (Task task : _list) {
-			if (task.getDateRange() == null && task.getDeadline() == null) {
-				continue;
-			} else if (task.getDeadline()!=null && toFind.inPeriod(task.getDeadline())) {				// deadline falls within period
-				matches.appendTask(task);
-				continue;
-			} else if (task.getDateRange()!=null && toFind.inPeriod(task.getDateRange().startDate)) {	// start date of period falls within search period
-				matches.appendTask(task);
-				continue;
-			}
-		}	
-		
-		return matches;
-	}
+  public TaskList deleteTaskByTitle(Task toDelete) {
+    TaskList matches = findTaskByTitle(toDelete);
+    return deleteTask(matches);
+  }
 
-	public TaskList findTaskByTitle(Task toFind) {
-		TaskList matches = new TaskList();
-		for (Task task : _list) {
-			if (task.titleMatches(toFind)) {
-				matches.appendTask(task);
-			}
-		}
-		return matches;
-	}
+  public TaskList findTaskByDeadline(Task toFind) {
+    TaskList matches = new TaskList();
+    for (Task task : _list) {
+      if (task.getDeadline() == null) {
+        continue;
+      }
+      if (task.isDueOn(toFind)) {
+        matches.appendTask(task);
+      }
+    }
+    return matches;
+  }
 
-	public TaskList getAll() {
-		return this;
-	}
+  public TaskList findTaskByPeriod(Task toFind) {
+    TaskList matches = new TaskList();
+    for (Task task : _list) {
+      if (task.getDateRange() == null && task.getDeadline() == null) {
+        continue;
+      } else if (task.getDeadline() != null
+          && toFind.inPeriod(task.getDeadline())) { // deadline falls within
+                                                    // period
+        matches.appendTask(task);
+        continue;
+      } else if (task.getDateRange() != null
+          && toFind.inPeriod(task.getDateRange().startDate)) { // start date of
+                                                               // period falls
+                                                               // within search
+                                                               // period
+        matches.appendTask(task);
+        continue;
+      }
+    }
 
-	public TaskList getAllCompleted() {
-		TaskList result = new TaskList();
-		for (Task task : _list) {
-			if (task.getStatus()) {
-				result.addTask(task);
-			}
-		}
-		return result;
-	}
+    return matches;
+  }
 
-	public TaskList getAllIncomplete() {
-		TaskList result = new TaskList();
-		for (Task task : _list) {
-			if ((task.getStatus()) == null || !task.getStatus()) {
-				result.addTask(task);
-			}
-		}
-		return result;
-	}
+  public TaskList findTaskByTitle(Task toFind) {
+    TaskList matches = new TaskList();
+    for (Task task : _list) {
+      if (task.titleMatches(toFind)) {
+        matches.appendTask(task);
+      }
+    }
+    return matches;
+  }
 
-	public ArrayList<Task> getArrayList() {
-		return _list;
-	}
+  public TaskList getAll() {
+    return this;
+  }
 
-	private int getIndexOfTaskById(int id) {
-		return _list.indexOf(getTaskById(id));
-	}
+  public TaskList getAllCompleted() {
+    TaskList result = new TaskList();
+    for (Task task : _list) {
+      if (task.getStatus()) {
+        result.addTask(task);
+      }
+    }
+    return result;
+  }
 
-	/*
-	 * @param id
-	 * 
-	 * @returns the task with specified id
-	 */
-	public Task getTaskById(int id) {
-		for (Task task : _list) {
-			if (task.getId() == id) {
-				return task;
-			}
-		}
-		return null;
-	}
+  public TaskList getAllIncomplete() {
+    TaskList result = new TaskList();
+    for (Task task : _list) {
+      if ((task.getStatus()) == null || !task.getStatus()) {
+        result.addTask(task);
+      }
+    }
+    return result;
+  }
 
-	protected Task getTaskByIndex(int index) {
-		return _list.get(index);
-	}
+  public ObservableList<Task> getArrayList() {
+    return _list;
+    // return (ArrayList<Task>) Arrays
+    // .asList(_list.toArray(new Task[_list.size()]));
+  }
 
-	@Override
-	public Iterator<Task> iterator() {
-		return _list.listIterator();
-	}
+  private int getIndexOfTaskById(int id) {
+    return _list.indexOf(getTaskById(id));
+  }
 
-	public int size() {
-		return _list.size();
-	}
+  /*
+   * @param id
+   * 
+   * @returns the task with specified id
+   */
+  public Task getTaskById(int id) {
+    for (Task task : _list) {
+      if (task.getId() == id) {
+        return task;
+      }
+    }
+    return null;
+  }
 
-	public TaskList findTaskByTitle(String title) {
-		Task toFind = new Task();
-		toFind.setTitle(title);
-		TaskList matches = new TaskList();
-		for (Task task : _list) {
-			if (task.titleMatches(toFind)) {
-				matches.appendTask(task);
-			}
-		}
-		return matches;
-	}
+  protected Task getTaskByIndex(int index) {
+    return _list.get(index);
+  }
+
+  @Override
+  public Iterator<Task> iterator() {
+    return _list.listIterator();
+  }
+
+  public int size() {
+    return _list.size();
+  }
+
+  public TaskList findTaskByTitle(String title) {
+    Task toFind = new Task();
+    toFind.setTitle(title);
+    TaskList matches = new TaskList();
+    for (Task task : _list) {
+      if (task.titleMatches(toFind)) {
+        matches.appendTask(task);
+      }
+    }
+    return matches;
+  }
 
 }
