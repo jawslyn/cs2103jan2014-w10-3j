@@ -7,6 +7,7 @@ import goku.action.Action;
 import goku.action.DeleteAction;
 import goku.action.DisplayAction;
 import goku.action.ExitAction;
+import goku.action.MakeActionException;
 import goku.action.SearchAction;
 import goku.autocomplete.WordAutocomplete;
 import goku.storage.Storage;

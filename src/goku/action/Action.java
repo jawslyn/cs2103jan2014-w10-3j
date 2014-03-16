@@ -3,7 +3,6 @@ package goku.action;
 import goku.GOKU;
 import goku.Result;
 import goku.TaskList;
-import goku.ui.MakeActionException;
 
 public abstract class Action {
   GOKU goku;
