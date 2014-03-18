@@ -1,4 +1,4 @@
-package goku;
+package goku.util;
 
 import hirondelle.date4j.DateTime;
 
