@@ -11,8 +11,10 @@ import goku.action.SearchAction;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 /**
  * User interface that acts as the intermediate component between the user
@@ -23,6 +25,8 @@ public class CLUserInterface implements UserInterface {
   private Scanner sc;
   private Storage storage;
   private InputParser parser;
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public CLUserInterface(GOKU goku) {
     this.goku = goku;
@@ -31,8 +35,21 @@ public class CLUserInterface implements UserInterface {
     parser = new InputParser(goku);
   }
 
+  private void trytoloadfile() {
+    try {
+      TaskList tasklist = storage.loadStorage();
+      goku.setTaskList(tasklist);
+    } catch (FileNotFoundException e) {
+      LOGGER.warning("File cannot be found, no tasks loaded.");
+    } catch (IOException e) {
+      LOGGER.warning("Error loading file, no tasks loaded.");
+    }
+    LOGGER.info("Successfully loaded file: " + storage.getName());
+  }
+
   @Override
   public void run() {
+    trytoloadfile();
     System.out.println("This is GOKU. How can I help?");
     loop();
     System.out.println("Thanks for using G.O.K.U.!");
@@ -57,6 +74,7 @@ public class CLUserInterface implements UserInterface {
   }
 
   private void doAction(Action action) throws MakeActionException {
+    assert action != null;
     if (action instanceof DisplayAction) {
       printTaskList(action.doIt().getTasks());
     } else if (action instanceof SearchAction) {
