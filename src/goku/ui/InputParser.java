@@ -43,7 +43,7 @@ public class InputParser {
 	private String[] editKeywords = { "edit", "e", "update", "u" };
 	private String[] completeKeywords = { "done", "complete", "do", "finish", "fin" };
 	private String[] displayKeywords = { "display", "view", "show", "v", "s" };
-	private String[] searchKeywords = { "search", "find", "f" };
+	private String[] searchKeywords = { "search", "find", "f", "free" };
 	private String[] exitKeywords = { "quit", "exit", "q" };
 	private String[] undoKeywords = { "undo", "revert", "rollback" };
 	private String[] redoKeywords = { "redo" };

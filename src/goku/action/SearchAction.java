@@ -1,7 +1,6 @@
 package goku.action;
 
 import goku.DateRange;
-import goku.DateUtil;
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
@@ -10,7 +9,6 @@ import hirondelle.date4j.DateTime;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 public class SearchAction extends Action {
 
@@ -43,8 +41,6 @@ public class SearchAction extends Action {
 	public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
 	public static final String ERR_NO_VALID_DATE_FOUND = "Can't search! Try entering a valid date after \"free\"";
 	private static final String ERR_DEADLINE_PERIOD_CONFLICT = "Can't search! Conflicting deadline and period.";
-	private static final String INVALID_NUMBER_OF_HOURS = "Cant't search! Number of hours of free time invalid.";
-	private static final int INVALID_HOURS = -1;
 
 	public Result searchTitle() {
 		Task task = new Task();
@@ -75,11 +71,13 @@ public class SearchAction extends Action {
 		}
 	}
 	
-	public Result testFreeTime() {
+	public Result checkFreeTime() {
 		
-		
-		
-		return new Result(true, IS_FREE, null, null);
+		if(list.isFree(dateQuery) == true) {
+			return new Result(true, IS_FREE, null, null);
+		} else {
+			return new Result(false, NOT_FREE, null, null);
+		}
 	}
 
 	@Override
@@ -87,7 +85,9 @@ public class SearchAction extends Action {
 
 		Result result = null;
 
-		if (dline != null && period != null) {
+		if (dateQuery != null) {
+			result = checkFreeTime();
+		} else if (dline != null && period != null) {
 			result = searchByDeadlineAndPeriod();
 		} else if (dline != null) {
 			result = searchByDeadline();
