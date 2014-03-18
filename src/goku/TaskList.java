@@ -23,6 +23,11 @@ public class TaskList implements Iterable<Task> {
     boolean success = _list.add(task);
     return success ? task.getId() : -1;
   }
+  
+  public int addTaskDummy(Task task) {
+    boolean success = _list.add(task);
+    return success ? task.getId() : -1;
+  }
 
   public boolean addTaskWithoutSettingId(Task task) {
     if (getTaskById(task.getId()) == null) {
@@ -125,7 +130,7 @@ public class TaskList implements Iterable<Task> {
     TaskList result = new TaskList();
     for (Task task : _list) {
       if (task.getStatus()) {
-        result.addTask(task);
+        result.addTaskDummy(task);
       }
     }
     return result;
@@ -135,7 +140,7 @@ public class TaskList implements Iterable<Task> {
     TaskList result = new TaskList();
     for (Task task : _list) {
       if ((task.getStatus()) == null || !task.getStatus()) {
-        result.addTask(task);
+        result.addTaskDummy(task);
       }
     }
     return result;
