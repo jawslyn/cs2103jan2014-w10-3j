@@ -128,8 +128,11 @@ public class TaskList implements Iterable<Task> {
 		DateTime result = null;
 		DateTime now = DateUtil.getNow();
 		
-		
-		
+		for (Task task : _list) {
+			if (task.getDateRange() != null) {
+				//TODO do stuff
+			}
+		}
 		
 		return result;
 	}

@@ -20,8 +20,6 @@ public class SearchAction extends Action {
 	public String to;
 	public Date dline;
 	public DateRange period;
-	public boolean findFreeSlots;
-	public int freeHoursToSearch;
 
 	public SearchAction(GOKU goku) {
 		super(goku);
@@ -32,8 +30,6 @@ public class SearchAction extends Action {
 		to = null;
 		dline = null;
 		period = null;
-		findFreeSlots = false;
-		freeHoursToSearch = -1;
 	}
 
 	private static final String MSG_SUCCESS = "Found tasks!";
@@ -72,18 +68,7 @@ public class SearchAction extends Action {
 		}
 	}
 
-	//TODO how to return to parser?
-	public DateTime findFreeSlots() throws MakeActionException {
-		
-		if (freeHoursToSearch == INVALID_HOURS) {
-			throw new MakeActionException(INVALID_NUMBER_OF_HOURS);
-		}
-		
-		return null;
-	}
-
 	@Override
-	//TODO free slots not implemented!!
 	public Result doIt() throws MakeActionException {
 
 		Result result = null;
