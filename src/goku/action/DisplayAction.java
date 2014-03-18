@@ -26,6 +26,7 @@ public class DisplayAction extends Action {
   }
 
   public Result displayDate() {
+    assert (byDeadline != null);
     Date deadline = byDeadline;
     Task t = new Task();
     t.setDeadline(deadline);
