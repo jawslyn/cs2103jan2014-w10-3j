@@ -91,20 +91,11 @@ public class TaskList implements Iterable<Task> {
 			if (task.getDateRange() == null && task.getDeadline() == null) {
 				continue;
 			} else if (task.getDeadline() != null
-					&& toFind.inPeriod(task.getDeadline())) { // deadline falls
-																// within
-																// period
+					&& toFind.inPeriod(task.getDeadline())) { // deadline falls within period
 				matches.appendTask(task);
 				continue;
 			} else if (task.getDateRange() != null
-					&& toFind.inPeriod(task.getDateRange().startDate)) { // start
-																			// date
-																			// of
-																			// period
-																			// falls
-																			// within
-																			// search
-																			// period
+					&& toFind.inPeriod(task.getDateRange().startDate)) { // start date of period falls within search period
 				matches.appendTask(task);
 				continue;
 			}
@@ -123,14 +114,14 @@ public class TaskList implements Iterable<Task> {
 		return matches;
 	}
 
-	public DateTime findFreeSlot(int hours) {
+	public boolean isFree(DateTime dateTime) {
 		
-		DateTime result = null;
-		DateTime now = DateUtil.getNow();
+		boolean result = true;
 		
 		for (Task task : _list) {
-			if (task.getDateRange() != null) {
-				//TODO do stuff
+			if (task.getDateRange()!=null && task.inPeriod(DateUtil.toDate(dateTime))) {
+				result = false;
+				break;
 			}
 		}
 		
