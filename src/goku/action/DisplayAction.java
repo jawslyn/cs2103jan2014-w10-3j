@@ -11,14 +11,10 @@ public class DisplayAction extends Action {
 
   private static final String MSG_SUCCESS = "displaying list of task:";
   Date byDeadline;
+  public boolean viewComplete;
 
   public DisplayAction(GOKU goku) {
     super(goku);
-  }
-
-  @Override
-  public Result doIt() {
-    return displayAll();
   }
 
   public Result displayAll() {
@@ -29,16 +25,25 @@ public class DisplayAction extends Action {
     return new Result(true, MSG_SUCCESS, null, list.getAllCompleted());
   }
 
-  public Result displayIncomplete() {
-    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
-  }
-
   public Result displayDate() {
     Date deadline = byDeadline;
     Task t = new Task();
     t.setDeadline(deadline);
     TaskList result = list.findTaskByDeadline(t);
     return new Result(true, null, null, result);
+  }
+
+  public Result displayIncomplete() {
+    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
+  }
+
+  @Override
+  public Result doIt() {
+    if (viewComplete == false) {
+      return displayAll();
+    } else {
+      return displayComplete();
+    }
   }
 
 }
