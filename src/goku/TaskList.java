@@ -13,10 +13,6 @@ public class TaskList implements Iterable<Task> {
 
   private ObservableList<Task> _list;
 
-  public ObservableList<Task> getObservable() {
-    return _list;
-  }
-
   public TaskList() {
     _list = FXCollections.observableArrayList();
   }
@@ -34,12 +30,12 @@ public class TaskList implements Iterable<Task> {
     return false;
   }
 
-  public boolean appendTask(Task task) {
-    return _list.add(task);
-  }
-
   public void addUndoTask(Task task) {
     _list.add(task);
+  }
+
+  public boolean appendTask(Task task) {
+    return _list.add(task);
   }
 
   public void clear() {
@@ -107,6 +103,18 @@ public class TaskList implements Iterable<Task> {
     return matches;
   }
 
+  public TaskList findTaskByTitle(String title) {
+    Task toFind = new Task();
+    toFind.setTitle(title);
+    TaskList matches = new TaskList();
+    for (Task task : _list) {
+      if (task.titleMatches(toFind)) {
+        matches.appendTask(task);
+      }
+    }
+    return matches;
+  }
+
   public TaskList findTaskByTitle(Task toFind) {
     TaskList matches = new TaskList();
     for (Task task : _list) {
@@ -117,23 +125,6 @@ public class TaskList implements Iterable<Task> {
     return matches;
   }
 
-  public boolean isFree(DateTime dateTime) {
-
-    boolean result = true;
-
-    assert (dateTime != null);
-
-    for (Task task : _list) {
-      if (task.getDateRange() != null
-          && task.inPeriod(DateUtil.toDate(dateTime))) {
-        result = false;
-        break;
-      }
-    }
-
-    return result;
-  }
-
   public TaskList getAll() {
     return this;
   }
@@ -141,7 +132,7 @@ public class TaskList implements Iterable<Task> {
   public TaskList getAllCompleted() {
     TaskList result = new TaskList();
     for (Task task : _list) {
-      if (task.getStatus()) {
+      if (task.getStatus() != null && task.getStatus()) {
         result.addTaskWithoutSettingId(task);
       }
     }
@@ -168,6 +159,10 @@ public class TaskList implements Iterable<Task> {
     return _list.indexOf(getTaskById(id));
   }
 
+  public ObservableList<Task> getObservable() {
+    return _list;
+  }
+
   /*
    * @param id
    * 
@@ -186,6 +181,23 @@ public class TaskList implements Iterable<Task> {
     return _list.get(index);
   }
 
+  public boolean isFree(DateTime dateTime) {
+
+    boolean result = true;
+
+    assert (dateTime != null);
+
+    for (Task task : _list) {
+      if (task.getDateRange() != null
+          && task.inPeriod(DateUtil.toDate(dateTime))) {
+        result = false;
+        break;
+      }
+    }
+
+    return result;
+  }
+
   @Override
   public Iterator<Task> iterator() {
     return _list.listIterator();
@@ -193,18 +205,6 @@ public class TaskList implements Iterable<Task> {
 
   public int size() {
     return _list.size();
-  }
-
-  public TaskList findTaskByTitle(String title) {
-    Task toFind = new Task();
-    toFind.setTitle(title);
-    TaskList matches = new TaskList();
-    for (Task task : _list) {
-      if (task.titleMatches(toFind)) {
-        matches.appendTask(task);
-      }
-    }
-    return matches;
   }
 
 }
