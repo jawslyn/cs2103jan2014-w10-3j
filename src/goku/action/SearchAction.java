@@ -51,6 +51,8 @@ public class SearchAction extends Action {
 
 	public Result searchByDeadline() {
 		Task task = new Task();
+		
+		assert(dline!=null);
 		task.setDeadline(dline);
 		TaskList foundTasks = list.findTaskByDeadline(task);
 		if (foundTasks.size() != 0) {
@@ -62,6 +64,8 @@ public class SearchAction extends Action {
 
 	public Result searchByPeriod() {
 		Task task = new Task();
+		
+		assert(period!=null);
 		task.setPeriod(period);
 		TaskList foundTasks = list.findTaskByPeriod(task);
 		if (foundTasks.size() != 0) {
@@ -72,6 +76,8 @@ public class SearchAction extends Action {
 	}
 	
 	public Result checkFreeTime() {
+		
+		assert(dateQuery!=null);
 		
 		if(list.isFree(dateQuery) == true) {
 			return new Result(true, IS_FREE, null, null);
@@ -106,8 +112,7 @@ public class SearchAction extends Action {
 	private Result searchByDeadlineAndPeriod() throws MakeActionException {
 
 		// check for conflicting deadline and period
-		if (!dline.before(period.getEndDate())
-				|| !dline.after(period.getStartDate())) {
+		if (!dline.before(period.getEndDate()) || !dline.after(period.getStartDate())) {
 			throw new MakeActionException(ERR_DEADLINE_PERIOD_CONFLICT);
 		}
 
@@ -137,8 +142,7 @@ public class SearchAction extends Action {
 				prIterator = byPeriod.getTasks().iterator();
 			}
 
-			mergedResults = new Result(true, MSG_SUCCESS, null,
-					mergedFoundTasks);
+			mergedResults = new Result(true, MSG_SUCCESS, null,	mergedFoundTasks);
 		} else if (byDeadline.isSuccess()) {
 			mergedResults = byDeadline;
 		} else {

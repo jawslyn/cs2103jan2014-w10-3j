@@ -227,6 +227,7 @@ public class InputParser {
 		if (testFree == true) {
 			// test if datetime received is free of tasks
 			searchAction.testFree = testFree;
+			//TODO debug!!
 			searchAction.dateQuery = extractDate();
 			if(searchAction.dateQuery == null) {
 				throw new MakeActionException(SearchAction.ERR_NO_VALID_DATE_FOUND);
