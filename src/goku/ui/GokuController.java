@@ -213,11 +213,9 @@ public class GokuController {
   static class TaskCell extends ListCell<Task> {
     @Override
     protected void updateItem(Task item, boolean empty) {
-      // TODO Auto-generated method stub
       super.updateItem(item, empty);
       if (item != null) {
         this.setFocusTraversable(false);
-        // setText(String.valueOf(item.getId()));
         HBox hbox = new HBox();
         hbox.getStyleClass().add("task-cell");
         Label id = new Label(String.valueOf(item.getId()));
