@@ -119,6 +119,8 @@ public class TaskList implements Iterable<Task> {
 		
 		boolean result = true;
 		
+		assert(dateTime!=null);
+		
 		for (Task task : _list) {
 			if (task.getDateRange()!=null && task.inPeriod(DateUtil.toDate(dateTime))) {
 				result = false;

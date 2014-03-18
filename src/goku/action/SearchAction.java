@@ -82,7 +82,7 @@ public class SearchAction extends Action {
 		if(list.isFree(dateQuery) == true) {
 			return new Result(true, IS_FREE, null, null);
 		} else {
-			return new Result(false, NOT_FREE, null, null);
+			return new Result(false, null, NOT_FREE, null);
 		}
 	}
 

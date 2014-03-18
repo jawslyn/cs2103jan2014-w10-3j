@@ -55,7 +55,7 @@ public class InputParser {
 		this.goku = goku;
 	}
 
-	private DateTime extractDate() {
+	private DateTime extractDeadline() {
 		int indexOfBy = Arrays.asList(params).indexOf("by");
 		if (indexOfBy < 0) {
 			return null;
@@ -68,6 +68,14 @@ public class InputParser {
 			params = Arrays.copyOfRange(params, 0, indexOfBy);
 		}
 		return parsed;
+	}
+	
+	private DateTime parseDate() {
+		if (params.length < 1) {
+			return null;
+		}
+		
+		return DateUtil.parse(params);
 	}
 
 	/*
@@ -123,7 +131,7 @@ public class InputParser {
 		if (impt == true) {
 			addAction.isImpt = true;
 		}
-		DateTime dl = extractDate();
+		DateTime dl = extractDeadline();
 		DateRange dr = extractPeriod();
 		addAction.dline = DateUtil.toDate(dl);
 		addAction.period = dr;
@@ -199,7 +207,7 @@ public class InputParser {
 			editAction.id = id;
 			params = Arrays.copyOfRange(params, 1, params.length);
 
-			DateTime dl = extractDate();
+			DateTime dl = extractDeadline();
 			DateRange dr = extractPeriod();
 			editAction.dline = DateUtil.toDate(dl);
 			editAction.period = dr;
@@ -227,14 +235,13 @@ public class InputParser {
 		if (testFree == true) {
 			// test if datetime received is free of tasks
 			searchAction.testFree = testFree;
-			//TODO debug!!
-			searchAction.dateQuery = extractDate();
+			searchAction.dateQuery = parseDate();
 			if(searchAction.dateQuery == null) {
 				throw new MakeActionException(SearchAction.ERR_NO_VALID_DATE_FOUND);
 			}
 		} else {
 			// search normally
-			DateTime dl = extractDate();
+			DateTime dl = extractDeadline();
 			DateRange dr = extractPeriod();
 			searchAction.dline = DateUtil.toDate(dl);
 			searchAction.period = dr;
