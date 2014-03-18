@@ -1,5 +1,6 @@
 package goku;
 
+import goku.util.DateOutput;
 import goku.util.DateUtil;
 
 import java.util.Date;
@@ -188,6 +189,7 @@ public class Task {
 
   @Override
   public String toString() {
+    DateOutput dateOutput = new DateOutput();
     StringBuffer sb = new StringBuffer();
     sb.append("ID: ");
     sb.append(id);
@@ -196,7 +198,7 @@ public class Task {
 
     if (deadline != null) {
       sb.append(" | Deadline: ");
-      sb.append(deadline.toString().substring(0, 16));
+      sb.append(dateOutput.format(deadline));
     }
 
     if (period != null) {
@@ -206,12 +208,12 @@ public class Task {
       sb.append(period.getEndDate());
     }
 
-    sb.append(" | Status: ");
-    if (isComplete != null && isComplete) {
-      sb.append("done");
-    } else {
-      sb.append("not done");
-    }
+ //   sb.append(" | Status: ");
+ //   if (isComplete != null && isComplete) {
+ //     sb.append("done");
+ //   } else {
+ //     sb.append("not done");
+ //   }
 
     sb.append(" | Importance: ");
     if (isImpt != null && isImpt) {
