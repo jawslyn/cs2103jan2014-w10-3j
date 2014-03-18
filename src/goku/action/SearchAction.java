@@ -1,138 +1,159 @@
 package goku.action;
 
 import goku.DateRange;
+import goku.DateUtil;
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
+import hirondelle.date4j.DateTime;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 public class SearchAction extends Action {
 
-  public String title;
-  public String deadline;
-  public String from;
-  public String to;
-  public Date dline;
-  public DateRange period;
+	public String title;
+	public String deadline;
+	public String from;
+	public String to;
+	public Date dline;
+	public DateRange period;
+	public boolean findFreeSlots;
+	public int freeHoursToSearch;
 
-  public SearchAction(GOKU goku) {
-    super(goku);
+	public SearchAction(GOKU goku) {
+		super(goku);
 
-    // initialise params to null
-    deadline = null;
-    from = null;
-    to = null;
-    dline = null;
-    period = null;
-  }
+		// initialise params
+		deadline = null;
+		from = null;
+		to = null;
+		dline = null;
+		period = null;
+		findFreeSlots = false;
+		freeHoursToSearch = -1;
+	}
 
-  private static final String MSG_SUCCESS = "Found tasks!";
-  private static final String MSG_FAIL = "No relevant tasks.";
-  public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
-  private static final String ERR_DEADLINE_PERIOD_CONFLICT = "Can't search! Conflicting deadline and period.";
+	private static final String MSG_SUCCESS = "Found tasks!";
+	private static final String MSG_FAIL = "No relevant tasks.";
+	public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
+	private static final String ERR_DEADLINE_PERIOD_CONFLICT = "Can't search! Conflicting deadline and period.";
+	private static final String INVALID_NUMBER_OF_HOURS = "Cant't search! Number of hours of free time invalid.";
+	private static final int INVALID_HOURS = -1;
 
-  public Result searchTitle() {
-    Task task = new Task();
-    task.setTitle(title);
-    TaskList foundTasks = list.findTaskByTitle(task);
-    return new Result(true, MSG_SUCCESS, null, foundTasks);
-  }
+	public Result searchTitle() {
+		Task task = new Task();
+		task.setTitle(title);
+		TaskList foundTasks = list.findTaskByTitle(task);
+		return new Result(true, MSG_SUCCESS, null, foundTasks);
+	}
 
-  public Result searchByDeadline() {
-    Task task = new Task();
-    task.setDeadline(dline);
-    TaskList foundTasks = list.findTaskByDeadline(task);
-    if (foundTasks.size() != 0) {
-      return new Result(true, MSG_SUCCESS, null, foundTasks);
-    } else {
-      return new Result(false, null, MSG_FAIL, null);
-    }
-  }
+	public Result searchByDeadline() {
+		Task task = new Task();
+		task.setDeadline(dline);
+		TaskList foundTasks = list.findTaskByDeadline(task);
+		if (foundTasks.size() != 0) {
+			return new Result(true, MSG_SUCCESS, null, foundTasks);
+		} else {
+			return new Result(false, null, MSG_FAIL, null);
+		}
+	}
 
-  public Result searchByPeriod() {
-    Task task = new Task();
-    task.setPeriod(period);
-    TaskList foundTasks = list.findTaskByPeriod(task);
-    if (foundTasks.size() != 0) {
-      return new Result(true, MSG_SUCCESS, null, foundTasks);
-    } else {
-      return new Result(false, null, MSG_FAIL, null);
-    }
-  }
+	public Result searchByPeriod() {
+		Task task = new Task();
+		task.setPeriod(period);
+		TaskList foundTasks = list.findTaskByPeriod(task);
+		if (foundTasks.size() != 0) {
+			return new Result(true, MSG_SUCCESS, null, foundTasks);
+		} else {
+			return new Result(false, null, MSG_FAIL, null);
+		}
+	}
 
-  @Override
-  public Result doIt() throws MakeActionException {
+	//TODO how to return to parser?
+	public DateTime findFreeSlots() throws MakeActionException {
+		
+		if (freeHoursToSearch == INVALID_HOURS) {
+			throw new MakeActionException(INVALID_NUMBER_OF_HOURS);
+		}
+		
+		return null;
+	}
 
-    Result result = null;
+	@Override
+	//TODO free slots not implemented!!
+	public Result doIt() throws MakeActionException {
 
-    if (dline != null && period != null) {
-      result = searchByDeadlineAndPeriod();
-    } else if (dline != null) {
-      result = searchByDeadline();
-    } else if (period != null) {
-      result = searchByPeriod();
-    } else {
-      result = searchTitle();
-    }
+		Result result = null;
 
-    return result;
-  }
+		if (dline != null && period != null) {
+			result = searchByDeadlineAndPeriod();
+		} else if (dline != null) {
+			result = searchByDeadline();
+		} else if (period != null) {
+			result = searchByPeriod();
+		} else {
+			result = searchTitle();
+		}
 
-  /*
-   * Searches by both deadline and period and merges result
-   */
-  private Result searchByDeadlineAndPeriod() throws MakeActionException {
+		return result;
+	}
 
-    // check for conflicting deadline and period
-    if (!dline.before(period.getEndDate())
-        || !dline.after(period.getStartDate())) {
-      throw new MakeActionException(ERR_DEADLINE_PERIOD_CONFLICT);
-    }
+	/*
+	 * Searches by both deadline and period and merges result
+	 */
+	private Result searchByDeadlineAndPeriod() throws MakeActionException {
 
-    Result mergedResults = null;
+		// check for conflicting deadline and period
+		if (!dline.before(period.getEndDate())
+				|| !dline.after(period.getStartDate())) {
+			throw new MakeActionException(ERR_DEADLINE_PERIOD_CONFLICT);
+		}
 
-    Result byDeadline = searchByDeadline();
-    Result byPeriod = searchByPeriod();
+		Result mergedResults = null;
 
-    if (byDeadline.isSuccess() && byPeriod.isSuccess()) {
-      // merge matching tasks in both results
-      Iterator<Task> dlIterator = byDeadline.getTasks().iterator();
-      Iterator<Task> prIterator = byPeriod.getTasks().iterator();
-      TaskList mergedFoundTasks = new TaskList();
+		Result byDeadline = searchByDeadline();
+		Result byPeriod = searchByPeriod();
 
-      while (dlIterator.hasNext()) {
-        Task dlTask = dlIterator.next();
+		if (byDeadline.isSuccess() && byPeriod.isSuccess()) {
+			// merge matching tasks in both results
+			Iterator<Task> dlIterator = byDeadline.getTasks().iterator();
+			Iterator<Task> prIterator = byPeriod.getTasks().iterator();
+			TaskList mergedFoundTasks = new TaskList();
 
-        while (prIterator.hasNext()) {
-          Task prTask = prIterator.next();
+			while (dlIterator.hasNext()) {
+				Task dlTask = dlIterator.next();
 
-          if (!dlTask.equals(prTask)) {
-            mergedFoundTasks.addTask(prTask);
-          }
-        }
+				while (prIterator.hasNext()) {
+					Task prTask = prIterator.next();
 
-        mergedFoundTasks.addTask(dlTask);
-        prIterator = byPeriod.getTasks().iterator();
-      }
+					if (!dlTask.equals(prTask)) {
+						mergedFoundTasks.addTask(prTask);
+					}
+				}
 
-      mergedResults = new Result(true, MSG_SUCCESS, null, mergedFoundTasks);
-    } else if (byDeadline.isSuccess()) {
-      mergedResults = byDeadline;
-    } else {
-      mergedResults = byPeriod;
-    }
+				mergedFoundTasks.addTask(dlTask);
+				prIterator = byPeriod.getTasks().iterator();
+			}
 
-    return mergedResults;
-  }
+			mergedResults = new Result(true, MSG_SUCCESS, null,
+					mergedFoundTasks);
+		} else if (byDeadline.isSuccess()) {
+			mergedResults = byDeadline;
+		} else {
+			mergedResults = byPeriod;
+		}
 
-  public String getDeadline() {
-    return deadline;
-  }
+		return mergedResults;
+	}
 
-  public String getTitle() {
-    return title;
-  }
+	public String getDeadline() {
+		return deadline;
+	}
+
+	public String getTitle() {
+		return title;
+	}
 }
