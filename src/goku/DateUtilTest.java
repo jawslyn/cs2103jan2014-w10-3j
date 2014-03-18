@@ -60,10 +60,6 @@ public class DateUtilTest {
 
     result = DateUtil.parseDay("todaY");
     assertTrue(now.isSameDayAs(result));
-
-    result = DateUtil.parseDay("monday");
-    assertTrue(now.isSameDayAs(result));
-
   }
 
   @Test
