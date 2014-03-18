@@ -1,6 +1,7 @@
 package goku.storage;
 
 import static org.junit.Assert.assertEquals;
+import goku.storage.MockStoreableList.MockStoreable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,66 +27,15 @@ public class LocalFileStorageTest {
     storage.delete();
   }
 
-  @Test(expected = NullPointerException.class)
-  public void save_NullStoreable_throwsException() throws IOException {
-    storage.save(null);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void save_NullStoreableArray_throwsException() throws IOException {
-    storage.saveAllArr(null);
-  }
-
-  @Test
-  public void save_EmptyStoreableArray() throws Exception {
-    MockStoreable[] mockArray = {};
-    storage.saveAllArr(mockArray);
-    String expected = getStringRepresentation(mockArray);
-    String actual = readAllFromFile();
-    assertEquals(expected, actual);
-  }
-
-  @Test
-  public void testSaveStoreable() throws IOException {
-    MockStoreable mockUnit = makeMockStoreable();
-    storage.save(mockUnit);
-    String expected = getStringRepresentation(mockUnit);
-    String actual = readAllFromFile();
-    assertEquals(expected, actual);
-  }
-
   @Test
   public void testSaveStoreableArray() throws FileNotFoundException,
       IOException {
-    MockStoreable[] mockArray = makeMockStoreableArray();
-    storage.saveAllArr(mockArray);
-    String expected = getStringRepresentation(mockArray);
-    String actual = readAllFromFile();
-    assertEquals(expected, actual);
-  }
-
-  private MockStoreable makeMockStoreable() {
-    return new MockStoreable(10, "Mock Storeable 1");
-  }
-
-  private String getStringRepresentation(MockStoreable mockUnit) {
-    return mockUnit.toStorageFormat() + System.lineSeparator();
-  }
-
-  private MockStoreable[] makeMockStoreableArray() {
-    MockStoreable[] mockArray = { new MockStoreable(10, "Mock Storeable 1"),
-        new MockStoreable(20, "Mock Storeable 2"),
-        new MockStoreable(5, "Mock Storeable 3") };
-    return mockArray;
-  }
-
-  private String getStringRepresentation(MockStoreable[] mockArray) {
-    StringBuilder sb = new StringBuilder();
-    for (MockStoreable s : mockArray) {
-      sb.append(s.toStorageFormat());
-      sb.append(System.lineSeparator());
-    }
-    return sb.toString();
+    MockStoreableList list = new MockStoreableList();
+    MockStoreable mock = list.new MockStoreable(1, "mock 1");
+    list.add(mock);
+    storage.saveAll(list);
+    String all = readAllFromFile();
+    assertEquals(all, mock.toStorageFormat() + System.lineSeparator());
   }
 
   private String readAllFromFile() throws FileNotFoundException, IOException {
