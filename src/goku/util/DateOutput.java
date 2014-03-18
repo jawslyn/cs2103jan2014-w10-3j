@@ -26,9 +26,13 @@ public class DateOutput {
       int hoursDifference = getDifferenceInHours(now, date);
       return hoursDifference + " hours later";
     } else if (daysDifference == 1) {
-      return "tomorrow";
+      return date.getHour() + ":" + date.getMinute();
     } else if (daysDifference < 7) {
-      return daysDifference + " days later";
+      if (daysDifference < 0) {
+        return "expired";
+      } else {
+        return daysDifference + " days later";
+      }
     } else {
       return date.getDay() + "/" + date.getMonth();
     }
