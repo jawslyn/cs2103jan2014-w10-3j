@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ goku.TaskTest.class, goku.TaskListTest.class,
-    goku.DateUtilTest.class })
+    goku.util.DateUtilTest.class })
 public class GokuTestSuite {
 
 }
