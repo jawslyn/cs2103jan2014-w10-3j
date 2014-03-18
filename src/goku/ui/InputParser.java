@@ -171,7 +171,14 @@ public class InputParser {
 	}
 
 	private DisplayAction makeDisplayAction() {
+		
 		DisplayAction da = new DisplayAction(goku);
+		
+		String nonArrayParams = Joiner.on(" ").join(params);
+		if(nonArrayParams.contains("completed")) {
+			da.viewComplete = true;
+		}
+		
 		return da;
 	}
 
