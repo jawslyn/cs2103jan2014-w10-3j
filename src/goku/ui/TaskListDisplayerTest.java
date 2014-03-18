@@ -1,8 +1,8 @@
 package goku.ui;
 
-import goku.DateUtil;
 import goku.Task;
 import goku.TaskList;
+import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 import java.util.Date;

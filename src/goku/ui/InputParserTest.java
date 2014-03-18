@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import goku.DateUtil;
 import goku.GOKU;
 import goku.action.Action;
 import goku.action.AddAction;
@@ -15,6 +14,7 @@ import goku.action.ExitAction;
 import goku.action.MakeActionException;
 import goku.action.NoAction;
 import goku.action.SearchAction;
+import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 import org.junit.After;

@@ -3,11 +3,11 @@ package goku.action;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import goku.DateUtil;
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
+import goku.util.DateUtil;
 
 import java.util.Date;
 
