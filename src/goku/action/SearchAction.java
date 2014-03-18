@@ -20,6 +20,8 @@ public class SearchAction extends Action {
 	public String to;
 	public Date dline;
 	public DateRange period;
+	public boolean testFree;
+	public DateTime dateQuery;
 
 	public SearchAction(GOKU goku) {
 		super(goku);
@@ -30,11 +32,16 @@ public class SearchAction extends Action {
 		to = null;
 		dline = null;
 		period = null;
+		testFree = false;
+		dateQuery = null;
 	}
 
 	private static final String MSG_SUCCESS = "Found tasks!";
 	private static final String MSG_FAIL = "No relevant tasks.";
+	private static final String IS_FREE = "Specified datetime is available.";
+	private static final String NOT_FREE = "Specified datetime is not available.";
 	public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
+	public static final String ERR_NO_VALID_DATE_FOUND = "Can't search! Try entering a valid date after \"free\"";
 	private static final String ERR_DEADLINE_PERIOD_CONFLICT = "Can't search! Conflicting deadline and period.";
 	private static final String INVALID_NUMBER_OF_HOURS = "Cant't search! Number of hours of free time invalid.";
 	private static final int INVALID_HOURS = -1;
@@ -66,6 +73,13 @@ public class SearchAction extends Action {
 		} else {
 			return new Result(false, null, MSG_FAIL, null);
 		}
+	}
+	
+	public Result testFreeTime() {
+		
+		
+		
+		return new Result(true, IS_FREE, null, null);
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class InputParser {
 		this.goku = goku;
 	}
 
-	private DateTime extractDeadline() {
+	private DateTime extractDate() {
 		int indexOfBy = Arrays.asList(params).indexOf("by");
 		if (indexOfBy < 0) {
 			return null;
@@ -123,7 +123,7 @@ public class InputParser {
 		if (impt == true) {
 			addAction.isImpt = true;
 		}
-		DateTime dl = extractDeadline();
+		DateTime dl = extractDate();
 		DateRange dr = extractPeriod();
 		addAction.dline = DateUtil.toDate(dl);
 		addAction.period = dr;
@@ -192,7 +192,7 @@ public class InputParser {
 			editAction.id = id;
 			params = Arrays.copyOfRange(params, 1, params.length);
 
-			DateTime dl = extractDeadline();
+			DateTime dl = extractDate();
 			DateRange dr = extractPeriod();
 			editAction.dline = DateUtil.toDate(dl);
 			editAction.period = dr;
@@ -209,7 +209,7 @@ public class InputParser {
 	/*
 	 * All inputs to search are taken to be the title of the Task to find
 	 */
-	private SearchAction makeSearchAction(boolean findFreeSlots) throws MakeActionException {
+	private SearchAction makeSearchAction(boolean testFree) throws MakeActionException {
 		if (params.length == 0) {
 			throw new MakeActionException(SearchAction.ERR_INSUFFICIENT_ARGS);
 		}
@@ -217,16 +217,16 @@ public class InputParser {
 		SearchAction searchAction = new SearchAction(goku);
 		
 		// determine if search is to find free slots
-		if (findFreeSlots == true) {
-			searchAction.findFreeSlots = findFreeSlots;
-			String title = Joiner.on(" ").join(params);
-			try {
-				searchAction.freeHoursToSearch = Integer.parseInt(title); 
-			} catch (NumberFormatException e) {
-				return searchAction;
+		if (testFree == true) {
+			// test if datetime received is free of tasks
+			searchAction.testFree = testFree;
+			searchAction.dateQuery = extractDate();
+			if(searchAction.dateQuery == null) {
+				throw new MakeActionException(SearchAction.ERR_NO_VALID_DATE_FOUND);
 			}
 		} else {
-			DateTime dl = extractDeadline();
+			// search normally
+			DateTime dl = extractDate();
 			DateRange dr = extractPeriod();
 			searchAction.dline = DateUtil.toDate(dl);
 			searchAction.period = dr;
