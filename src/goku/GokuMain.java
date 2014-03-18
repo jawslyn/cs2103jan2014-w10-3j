@@ -44,9 +44,9 @@ public class GokuMain {
 
   private static UserInterface setUserInterface(String[] args) {
     if (shouldRunGui(args)) {
-      return new CLUserInterface(goku);
-    } else {
       return new FXGUI(goku);
+    } else {
+      return new CLUserInterface(goku);
     }
   }
 
