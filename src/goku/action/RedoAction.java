@@ -28,17 +28,6 @@ public class RedoAction extends Action {
     TaskList prevList = goku.getRedoList().pollLast();
     goku.setTaskList(prevList);
 
-    /*
-     * System.out.println(commandToUndo.getCommand()); if
-     * (commandToUndo.getCommand().equals(DELETE)) { int id =
-     * commandToUndo.getTask().getId(); list.deleteTaskById(id); } else if
-     * (commandToUndo.getCommand().equals(ADD)) {
-     * System.out.println(commandToUndo.getTask());
-     * list.addTask(commandToUndo.getTask()); } else if
-     * (commandToUndo.getCommand().equals(EDIT)) { int id =
-     * commandToUndo.getTask().getId(); list.deleteTaskById(id);
-     * list.addTask(commandToUndo.getTask()); }
-     */
     return new Result(true, MSG_SUCCESS, null, null);
   }
 }
