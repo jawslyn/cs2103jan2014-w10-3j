@@ -18,6 +18,7 @@ import goku.TaskList;
  */
 public class DeleteAction extends Action {
   private static final String MSG_SUCCESS = "Deleted \"%s\"";
+  private static final String NO_MATCHES = "No matches found";
   private static final String ERR_FAILURE = "Many matches found for \"%s\".";
   private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
   public static final String ERR_INSUFFICIENT_ARGS = "Can't delete. Need an ID. Try \"delete 1\"";
@@ -50,6 +51,9 @@ public class DeleteAction extends Action {
     }
     Task task = new Task();
     task.setTitle(title);
+    if (list.findTaskByTitle(title).size() == 0) {
+      return new Result(false, null, NO_MATCHES, null);
+    }
     TaskList possibleDeletion = list.deleteTaskByTitle(task);
     if (possibleDeletion.size() == 0) {
       return new Result(true, String.format(MSG_SUCCESS, task.getTitle()),
@@ -58,6 +62,7 @@ public class DeleteAction extends Action {
       return new Result(false, null, String.format(ERR_FAILURE, title),
           possibleDeletion);
     }
+
   }
 
   @Override
