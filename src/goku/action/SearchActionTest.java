@@ -2,6 +2,11 @@ package goku.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+
 import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
@@ -25,7 +30,7 @@ public class SearchActionTest {
   }
 
   @After
-  public void cleanUp() {
+  public void cleanUp() throws IOException {
     list.clear();
   }
 
@@ -140,6 +145,43 @@ public class SearchActionTest {
     Result result = search.doIt();
     assertTrue(result.isSuccess());
     assertEquals(1, result.getTasks().size());
+  }
+  
+  //TODO
+  /*
+   * Query date well within period of a task
+   * Returns false
+   */
+  @Test
+  public void checkIfFree_dateQueryWithinPeriodOfTask() {
+    
+  }
+  
+  /*
+   * Query date on boundary of period of a task
+   * Returns false
+   */
+  @Test
+  public void checkIfFree_dateQueryOnBoundaryOfPeriodOfTask() {
+    
+  }
+  
+  /*
+   * Query date outside period of task
+   * Returns true
+   */
+  @Test
+  public void checkIfFree_dateQueryOutsidePeriodOfTask() {
+    
+  }
+  
+  /*
+   * Query date in system where task has no period
+   * Returns true always
+   */
+  @Test
+  public void checkIfFree_dateQueryOnTasksWithNoPeriods() {
+    
   }
 
   private Task makeTaskWithTitle(String title) {
