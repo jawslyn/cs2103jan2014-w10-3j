@@ -172,7 +172,7 @@ public class SearchActionTest {
     addAllTasks(task);
     
     SearchAction search = new SearchAction(goku);
-    search.dateQuery = DateUtil.date4j(task.getDateRange().getEndDate());
+    search.dateQuery = task.getDateRange().getEndDate();
     
     Result result = search.doIt();
     assertFalse(result.isSuccess());
@@ -222,8 +222,7 @@ public class SearchActionTest {
     task.setTitle(title);
     DateTime start = DateUtil.getNow().plusDays(startDaysLater);
     DateTime end = DateUtil.getNow().plusDays(endDaysLater);
-    DateRange period = new DateRange(DateUtil.toDate(start),
-        DateUtil.toDate(end));
+    DateRange period = new DateRange(start, end);
     task.setPeriod(period);
     return task;
   }
@@ -232,7 +231,7 @@ public class SearchActionTest {
     Task task = new Task();
     task.setTitle(title);
     DateTime deadline = DateUtil.getNow().plusDays(daysLater);
-    task.setDeadline(DateUtil.toDate(deadline));
+    task.setDeadline(deadline);
     return task;
   }
 

@@ -87,9 +87,7 @@ public class TaskList implements Iterable<Task> {
     for (Task task : _list) {
       if (task.getDateRange() == null && task.getDeadline() == null) {
         continue;
-      } else if (task.getDeadline() != null
-          && toFind.inPeriod(task.getDeadline())) { // deadline falls within
-                                                    // period
+      } else if (task.getDeadline() != null && toFind.inPeriod(task.getDeadline())) { // deadline falls within period
         matches.appendTask(task);
         continue;
       } else if (task.getDateRange() != null
@@ -189,10 +187,10 @@ public class TaskList implements Iterable<Task> {
 
     for (Task task : _list) {
       if (task.getDateRange() != null) {
-        DateTime taskStartDate = DateUtil.date4j(task.getDateRange().getStartDate());
-        DateTime taskEndDate = DateUtil.date4j(task.getDateRange().getEndDate());
+        DateTime taskStartDate = task.getDateRange().getStartDate();
+        DateTime taskEndDate = task.getDateRange().getEndDate();
         
-        if (isEqualOrBefore(dateTime, taskEndDate) && isEqualOrAfter(dateTime,taskStartDate)) {
+        if (DateUtil.isEarlierOrOn(dateTime, taskEndDate) && DateUtil.isLaterOrOn(dateTime, taskStartDate)) {
           result = false;
           break;
         }
@@ -202,40 +200,6 @@ public class TaskList implements Iterable<Task> {
     return result;
   }
   
-  /*
-   * Returns true is date a is equal to or before b
-   * Returns false otherwise
-   * Pre-cond: a and b are not null
-   */
-  private boolean isEqualOrBefore(DateTime a, DateTime b) {
-    assert(a != null && b != null);
-    
-    boolean result = false;
-    
-    if (a.equals(b) || DateUtil.toDate(a).before(DateUtil.toDate(b))) {
-      result = true;
-    }
-    
-    return result;
-  }
-  
-  /*
-   * Returns true is date a is equal to or after b
-   * Returns false otherwise
-   * Pre-cond: a and b are not null
-   */
-  private boolean isEqualOrAfter(DateTime a, DateTime b) {
-    assert(a != null && b != null);
-    
-    boolean result = false;
-    
-    if (a.equals(b) || DateUtil.toDate(a).after(DateUtil.toDate(b))) {
-      result = true;
-    }
-    
-    return result;
-  }  
-
   @Override
   public Iterator<Task> iterator() {
     return _list.listIterator();

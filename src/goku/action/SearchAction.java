@@ -5,9 +5,8 @@ import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
+import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
-
-import java.util.Date;
 
 public class SearchAction extends Action {
 
@@ -15,7 +14,7 @@ public class SearchAction extends Action {
   public String deadline;
   public String from;
   public String to;
-  public Date dline;
+  public DateTime dline;
   public DateRange period;
   public boolean testFree = false;
   public DateTime dateQuery;
@@ -116,8 +115,8 @@ public class SearchAction extends Action {
    */
   private Result searchByDeadlineInPeriod() throws MakeActionException {
     // check for conflicting deadline and period
-    if (!dline.before(period.getEndDate())
-        || !dline.after(period.getStartDate())) {
+    if (DateUtil.isEarlierThan(dline, period.getEndDate())
+        || DateUtil.isLaterThan(dline, period.getStartDate())) {
       throw new MakeActionException(ERR_DEADLINE_PERIOD_CONFLICT);
     }
 

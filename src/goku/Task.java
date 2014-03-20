@@ -2,8 +2,7 @@ package goku;
 
 import goku.util.DateOutput;
 import goku.util.DateUtil;
-
-import java.util.Date;
+import hirondelle.date4j.DateTime;
 
 import com.google.gson.Gson;
 
@@ -16,7 +15,7 @@ public class Task {
 
   private Integer id;
   private String title;
-  private Date deadline;
+  private DateTime deadline;
   private DateRange period;
   private String[] tags;
   private String notes;
@@ -59,11 +58,11 @@ public class Task {
     return period;
   }
 
-  public Date getDeadline() {
+  public DateTime getDeadline() {
     return deadline;
   }
 
-  public Date getEndDate() {
+  public DateTime getEndDate() {
     return period.getEndDate();
   }
 
@@ -79,7 +78,7 @@ public class Task {
     return notes;
   }
 
-  public Date getStartDate() {
+  public DateTime getStartDate() {
     return period.getStartDate();
   }
 
@@ -95,7 +94,7 @@ public class Task {
     return title;
   }
 
-  public boolean inPeriod(Date date) {
+  public boolean inPeriod(DateTime date) {
     return DateUtil.isEarlierThan(date, getEndDate())
         && DateUtil.isLaterThan(date, getStartDate());
   }
@@ -104,7 +103,7 @@ public class Task {
     return isComplete;
   }
 
-  public boolean isDueBefore(Date date) {
+  public boolean isDueBefore(DateTime date) {
     return DateUtil.isEarlierThan(deadline, date);
   }
 
@@ -112,7 +111,7 @@ public class Task {
     return DateUtil.isEarlierThan(deadline, task.getDeadline());
   }
 
-  public boolean isDueOn(Date date) {
+  public boolean isDueOn(DateTime date) {
     return DateUtil.isEarlierOrOn(deadline, date);
   }
 
@@ -124,7 +123,7 @@ public class Task {
     this.isComplete = complete;
   }
 
-  public void setDeadline(Date deadline) {
+  public void setDeadline(DateTime deadline) {
     this.deadline = deadline;
   }
 
@@ -140,7 +139,7 @@ public class Task {
     this.notes = notes;
   }
 
-  public void setPeriod(Date startDate, Date endDate) {
+  public void setPeriod(DateTime startDate, DateTime endDate) {
     setPeriod(new DateRange(startDate, endDate));
   }
 

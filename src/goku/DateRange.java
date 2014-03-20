@@ -1,21 +1,21 @@
 package goku;
 
-import java.util.Date;
+import hirondelle.date4j.DateTime;
 
 public class DateRange {
-  Date startDate;
-  Date endDate;
+  DateTime startDate;
+  DateTime endDate;
 
-  public DateRange(Date startDate, Date endDate) {
+  public DateRange(DateTime startDate, DateTime endDate) {
     this.startDate = startDate;
     this.endDate = endDate;
   }
 
-  public Date getStartDate() {
+  public DateTime getStartDate() {
     return startDate;
   }
 
-  public Date getEndDate() {
+  public DateTime getEndDate() {
     return endDate;
   }
 

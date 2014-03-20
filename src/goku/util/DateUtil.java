@@ -275,21 +275,19 @@ public class DateUtil {
     return getNearestDateToWeekday(weekdayToInteger(weekday));
   }
 
-  public static boolean isEarlierThan(Date aDate, Date otherDate) {
-    DateTime dt1 = date4j(aDate);
-    DateTime dt2 = date4j(otherDate);
-    return dt1.lt(dt2);
+  public static boolean isEarlierThan(DateTime aDate, DateTime otherDate) {
+    return aDate.lt(otherDate);
   }
 
-  public static boolean isLaterThan(Date aDate, Date otherDate) {
-    DateTime dt1 = date4j(aDate);
-    DateTime dt2 = date4j(otherDate);
-    return dt1.gt(dt2);
+  public static boolean isLaterThan(DateTime aDate, DateTime otherDate) {
+    return aDate.gt(otherDate);
   }
   
-  public static boolean isEarlierOrOn(Date aDate, Date otherDate) {
-    DateTime dt1 = date4j(aDate);
-    DateTime dt2 = date4j(otherDate);  
-    return dt1.lteq(dt2);
+  public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
+    return aDate.lteq(otherDate);
+  }
+  
+  public static boolean isLaterOrOn(DateTime aDate, DateTime otherDate) {
+    return aDate.gteq(otherDate);
   }
 }
