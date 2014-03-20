@@ -168,7 +168,7 @@ public class SearchActionTest {
    */
   @Test
   public void checkIfFree_dateQueryOnBoundaryOfPeriodOfTask() throws Exception{
-    Task task = makeTaskWithPeriodDaysRelative("task a", 1, 5);
+    Task task = makeTaskWithPeriodDaysRelative("task a", 0, 5);
     addAllTasks(task);
     
     SearchAction search = new SearchAction(goku);
@@ -183,8 +183,15 @@ public class SearchActionTest {
    * Returns true
    */
   @Test
-  public void checkIfFree_dateQueryOutsidePeriodOfTask() {
+  public void checkIfFree_dateQueryOutsidePeriodOfTask() throws Exception{
+    Task task = makeTaskWithPeriodDaysRelative("task a", 1, 5);
+    addAllTasks(task);
     
+    SearchAction search = new SearchAction(goku);
+    search.dateQuery = DateUtil.getNow();
+    
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
   }
   
   /*
@@ -192,8 +199,15 @@ public class SearchActionTest {
    * Returns true always
    */
   @Test
-  public void checkIfFree_dateQueryOnTasksWithNoPeriods() {
+  public void checkIfFree_dateQueryOnTasksWithNoPeriods() throws Exception{
+    Task task = makeTaskWithTitle("task a");
+    addAllTasks(task);
     
+    SearchAction search = new SearchAction(goku);
+    search.dateQuery = DateUtil.getNow();
+    
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
   }
 
   private Task makeTaskWithTitle(String title) {
