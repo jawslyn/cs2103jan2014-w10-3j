@@ -237,10 +237,30 @@ public class InputParserTest {
     assertNotNull(sa.dline);
   }
   
-  @Test
+  @Test (expected = MakeActionException.class)
   public void parse_SearchAction_CheckFree_throwsException() throws Exception {
     a = p.parse("free");
     assertTrue(a instanceof NoAction);
+  }
+  
+  @Test
+  public void parse_SearchAction_CheckFreeIsTrue() throws Exception {
+    
+  }
+  
+  @Test
+  public void parse_SearchAction_CheckFreeIsFalse() throws Exception {
+    
+  }
+  
+  @Test
+  public void parse_SearchAction_CheckFreeDateQueryValid() throws Exception {
+    
+  }
+  
+  @Test (expected = MakeActionException.class)
+  public void parse_SearchAction_CheckFreeDateQueryInvalid() throws Exception {
+    
   }
 
   @Test
