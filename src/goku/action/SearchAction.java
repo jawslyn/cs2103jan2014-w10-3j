@@ -17,20 +17,11 @@ public class SearchAction extends Action {
   public String to;
   public Date dline;
   public DateRange period;
-  public boolean testFree;
+  public boolean testFree = false;
   public DateTime dateQuery;
 
   public SearchAction(GOKU goku) {
     super(goku);
-
-    // initialise params
-    deadline = null;
-    from = null;
-    to = null;
-    dline = null;
-    period = null;
-    testFree = false;
-    dateQuery = null;
   }
 
   private static final String MSG_SUCCESS = "Found tasks!";
