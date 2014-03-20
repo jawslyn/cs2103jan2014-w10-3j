@@ -8,7 +8,6 @@ import hirondelle.date4j.DateTime;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.TimeZone;
 
 public class TaskListDisplayer {
@@ -68,14 +67,14 @@ public class TaskListDisplayer {
     if (dateRange == null) {
       return false;
     }
-    return tmr.isSameDayAs(DateUtil.date4j(dateRange.getStartDate()));
+    return tmr.isSameDayAs(dateRange.getStartDate());
   }
 
-  private boolean isTomorrow(Date date) {
+  private boolean isTomorrow(DateTime date) {
     if (date == null) {
       return false;
     }
-    return tmr.isSameDayAs(DateUtil.date4j(date));
+    return tmr.isSameDayAs(date);
 
   }
 
@@ -90,11 +89,11 @@ public class TaskListDisplayer {
     return isToday(dateRange.getEndDate());
   }
 
-  private boolean isToday(Date date) {
+  private boolean isToday(DateTime date) {
     if (date == null) {
       return false;
     }
-    return now.isSameDayAs(DateUtil.date4j(date));
+    return now.isSameDayAs(date);
   }
 
   private boolean isOver(Task task) {
@@ -108,11 +107,10 @@ public class TaskListDisplayer {
     return isOver(dateRange.getEndDate());
   }
 
-  public boolean isOver(Date date) {
+  public boolean isOver(DateTime date) {
     if (date == null) {
       return false;
     }
-    DateTime dt = DateUtil.date4j(date);
-    return dt.isInThePast(TimeZone.getDefault());
+    return date.isInThePast(TimeZone.getDefault());
   }
 }

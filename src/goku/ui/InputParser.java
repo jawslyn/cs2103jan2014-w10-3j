@@ -105,8 +105,7 @@ public class InputParser {
 				DateTime end = DateUtil.parse(endCandidates);
 
 				if (start != null && end != null) {
-					dr = new DateRange(DateUtil.toDate(start),
-							DateUtil.toDate(end));
+					dr = new DateRange(start, end);
 					params = Arrays.copyOfRange(params, 0, indexOfFrom);
 				}
 			}
@@ -133,7 +132,7 @@ public class InputParser {
 		}
 		DateTime dl = extractDeadline();
 		DateRange dr = extractPeriod();
-		addAction.dline = DateUtil.toDate(dl);
+		addAction.dline = dl;
 		addAction.period = dr;
 		addAction.title = Joiner.on(" ").join(params);
 		return addAction;
@@ -209,7 +208,7 @@ public class InputParser {
 
 			DateTime dl = extractDeadline();
 			DateRange dr = extractPeriod();
-			editAction.dline = DateUtil.toDate(dl);
+			editAction.dline = dl;
 			editAction.period = dr;
 			String title = Joiner.on(" ").join(params);
 			if (!title.isEmpty()) {
@@ -243,7 +242,7 @@ public class InputParser {
 			// search normally
 			DateTime dl = extractDeadline();
 			DateRange dr = extractPeriod();
-			searchAction.dline = DateUtil.toDate(dl);
+			searchAction.dline = dl;
 			searchAction.period = dr;
 			String title = Joiner.on(" ").join(params);
 			if (!title.isEmpty()) {

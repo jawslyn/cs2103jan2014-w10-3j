@@ -5,8 +5,7 @@ import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
-
-import java.util.Date;
+import hirondelle.date4j.DateTime;
 
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
@@ -22,7 +21,7 @@ public class EditAction extends Action {
   public int id;
 
   public String title;
-  public Date dline;
+  public DateTime dline;
   public DateRange period;
   public Boolean isComplete;
 
