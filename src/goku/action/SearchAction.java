@@ -115,8 +115,8 @@ public class SearchAction extends Action {
    */
   private Result searchByDeadlineInPeriod() throws MakeActionException {
     // check for conflicting deadline and period
-    if (DateUtil.isEarlierThan(dline, period.getEndDate())
-        || DateUtil.isLaterThan(dline, period.getStartDate())) {
+    if (DateUtil.isEarlierThan(dline, period.getStartDate())
+        || DateUtil.isLaterThan(dline, period.getEndDate())) {
       throw new MakeActionException(ERR_DEADLINE_PERIOD_CONFLICT);
     }
 

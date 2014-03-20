@@ -236,6 +236,12 @@ public class InputParserTest {
     assertNotNull(sa.title);
     assertNotNull(sa.dline);
   }
+  
+  @Test
+  public void parse_SearchAction_CheckFree_throwsException() throws Exception {
+    a = p.parse("free");
+    assertTrue(a instanceof NoAction);
+  }
 
   @Test
   public void parse_ExitAction() throws Exception {
