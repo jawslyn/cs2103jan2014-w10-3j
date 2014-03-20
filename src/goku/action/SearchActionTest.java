@@ -1,11 +1,10 @@
 package goku.action;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import goku.DateRange;
 import goku.GOKU;
@@ -147,14 +146,20 @@ public class SearchActionTest {
     assertEquals(1, result.getTasks().size());
   }
   
-  //TODO
   /*
    * Query date well within period of a task
    * Returns false
    */
   @Test
-  public void checkIfFree_dateQueryWithinPeriodOfTask() {
+  public void checkIfFree_dateQueryWithinPeriodOfTask() throws Exception{
+    Task task = makeTaskWithPeriodDaysRelative("task a", 0, 5);
+    addAllTasks(task);
     
+    SearchAction search = new SearchAction(goku);
+    search.dateQuery = DateUtil.getNow().plusDays(1);
+    
+    Result result = search.doIt();
+    assertFalse(result.isSuccess());
   }
   
   /*
@@ -162,8 +167,15 @@ public class SearchActionTest {
    * Returns false
    */
   @Test
-  public void checkIfFree_dateQueryOnBoundaryOfPeriodOfTask() {
+  public void checkIfFree_dateQueryOnBoundaryOfPeriodOfTask() throws Exception{
+    Task task = makeTaskWithPeriodDaysRelative("task a", 1, 5);
+    addAllTasks(task);
     
+    SearchAction search = new SearchAction(goku);
+    search.dateQuery = DateUtil.date4j(task.getDateRange().getEndDate());
+    
+    Result result = search.doIt();
+    assertFalse(result.isSuccess());
   }
   
   /*
