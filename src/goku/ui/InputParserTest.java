@@ -1,6 +1,7 @@
 package goku.ui;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -245,22 +246,35 @@ public class InputParserTest {
   
   @Test
   public void parse_SearchAction_CheckFreeIsTrue() throws Exception {
+    a = p.parse("free today");
+    assertTrue(a instanceof SearchAction);
     
+    SearchAction sa = (SearchAction) a;
+    assertTrue(sa.testFree);    
   }
   
   @Test
   public void parse_SearchAction_CheckFreeIsFalse() throws Exception {
+    a = p.parse("search today");
+    assertTrue(a instanceof SearchAction);
     
+    SearchAction sa = (SearchAction) a;
+    assertFalse(sa.testFree);
   }
   
   @Test
   public void parse_SearchAction_CheckFreeDateQueryValid() throws Exception {
+    a = p.parse("free tmr 10am");
+    assertTrue(a instanceof SearchAction);
     
+    SearchAction sa = (SearchAction) a;
+    assertNotNull(sa.dateQuery);
   }
   
   @Test (expected = MakeActionException.class)
   public void parse_SearchAction_CheckFreeDateQueryInvalid() throws Exception {
-    
+    a = p.parse("free meh");
+    assertTrue(a instanceof NoAction);
   }
 
   @Test
