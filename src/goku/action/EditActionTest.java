@@ -8,8 +8,7 @@ import goku.Result;
 import goku.Task;
 import goku.TaskList;
 import goku.util.DateUtil;
-
-import java.util.Date;
+import hirondelle.date4j.DateTime;
 
 import org.junit.After;
 import org.junit.Before;
@@ -63,7 +62,7 @@ public class EditActionTest {
 
     editAction = new EditAction(goku);
     editAction.id = id;
-    Date deadline = DateUtil.toDate(DateUtil.getNow());
+    DateTime deadline = DateUtil.getNow();
     editAction.dline = deadline;
     assertNull(toEdit.getDeadline());
     result = editAction.doIt();

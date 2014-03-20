@@ -2,7 +2,6 @@ package goku;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 import org.junit.Before;
@@ -198,7 +197,7 @@ public class TaskListTest {
 	private Task makeTaskWithTitleAndDeadline(String title, int d, int m, int y) {
 		Task t = new Task();
 		t.setTitle(title);
-		t.setDeadline(DateUtil.toDate(DateTime.forDateOnly(y, m, d)));
+		t.setDeadline(DateTime.forDateOnly(y, m, d));
 		return t;
 	}
 

@@ -64,7 +64,7 @@ public class InputParserTest {
     assertTrue(a instanceof AddAction);
     aa = (AddAction) a;
     assertEquals("this is a task", aa.getTitle());
-    DateTime later = DateUtil.date4j(aa.dline);
+    DateTime later = aa.dline;
     assertTrue(later.gt(now));
 
     a = p.parse("add this is a task from today to tomorrow    ");
@@ -83,14 +83,14 @@ public class InputParserTest {
     assertTrue(a instanceof AddAction);
     aa = (AddAction) a;
     assertEquals("this is a task", aa.getTitle());
-    DateTime due = DateUtil.date4j(aa.dline);
+    DateTime due = aa.dline;
     assertEquals(new Integer(15), due.getHour());
 
     a = p.parse("add this is a task by 1.45pm   tomorrow");
     assertTrue(a instanceof AddAction);
     aa = (AddAction) a;
     assertEquals("this is a task", aa.getTitle());
-    due = DateUtil.date4j(aa.dline);
+    due = aa.dline;
     assertEquals(new Integer(13), due.getHour());
     assertEquals(new Integer(45), due.getMinute());
 
@@ -98,7 +98,7 @@ public class InputParserTest {
     assertTrue(a instanceof AddAction);
     aa = (AddAction) a;
     assertEquals("this is a task", aa.getTitle());
-    due = DateUtil.date4j(aa.dline);
+    due = aa.dline;
     assertEquals(new Integer(13), due.getHour());
     assertEquals(new Integer(45), due.getMinute());
 
@@ -106,8 +106,8 @@ public class InputParserTest {
     assertTrue(a instanceof AddAction);
     aa = (AddAction) a;
     assertEquals("this is a task", aa.getTitle());
-    DateTime from = DateUtil.date4j(aa.period.getStartDate());
-    DateTime to = DateUtil.date4j(aa.period.getEndDate());
+    DateTime from = aa.period.getStartDate();
+    DateTime to = aa.period.getEndDate();
     assertTrue(from.getHour() == 15);
     assertTrue(from.getDay() == 12);
     assertTrue(from.getMonth() == 3);

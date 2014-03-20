@@ -1,16 +1,14 @@
 package goku;
 
 import static org.junit.Assert.assertEquals;
-
-import java.util.Date;
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class DeadlineComparatorTest {
   DeadlineComparator comp;
-  private static final long TEST_TIME = System.currentTimeMillis() + 1000000;
-  private static final long TEST_TIME_ALT = TEST_TIME + 1000000;
 
   @Before
   public void setup() {
@@ -25,9 +23,11 @@ public class DeadlineComparatorTest {
   @Test
   public void compare_twoIdenticalTask_returnsZero() throws Exception {
     Task task = new Task();
+    task.setId(1);
+    
     int result = comp.compare(task, task);
     assertEquals(0, result);
-    task.setDeadline(new Date(TEST_TIME));
+    task.setDeadline(DateUtil.getNow());
     assertEquals(0, result);
   }
 
@@ -36,6 +36,9 @@ public class DeadlineComparatorTest {
       throws Exception {
     Task a = new Task();
     Task b = new Task();
+    a.setId(1);
+    b.setId(2);
+    
     int result = comp.compare(a, b);
     assertEquals(-1, result);
     result = comp.compare(b, a);
@@ -43,10 +46,12 @@ public class DeadlineComparatorTest {
   }
 
   @Test
-  public void compare_twoIdenticalTaskWithSameDeadline_reuturnsZero()
+  public void compare_twoIdenticalTaskWithSameDeadline_returnsZero()
       throws Exception {
     Task task = new Task();
-    task.setDeadline(new Date(TEST_TIME));
+    task.setId(1);
+    task.setDeadline(DateUtil.getNow());
+    
     int result = comp.compare(task, task);
     assertEquals(0, result);
   }
@@ -55,8 +60,12 @@ public class DeadlineComparatorTest {
   public void compare_twoTaskWithSameDeadline_returnsZero() throws Exception {
     Task a = new Task();
     Task b = new Task();
-    a.setDeadline(new Date(TEST_TIME));
-    b.setDeadline(new Date(TEST_TIME));
+    DateTime testTime = DateUtil.getNow();
+    a.setId(1);
+    b.setId(2);;
+    a.setDeadline(testTime);
+    b.setDeadline(testTime);
+    
     int result = comp.compare(a, b);
     assertEquals(-1, result);
     result = comp.compare(b, a);
@@ -67,8 +76,11 @@ public class DeadlineComparatorTest {
   public void compare_twoTaskWithDifferentDeadline_returns() throws Exception {
     Task a = new Task();
     Task b = new Task();
-    a.setDeadline(new Date(TEST_TIME));
-    b.setDeadline(new Date(TEST_TIME_ALT));
+    DateTime testTime = DateUtil.getNow();
+    DateTime testTimeAlt = DateUtil.parse("tomorrow");
+    
+    a.setDeadline(testTime);
+    b.setDeadline(testTimeAlt);
     int result = comp.compare(a, b);
     assertEquals(-1, result);
     result = comp.compare(b, a);

@@ -1,7 +1,9 @@
 package goku;
 
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
+
 import java.util.Comparator;
-import java.util.Date;
 
 /*
  * Used to sort tasks according to EARLIEST_DEADLINE_FIRST order
@@ -14,8 +16,8 @@ public class DeadlineComparator implements Comparator<Task> {
     if (a == null || b == null) {
       throw new NullPointerException();
     }
-    Date deadlineA = a.getDeadline();
-    Date deadlineB = b.getDeadline();
+    DateTime deadlineA = a.getDeadline();
+    DateTime deadlineB = b.getDeadline();
 
     // Since both tasks do not have deadline, we compare base on their id, which
     // is analogous to the date of creation of task
@@ -25,9 +27,9 @@ public class DeadlineComparator implements Comparator<Task> {
       return 1;
     } else if (deadlineA != null && deadlineB == null) {
       return -1;
-    } else if (deadlineA.before(deadlineB)) {
+    } else if (DateUtil.isEarlierThan(deadlineA, deadlineB)) {
       return -1;
-    } else if (deadlineA.after(deadlineB)) {
+    } else if (DateUtil.isLaterThan(deadlineA, deadlineB)) {
       return 1;
     } else {
       return Integer.compare(a.getId(), b.getId());

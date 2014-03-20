@@ -4,13 +4,12 @@ import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
-
-import java.util.Date;
+import hirondelle.date4j.DateTime;
 
 public class DisplayAction extends Action {
 
   private static final String MSG_SUCCESS = "displaying list of task:";
-  Date byDeadline;
+  DateTime byDeadline;
   public boolean viewComplete;
 
   public DisplayAction(GOKU goku) {
@@ -27,7 +26,7 @@ public class DisplayAction extends Action {
 
   public Result displayDate() {
     assert (byDeadline != null);
-    Date deadline = byDeadline;
+    DateTime deadline = byDeadline;
     Task t = new Task();
     t.setDeadline(deadline);
     TaskList result = list.findTaskByDeadline(t);
