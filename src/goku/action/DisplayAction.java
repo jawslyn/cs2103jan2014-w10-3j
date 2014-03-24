@@ -17,11 +17,11 @@ public class DisplayAction extends Action {
   }
 
   public Result displayAll() {
-    return new Result(true, MSG_SUCCESS, null, list);
+    return new Result(true, MSG_SUCCESS, null, list.asList());
   }
 
   public Result displayComplete() {
-    return new Result(true, MSG_SUCCESS, null, list.getAllCompleted());
+    return new Result(true, MSG_SUCCESS, null, list.getAllCompleted().asList());
   }
 
   public Result displayDate() {
@@ -30,11 +30,11 @@ public class DisplayAction extends Action {
     Task t = new Task();
     t.setDeadline(deadline);
     TaskList result = list.findTaskByDeadline(t);
-    return new Result(true, null, null, result);
+    return new Result(true, null, null, result.asList());
   }
 
   public Result displayIncomplete() {
-    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
+    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete().asList());
   }
 
   @Override

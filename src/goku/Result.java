@@ -1,5 +1,7 @@
 package goku;
 
+import java.util.List;
+
 
 public class Result {
   private static final String MSG_DEFAULT_SUCCESS = "Success!";
@@ -7,14 +9,18 @@ public class Result {
   private boolean isSuccess;
   private String successMsg;
   private String errorMsg;
-  private TaskList tasks;
+  public List<Task> listOfTask;
 
   public Result(boolean isSuccess, String successMsg, String errorMsg,
-      TaskList tasks) {
+      List<Task> list) {
     this.isSuccess = isSuccess;
-    this.setSuccessMsg(successMsg);
-    this.setErrorMsg(errorMsg);
-    this.setTasks(tasks);
+    setSuccessMsg(successMsg);
+    setErrorMsg(errorMsg);
+    setTasks(list);
+  }
+
+  public void setTasks(List<Task> list) {
+    this.listOfTask = list;
   }
 
   public static Result makeSuccessResult() {
@@ -33,8 +39,8 @@ public class Result {
     return successMsg;
   }
 
-  public TaskList getTasks() {
-    return tasks;
+  public List<Task> getTasks() {
+    return listOfTask;
   }
 
   public boolean isSuccess() {
@@ -51,9 +57,5 @@ public class Result {
 
   public void setSuccessMsg(String successMsg) {
     this.successMsg = successMsg;
-  }
-
-  public void setTasks(TaskList tasks) {
-    this.tasks = tasks;
   }
 }

@@ -35,7 +35,7 @@ public class SearchAction extends Action {
     Task task = new Task();
     task.setTitle(title);
     TaskList foundTasks = list.findTaskByTitle(task);
-    return new Result(true, MSG_SUCCESS, null, foundTasks);
+    return new Result(true, MSG_SUCCESS, null, foundTasks.asList());
   }
 
   public Result searchByDeadline() {
@@ -45,7 +45,7 @@ public class SearchAction extends Action {
     task.setDeadline(dline);
     TaskList foundTasks = list.findTaskByDeadline(task);
     if (foundTasks.size() != 0) {
-      return new Result(true, MSG_SUCCESS, null, foundTasks);
+      return new Result(true, MSG_SUCCESS, null, foundTasks.asList());
     } else {
       return new Result(false, null, MSG_FAIL, null);
     }
@@ -73,7 +73,7 @@ public class SearchAction extends Action {
     task.setPeriod(period);
     TaskList foundTasks = list.findTaskByPeriod(task);
     if (foundTasks.size() != 0) {
-      return new Result(true, MSG_SUCCESS, null, foundTasks);
+      return new Result(true, MSG_SUCCESS, null, foundTasks.asList());
     } else {
       return new Result(false, null, MSG_FAIL, null);
     }
@@ -129,7 +129,7 @@ public class SearchAction extends Action {
       }
     }
 
-    return new Result(true, MSG_SUCCESS, null, tasksDueInPeriod);
+    return new Result(true, MSG_SUCCESS, null, tasksDueInPeriod.asList());
   }
 
   public String getDeadline() {
