@@ -2,7 +2,7 @@ package goku.ui;
 
 import goku.GOKU;
 import goku.Result;
-import goku.TaskList;
+import goku.Task;
 import goku.action.Action;
 import goku.action.DisplayAction;
 import goku.action.ExitAction;
@@ -13,6 +13,7 @@ import goku.storage.StorageFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -21,24 +22,38 @@ import java.util.logging.Logger;
  * interface and the main logic of GOKU.
  */
 public class CLUserInterface implements UserInterface {
-	private GOKU goku;
-	private Scanner sc;
-	private Storage storage;
-	private InputParser parser;
+  private static final String GOKU_PROMPT = ">> ";
+  private static final String GOKU_WELCOME_MESSAGE = "This is GOKU. How can I help?";
+  private static final String GOKU_EXIT_MESSAGE = "Thanks for using G.O.K.U.!";
+
+  private GOKU goku;
+  private InputParser parser;
+
+  private Scanner sc = new Scanner(System.in);
+  private Storage storage = StorageFactory.getDefaultStorage();
   private static final Logger LOGGER = Logger
       .getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-	public CLUserInterface(GOKU goku) {
-		this.goku = goku;
-		sc = new Scanner(System.in);
-		storage = StorageFactory.getDefaultStorage();
-		parser = new InputParser(goku);
-	}
+  public CLUserInterface(GOKU goku) {
+    this.goku = goku;
+    parser = new InputParser(goku);
+  }
+
+  @Override
+  public void run() {
+    printWelcomeMessage();
+    trytoloadfile();
+    getUserInputUntilExit();
+    printExitMessage();
+  }
+
+  private void printWelcomeMessage() {
+    System.out.println(GOKU_WELCOME_MESSAGE);
+  }
 
   private void trytoloadfile() {
     try {
-      TaskList tasklist = storage.loadStorage();
-      goku.setTaskList(tasklist);
+      goku.setTaskList(storage.loadStorage());
     } catch (FileNotFoundException e) {
       LOGGER.warning("File cannot be found, no tasks loaded.");
     } catch (IOException e) {
@@ -47,83 +62,76 @@ public class CLUserInterface implements UserInterface {
     LOGGER.info("Successfully loaded file: " + storage.getName());
   }
 
-	@Override
-	public void run() {
-    trytoloadfile();
-		System.out.println("This is GOKU. How can I help?");
-		loop();
-		System.out.println("Thanks for using G.O.K.U.!");
-	}
+  public void getUserInputUntilExit() {
+    while (true) {
+      printPrompt();
+      try {
+        String input = getUserInput();
+        Action action = parser.parse(input);
+        if (action instanceof ExitAction) {
+          return;
+        }
+        doAction(action);
+      } catch (MakeActionException e) {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
 
-	public void loop() {
-		while (true) {
-			System.out.print(">> ");
-			Action action = null;
-			String input = null;
-			try {
-				input = getUserInput();
-				action = parser.parse(input);
-				doAction(action);
-			} catch (MakeActionException e) {
-				System.out.println(e.getMessage());
-			}
-			if (action instanceof ExitAction) {
-				return;
-			}
-		}
-	}
+  private void printPrompt() {
+    System.out.print(GOKU_PROMPT);
+  }
 
-	private void doAction(Action action) throws MakeActionException {
+  private void printExitMessage() {
+    System.out.println(GOKU_EXIT_MESSAGE);
+  }
+
+  private void doAction(Action action) throws MakeActionException {
     assert action != null;
-		if (action instanceof DisplayAction) {
-			printTaskList(action.doIt().getTasks());
-		} else if (action instanceof SearchAction) {
-			Result result = action.doIt();
-			feedBack(result);
-		} else {
-			Result result = action.doIt();
-			feedBack(result);
-			save();
-		}
-	}
+    Result result = action.doIt();
+    if (action instanceof DisplayAction) {
+      printTaskList(result.getTasks());
+    } else {
+      feedBack(result);
+      save();
+    }
+  }
 
-	public void save() {
-		try {
-			storage.saveAll(goku.getTaskList());
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Error saving tasks.");
-		}
-	}
+  public void save() {
+    try {
+      storage.saveAll(goku.getTaskList());
+    } catch (IOException e) {
+      System.out.println("Error saving tasks.");
+    }
+  }
 
-	/**
-	 * @return string that user entered
-	 */
-	@Override
-	public String getUserInput() {
-		return sc.nextLine();
-	}
+  /**
+   * @return string that user entered
+   */
+  @Override
+  public String getUserInput() {
+    return sc.nextLine();
+  }
 
-	@Override
-	public void feedBack(Result result) {
-		if (result == null) {
-			return;
-		}
-		if (result.isSuccess()) {
-			System.out.println(result.getSuccessMsg());
-			if (result.getTasks() != null) {
-				printTaskList(result.getTasks());
-			}
-		} else {
-			System.out.println(result.getErrorMsg());
-			if (result.getTasks() != null) {
-				// printTaskList(result.getTasks());
-			}
-		}
-	}
+  @Override
+  public void feedBack(Result result) {
+    if (result == null) {
+      return;
+    }
+    if (result.isSuccess()) {
+      System.out.println(result.getSuccessMsg());
+      if (result.getTasks() != null) {
+        printTaskList(result.getTasks());
+      }
+    } else {
+      System.out.println(result.getErrorMsg());
+      if (result.getTasks() != null) {
+      }
+    }
+  }
 
-	public void printTaskList(TaskList list) {
-		TaskListDisplayer tld = new TaskListDisplayer(System.out);
-		tld.display(list);
-	}
+  public void printTaskList(List<Task> list) {
+    TaskListDisplayer tld = new TaskListDisplayer(System.out);
+    tld.display(list);
+  }
 }

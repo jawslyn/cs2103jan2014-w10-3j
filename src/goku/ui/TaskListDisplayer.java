@@ -2,12 +2,13 @@ package goku.ui;
 
 import goku.DateRange;
 import goku.Task;
-import goku.TaskList;
 import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 public class TaskListDisplayer {
@@ -20,7 +21,7 @@ public class TaskListDisplayer {
   DateTime now = DateUtil.getNow();
   DateTime tmr = now.plusDays(1);
 
-  public void display(TaskList list) {
+  public void display(List<Task> list) {
     if (list == null) {
       return;
     }
