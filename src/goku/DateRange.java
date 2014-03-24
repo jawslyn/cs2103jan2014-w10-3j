@@ -1,5 +1,6 @@
 package goku;
 
+import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 public class DateRange {
@@ -18,5 +19,15 @@ public class DateRange {
   public DateTime getEndDate() {
     return endDate;
   }
-
+  
+  public boolean containsDate(DateTime date) {
+    if (date == null) return false;
+    return DateUtil.isEarlierOrOn(date, getEndDate())
+        && DateUtil.isLaterOrOn(date, getStartDate());
+  }
+  
+  public boolean intersectsWith(DateRange range) {
+    if (range == null) return false;
+    return containsDate(range.getStartDate()) || containsDate(range.getEndDate());
+  }
 }

@@ -50,7 +50,7 @@ public class EditAction extends Action {
     taskWithEdits.setTitle(title);
     taskWithEdits.setDeadline(dline);
     taskWithEdits.setPeriod(period);
-    taskWithEdits.setComplete(isComplete);
+    taskWithEdits.setStatus(isComplete);
 
     Task t = list.getTaskById(id);
     t.updateWith(taskWithEdits);

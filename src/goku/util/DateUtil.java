@@ -276,18 +276,22 @@ public class DateUtil {
   }
 
   public static boolean isEarlierThan(DateTime aDate, DateTime otherDate) {
+    if (aDate == null) return false;
     return aDate.lt(otherDate);
   }
 
   public static boolean isLaterThan(DateTime aDate, DateTime otherDate) {
+    if (aDate == null) return false;
     return aDate.gt(otherDate);
   }
   
   public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
+    if (aDate == null) return false;
     return aDate.lteq(otherDate);
   }
   
   public static boolean isLaterOrOn(DateTime aDate, DateTime otherDate) {
+    if (aDate == null) return false;
     return aDate.gteq(otherDate);
   }
 }

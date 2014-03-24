@@ -1,9 +1,10 @@
 package goku.action;
 
+import java.util.List;
+
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
-import goku.TaskList;
 import hirondelle.date4j.DateTime;
 
 public class DisplayAction extends Action {
@@ -21,7 +22,7 @@ public class DisplayAction extends Action {
   }
 
   public Result displayComplete() {
-    return new Result(true, MSG_SUCCESS, null, list.getAllCompleted().asList());
+    return new Result(true, MSG_SUCCESS, null, list.getAllCompleted());
   }
 
   public Result displayDate() {
@@ -29,12 +30,12 @@ public class DisplayAction extends Action {
     DateTime deadline = byDeadline;
     Task t = new Task();
     t.setDeadline(deadline);
-    TaskList result = list.findTaskByDeadline(t);
-    return new Result(true, null, null, result.asList());
+    List<Task> result = list.findTaskByDeadline(deadline);
+    return new Result(true, null, null, result);
   }
 
   public Result displayIncomplete() {
-    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete().asList());
+    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
   }
 
   @Override

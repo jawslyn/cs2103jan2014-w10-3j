@@ -1,5 +1,7 @@
 package goku.action;
 
+import java.util.List;
+
 import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
@@ -34,8 +36,8 @@ public class SearchAction extends Action {
   public Result searchTitle() {
     Task task = new Task();
     task.setTitle(title);
-    TaskList foundTasks = list.findTaskByTitle(task);
-    return new Result(true, MSG_SUCCESS, null, foundTasks.asList());
+    List<Task> foundTasks = list.findTaskByTitle(title);
+    return new Result(true, MSG_SUCCESS, null, foundTasks);
   }
 
   public Result searchByDeadline() {
@@ -43,9 +45,9 @@ public class SearchAction extends Action {
 
     assert (dline != null);
     task.setDeadline(dline);
-    TaskList foundTasks = list.findTaskByDeadline(task);
+    List<Task> foundTasks = list.findTaskByDeadline(dline);
     if (foundTasks.size() != 0) {
-      return new Result(true, MSG_SUCCESS, null, foundTasks.asList());
+      return new Result(true, MSG_SUCCESS, null, foundTasks);
     } else {
       return new Result(false, null, MSG_FAIL, null);
     }
@@ -71,9 +73,9 @@ public class SearchAction extends Action {
 
     assert (period != null);
     task.setPeriod(period);
-    TaskList foundTasks = list.findTaskByPeriod(task);
+    List<Task> foundTasks = list.findTaskByPeriod(period);
     if (foundTasks.size() != 0) {
-      return new Result(true, MSG_SUCCESS, null, foundTasks.asList());
+      return new Result(true, MSG_SUCCESS, null, foundTasks);
     } else {
       return new Result(false, null, MSG_FAIL, null);
     }

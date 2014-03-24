@@ -1,5 +1,7 @@
 package goku.action;
 
+import java.util.List;
+
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
@@ -54,13 +56,13 @@ public class DeleteAction extends Action {
     if (list.findTaskByTitle(title).size() == 0) {
       return new Result(false, null, NO_MATCHES, null);
     }
-    TaskList possibleDeletion = list.deleteTaskByTitle(title);
+    List<Task> possibleDeletion = list.deleteTaskByTitle(title);
     if (possibleDeletion.size() == 0) {
       return new Result(true, String.format(MSG_SUCCESS, task.getTitle()),
           null, null);
     } else {
       return new Result(false, null, String.format(ERR_FAILURE, title),
-          possibleDeletion.asList());
+          possibleDeletion);
     }
 
   }

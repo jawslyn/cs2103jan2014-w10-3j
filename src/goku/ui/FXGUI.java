@@ -54,7 +54,6 @@ public class FXGUI extends Application implements UserInterface {
   @Override
   public void feedBack(Result result) {
     // TODO Auto-generated method stub
-
   }
 
   @Override

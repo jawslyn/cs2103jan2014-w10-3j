@@ -81,7 +81,7 @@ public class AddAction extends Action {
   private Result successAddTask() {
     Result result = Result.makeSuccessResult();
     result.setSuccessMsg(String.format(MSG_SUCCESS, title));
-    result.setTasks(list.getAllIncomplete().asList());
+    result.setTasks(list.getAllIncomplete());
     return result;
   }
 }

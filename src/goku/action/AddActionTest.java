@@ -2,6 +2,9 @@ package goku.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
@@ -40,7 +43,7 @@ public class AddActionTest {
     assertEquals(1, list.size());
     Task task = new Task();
     task.setTitle("hi");
-    TaskList addedTask = list.findTaskByTitle(task);
+    List<Task> addedTask = list.findTaskByTitle("hi");
     assertEquals(1, addedTask.size());
   }
 
@@ -63,11 +66,11 @@ public class AddActionTest {
     add3.doIt();
     assertEquals(3, list.size());
 
-    TaskList results;
-    results = list.findTaskByTitle(task1);
+    List<Task> results;
+    results = list.findTaskByTitle("abc");
     assertEquals(2, results.size());
 
-    results = list.findTaskByTitle(task2);
+    results = list.findTaskByTitle("def");
     assertEquals(2, results.size());
   }
 

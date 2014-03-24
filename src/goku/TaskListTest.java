@@ -4,17 +4,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import hirondelle.date4j.DateTime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
 public class TaskListTest {
 	private TaskList list;
-	private TaskList returnList;
+	private List<Task> returnList;
 
 	@Before
 	public void setup() {
 		list = new TaskList();
-		returnList = new TaskList();
+		returnList = new ArrayList<>();
 	}
 
 	@Test
@@ -62,7 +65,7 @@ public class TaskListTest {
 
 		Task toFind = new Task();
 		toFind.setTitle("123");
-		returnList = list.findTaskByTitle(toFind);
+		returnList = list.findTaskByTitle("123");
 		assertReturnListIsSize(0);
 		assertListIsSize(2);
 	}
@@ -77,7 +80,7 @@ public class TaskListTest {
 
 		Task toFind = new Task();
 		toFind.setTitle("abc");
-		returnList = list.findTaskByTitle(toFind);
+		returnList = list.findTaskByTitle("abc");
 		assertReturnListIsSize(2);
 		assertListIsSize(2);
 	}
@@ -91,7 +94,7 @@ public class TaskListTest {
 		list.addTask(otherTask);
 
 		Task dueTask = makeTaskWithTitleAndDeadline("123", 5, 8, 2014);
-		returnList = list.findTaskByDeadline(dueTask);
+		returnList = list.findTaskByDeadline(dueTask.getDeadline());
 		assertReturnListIsSize(2);
 	}
 
@@ -104,7 +107,7 @@ public class TaskListTest {
 		list.addTask(otherTask);
 
 		Task dueTask = makeTaskWithTitleAndDeadline("123", 4, 8, 2014);
-		returnList = list.findTaskByDeadline(dueTask);
+		returnList = list.findTaskByDeadline(dueTask.getDeadline());
 		assertReturnListIsSize(1);
 	}
 
@@ -116,7 +119,7 @@ public class TaskListTest {
 		list.addTask(otherTask);
 
 		Task dueTask = makeTaskWithTitleAndDeadline("123", 2, 8, 2014);
-		returnList = list.findTaskByDeadline(dueTask);
+		returnList = list.findTaskByDeadline(dueTask.getDeadline());
 		assertReturnListIsSize(0);
 	}
 
@@ -154,8 +157,8 @@ public class TaskListTest {
 		list.addTask(otherTask);
 		assertListIsSize(2);
 
-		Task toDelete = makeTaskWithTitle("xyz");
-		returnList = list.deleteTaskByTitle(toDelete);
+//		Task toDelete = makeTaskWithTitle("xyz");
+		returnList = list.deleteTaskByTitle("xyz");
 		assertListIsSize(2);
 		assertReturnListIsSize(0);
 	}
@@ -168,8 +171,7 @@ public class TaskListTest {
 		list.addTask(otherTask);
 		assertListIsSize(2);
 
-		Task toDelete = makeTaskWithTitle("ab");
-		returnList = list.deleteTaskByTitle(toDelete);
+		returnList = list.deleteTaskByTitle("ab");
 		assertListIsSize(1);
 		assertReturnListIsSize(0);
 	}
@@ -182,8 +184,8 @@ public class TaskListTest {
 		list.addTask(otherTask);
 		assertListIsSize(2);
 
-		Task toDelete = makeTaskWithTitle("abc");
-		returnList = list.deleteTaskByTitle(toDelete);
+//		Task toDelete = makeTaskWithTitle("abc");
+		returnList = list.deleteTaskByTitle("abc");
 		assertReturnListIsSize(2);
 
 	}

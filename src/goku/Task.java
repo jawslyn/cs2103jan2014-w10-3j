@@ -1,5 +1,6 @@
 package goku;
 
+import goku.storage.Storeable;
 import goku.util.DateOutput;
 import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
@@ -11,7 +12,7 @@ import com.google.gson.Gson;
  * analogous to real life tasks which the user wishes to note down.
  */
 
-public class Task {
+public class Task implements Storeable {
 
   private Integer id;
   private String title;
@@ -19,8 +20,8 @@ public class Task {
   private DateRange period;
   private String[] tags;
   private String notes;
-  private Boolean isComplete;
-  private Boolean isImpt;
+  private Boolean complete;
+  private Boolean impt;
 
   public Task() {
   }
@@ -35,8 +36,56 @@ public class Task {
     period = task.period;
     tags = task.tags;
     notes = task.notes;
-    isComplete = false;
-    isImpt = task.isImpt;
+    complete = false;
+    impt = task.impt;
+  }
+
+  public boolean titleMatches(String title) {
+    if (getTitle() == null || title == null) {
+      return false;
+    }
+    String aTitle = getTitle().toLowerCase();
+    String otherTitle = title.toLowerCase();
+    return aTitle.contains(otherTitle);
+  }
+
+  public void updateWith(Task other) {
+    title = other.title == null ? title : other.title;
+    deadline = other.deadline == null ? deadline : other.deadline;
+    period = other.period == null ? period : other.period;
+    complete = other.complete == null ? complete : other.complete;
+    tags = other.tags == null ? tags : other.tags;
+    notes = other.notes == null ? notes : other.notes;
+    impt = other.impt == null ? impt : other.impt;
+  }
+
+  public String toStorageFormat() {
+    Gson gson = new Gson();
+    return gson.toJson(this);
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer sb = new StringBuffer();
+  
+    sb.append(impt ? "(!) " : "");
+    sb.append("[" + id + "] ");
+    sb.append(title);
+  
+    if (deadline != null) {
+      sb.append(" | by ");
+      sb.append(DateOutput.format(deadline));
+    }
+  
+    if (period != null) {
+      sb.append(" | from ");
+      sb.append(period.getStartDate());
+      sb.append(" to ");
+      sb.append(period.getEndDate());
+    }
+  
+    return sb.toString();
+  
   }
 
   @Override
@@ -54,194 +103,71 @@ public class Task {
     return false;
   }
 
-  public DateRange getDateRange() {
-    return period;
-  }
-
-  public DateTime getDeadline() {
-    return deadline;
-  }
-
-  public DateTime getEndDate() {
-    return period.getEndDate();
-  }
-
   public Integer getId() {
     return id;
-  }
-
-  public Boolean getImpt() {
-    return isImpt;
-  }
-
-  public String getNotes() {
-    return notes;
-  }
-
-  public DateTime getStartDate() {
-    return period.getStartDate();
-  }
-
-  public Boolean getStatus() {
-    return isComplete;
-  }
-
-  public String[] getTags() {
-    return tags;
   }
 
   public String getTitle() {
     return title;
   }
 
-  public boolean inPeriod(DateTime date) {
-    return DateUtil.isEarlierThan(date, getEndDate())
-        && DateUtil.isLaterThan(date, getStartDate());
+  public DateTime getDeadline() {
+    return deadline;
+  }
+
+  public DateRange getDateRange() {
+    return period;
+  }
+
+  public DateTime getStartDate() {
+    return period.getStartDate();
+  }
+
+  public DateTime getEndDate() {
+    return period.getEndDate();
+  }
+
+  public Boolean getImpt() {
+    return impt;
+  }
+
+  public Boolean getStatus() {
+    return complete;
   }
 
   public Boolean isDone() {
-    return isComplete;
-  }
-
-  public boolean isDueBefore(DateTime date) {
-    return DateUtil.isEarlierThan(deadline, date);
-  }
-
-  public boolean isDueBefore(Task task) {
-    return DateUtil.isEarlierThan(deadline, task.getDeadline());
+    return complete;
   }
 
   public boolean isDueOn(DateTime date) {
-    return DateUtil.isEarlierOrOn(deadline, date);
-  }
-
-  public boolean isDueOn(Task task) {
-    return DateUtil.isEarlierOrOn(deadline, task.getDeadline());
-  }
-
-  public void setComplete(Boolean complete) {
-    this.isComplete = complete;
-  }
-
-  public void setDeadline(DateTime deadline) {
-    this.deadline = deadline;
+    return deadline != null && DateUtil.isEarlierOrOn(deadline, date);
   }
 
   public void setId(int id) {
     this.id = id;
   }
 
-  public void setImpt(Boolean impt) {
-    this.isImpt = impt;
-  }
-
-  public void setNotes(String notes) {
-    this.notes = notes;
-  }
-
-  public void setPeriod(DateTime startDate, DateTime endDate) {
-    setPeriod(new DateRange(startDate, endDate));
-  }
-
-  public void setPeriod(DateRange period) {
-    this.period = period;
-  }
-
-  public void setStatus(boolean status) {
-    isComplete = status;
-  }
-
-  public void setTags(String[] tags) {
-    this.tags = tags;
-  }
-
   public void setTitle(String title) {
     this.title = title;
   }
 
-  public boolean tagsMatch(Task otherTask) {
-    String[] otherTags = otherTask.getTags();
-    for (String otherTag : otherTags) {
-      for (String tag : tags) {
-        if (otherTag.equalsIgnoreCase(tag)) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public void setStatus(Boolean status) {
+    if (status == null) return;
+    complete = status;
   }
 
-  public boolean titleMatches(Task otherTask) {
-    if (getTitle() == null || otherTask.getTitle() == null) {
-      return false;
-    }
-    String aTitle = getTitle().toLowerCase();
-    String otherTitle = otherTask.getTitle().toLowerCase();
-    return aTitle.contains(otherTitle);
+  public void setDeadline(DateTime deadline) {
+    if (deadline == null) return;
+    this.deadline = deadline;
   }
 
-  public boolean titleMatches(String title) {
-    if (getTitle() == null || title == null) {
-      return false;
-    }
-    String aTitle = getTitle().toLowerCase();
-    String otherTitle = title.toLowerCase();
-    return aTitle.contains(otherTitle);
+  public void setPeriod(DateRange period) {
+    if (period == null) return;
+    this.period = period;
   }
 
-  public String toStorageFormat() {
-    Gson gson = new Gson();
-
-    return gson.toJson(this);
-  }
-
-  @Override
-  public String toString() {
-    DateOutput dateOutput = new DateOutput();
-    StringBuffer sb = new StringBuffer();
-    sb.append("ID: ");
-    sb.append(id);
-    sb.append(" | Title: ");
-    sb.append(title);
-
-    if (deadline != null) {
-      sb.append(" | Deadline: ");
-      sb.append(dateOutput.format(deadline));
-    }
-
-    if (period != null) {
-      sb.append(" | From: ");
-      sb.append(period.getStartDate());
-      sb.append(" To: ");
-      sb.append(period.getEndDate());
-    }
-
- //   sb.append(" | Status: ");
- //   if (isComplete != null && isComplete) {
- //     sb.append("done");
- //   } else {
- //     sb.append("not done");
- //   }
-
-    sb.append(" | Importance: ");
-    if (isImpt != null && isImpt) {
-      sb.append("HIGH");
-    } else {
-      sb.append("NORMAL");
-    }
-
-    return sb.toString();
-
-  }
-
-  public void updateWith(Task otherTask) {
-    title = otherTask.title == null ? title : otherTask.title;
-    deadline = otherTask.deadline == null ? deadline : otherTask.deadline;
-    period = otherTask.period == null ? period : otherTask.period;
-    isComplete = otherTask.isComplete == null ? isComplete
-        : otherTask.isComplete;
-    tags = otherTask.tags == null ? tags : otherTask.tags;
-    notes = otherTask.notes == null ? notes : otherTask.notes;
-    isImpt = otherTask.isImpt == null ? isImpt : otherTask.isImpt;
+  public void setImpt(Boolean impt) {
+    if (impt == null) return;
+    this.impt = impt;
   }
 }
