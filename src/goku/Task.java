@@ -180,6 +180,15 @@ public class Task {
     return aTitle.contains(otherTitle);
   }
 
+  public boolean titleMatches(String title) {
+    if (getTitle() == null || title == null) {
+      return false;
+    }
+    String aTitle = getTitle().toLowerCase();
+    String otherTitle = title.toLowerCase();
+    return aTitle.contains(otherTitle);
+  }
+
   public String toStorageFormat() {
     Gson gson = new Gson();
 

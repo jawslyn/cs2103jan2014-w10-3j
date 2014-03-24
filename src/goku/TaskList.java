@@ -4,6 +4,7 @@ import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 import java.util.Iterator;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -66,6 +67,11 @@ public class TaskList implements Iterable<Task> {
 
   public TaskList deleteTaskByTitle(Task toDelete) {
     TaskList matches = findTaskByTitle(toDelete);
+    return deleteTask(matches);
+  }
+
+  public TaskList deleteTaskByTitle(String title) {
+    TaskList matches = findTaskByTitle(title);
     return deleteTask(matches);
   }
 
@@ -149,8 +155,10 @@ public class TaskList implements Iterable<Task> {
 
   public ObservableList<Task> getArrayList() {
     return _list;
-    // return (ArrayList<Task>) Arrays
-    // .asList(_list.toArray(new Task[_list.size()]));
+  }
+  
+  public List<Task> asList() {
+    return _list;
   }
 
   private int getIndexOfTaskById(int id) {
