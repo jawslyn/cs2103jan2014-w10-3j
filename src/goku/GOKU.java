@@ -1,6 +1,8 @@
 package goku;
 
+import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 import javafx.collections.ObservableList;
 
@@ -11,8 +13,8 @@ import javafx.collections.ObservableList;
 public class GOKU {
 
   private static TaskList _list;
-  private LinkedList<TaskList> undoList;
-  private LinkedList<TaskList> redoList;
+  private Deque<TaskList> undoList;
+  private Deque<TaskList> redoList;
 
   public GOKU() {
     _list = new TaskList();
@@ -20,24 +22,20 @@ public class GOKU {
     redoList = new LinkedList<TaskList>();
   }
 
-  public LinkedList<TaskList> getRedoList() {
-    return redoList;
-  }
-
   public TaskList getTaskList() {
     return _list;
-  }
-
-  public static ObservableList<Task> getObservableStatic() {
-    return _list.getObservable();
   }
 
   public ObservableList<Task> getObservable() {
     return _list.getObservable();
   }
 
-  public LinkedList<TaskList> getUndoList() {
+  public Deque<TaskList> getUndoList() {
     return undoList;
+  }
+
+  public Deque<TaskList> getRedoList() {
+    return redoList;
   }
 
   public void setTaskList(TaskList list) {
