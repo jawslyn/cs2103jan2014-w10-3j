@@ -7,7 +7,6 @@ import hirondelle.date4j.DateTime;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 

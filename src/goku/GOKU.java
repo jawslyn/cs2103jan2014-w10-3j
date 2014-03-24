@@ -2,7 +2,6 @@ package goku;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 import javafx.collections.ObservableList;
 
