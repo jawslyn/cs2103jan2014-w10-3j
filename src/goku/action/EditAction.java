@@ -32,20 +32,26 @@ public class EditAction extends Action {
 
   public void addToUndoList() {
     TaskList currList = new TaskList();
-    for (Task t : list.getArrayList()) {
-      currList.addUndoTask(t);
+    for (Task t : goku.getTaskList().getArrayList()) {
+      currList.addTaskWithoutSettingId(t);
     }
-    goku.getUndoList().offer(currList);
+
+    TaskList newCurrList = new TaskList();
+    for (Task t : currList) {
+      Task newT = new Task(t);
+      newCurrList.addTaskWithoutSettingId(newT);
+    }
+
+    goku.getUndoList().offer(newCurrList);
   }
 
   @Override
   public Result doIt() {
+    addToUndoList();
     return updateTask();
   }
 
   public Result updateTask() {
-    addToUndoList();
-
     Task taskWithEdits = new Task();
     taskWithEdits.setTitle(title);
     taskWithEdits.setDeadline(dline);
