@@ -1,11 +1,11 @@
 package goku.action;
 
-import java.util.List;
-
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
+
+import java.util.List;
 
 /* Delete removes a task from GOKU.
  * It does so in 2 steps:
@@ -36,7 +36,7 @@ public class DeleteAction extends Action {
   public void addToUndoList() {
     TaskList currList = new TaskList();
     for (Task t : list.getArrayList()) {
-      currList.addUndoTask(t);
+      currList.addTaskWithoutSettingId(t);
     }
     goku.getUndoList().offer(currList);
   }
