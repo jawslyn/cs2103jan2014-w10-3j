@@ -32,12 +32,30 @@ public class TaskList implements Iterable<Task> {
     return false;
   }
 
-  public void addUndoTask(Task task) {
-    _list.add(task);
+  public List<Task> asList() {
+    return _list;
   }
 
   public void clear() {
     _list.clear();
+  }
+
+  @Override
+  public TaskList clone() {
+    TaskList cloned = new TaskList();
+    for (Task task : _list) {
+      cloned.addTaskWithoutSettingId(task);
+    }
+    return cloned;
+  }
+
+  private List<Task> deleteTask(List<Task> matches) {
+    if (matches.size() == 1) {
+      deleteTaskById(matches.get(0).getId());
+      return new ArrayList<Task>();
+    } else {
+      return matches;
+    }
   }
 
   public Task deleteTaskById(int id) {
@@ -53,15 +71,6 @@ public class TaskList implements Iterable<Task> {
     return deleteTask(findTaskByTitle(title));
   }
 
-  private List<Task> deleteTask(List<Task> matches) {
-    if (matches.size() == 1) {
-      deleteTaskById(matches.get(0).getId());
-      return new ArrayList<Task>();
-    } else {
-      return matches;
-    }
-  }
-
   public List<Task> findTaskByDeadline(DateTime deadline) {
     List<Task> matches = new ArrayList<>();
     for (Task task : _list) {
@@ -75,8 +84,8 @@ public class TaskList implements Iterable<Task> {
   public List<Task> findTaskByPeriod(DateRange range) {
     List<Task> matches = new ArrayList<>();
     for (Task task : _list) {
-      if (range.containsDate(task.getDeadline()) ||
-          range.intersectsWith(task.getDateRange())) {
+      if (range.containsDate(task.getDeadline())
+          || range.intersectsWith(task.getDateRange())) {
         matches.add(task);
       }
     }
@@ -104,7 +113,7 @@ public class TaskList implements Iterable<Task> {
   }
 
   public List<Task> getAllIncomplete() {
-	  List<Task> incomplete = new ArrayList<Task>();
+    List<Task> incomplete = new ArrayList<Task>();
     for (Task task : _list) {
       if ((task.getStatus()) == null || !task.getStatus()) {
         incomplete.add(task);
@@ -114,10 +123,6 @@ public class TaskList implements Iterable<Task> {
   }
 
   public ObservableList<Task> getArrayList() {
-    return _list;
-  }
-  
-  public List<Task> asList() {
     return _list;
   }
 
@@ -157,8 +162,9 @@ public class TaskList implements Iterable<Task> {
       if (task.getDateRange() != null) {
         DateTime taskStartDate = task.getDateRange().getStartDate();
         DateTime taskEndDate = task.getDateRange().getEndDate();
-        
-        if (DateUtil.isEarlierOrOn(dateTime, taskEndDate) && DateUtil.isLaterOrOn(dateTime, taskStartDate)) {
+
+        if (DateUtil.isEarlierOrOn(dateTime, taskEndDate)
+            && DateUtil.isLaterOrOn(dateTime, taskStartDate)) {
           result = false;
           break;
         }
@@ -167,7 +173,7 @@ public class TaskList implements Iterable<Task> {
 
     return result;
   }
-  
+
   @Override
   public Iterator<Task> iterator() {
     return _list.listIterator();
@@ -175,13 +181,5 @@ public class TaskList implements Iterable<Task> {
 
   public int size() {
     return _list.size();
-  }
-
-  public TaskList clone() {
-    TaskList cloned = new TaskList();
-    for (Task task : _list) {
-      cloned.addTaskWithoutSettingId(task);
-    }
-    return cloned;
   }
 }
