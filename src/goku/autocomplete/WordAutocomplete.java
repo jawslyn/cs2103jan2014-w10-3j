@@ -73,13 +73,10 @@ public class WordAutocomplete {
 
   private List<String> makeDefaultCorpus() {
     List<String> defaultCorpus = new ArrayList<String>();
-    defaultCorpus.add("add");
-    defaultCorpus.add("view");
-    defaultCorpus.add("edit");
-    defaultCorpus.addAll(Arrays
-        .asList((new String[] { "delete", "remove", "update", "done",
-            "complete", "do", "finish", "display", "view", "show", "search",
-            "find", "quit", "exit", "undo", "revert", "rollback" })));
+    defaultCorpus.addAll(Arrays.asList((new String[] { "add", "edit", "delete",
+        "remove", "update", "done", "complete", "do", "finish", "display",
+        "view", "show", "search", "find", "quit", "exit", "undo", "revert",
+        "rollback" })));
 
     return defaultCorpus;
   }

@@ -12,12 +12,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class CompletionController {
-  private static enum Mode {
-    INSERT, COMPLETION
-  };
-
-  private Mode mode = Mode.INSERT;
-
   private WordAutocomplete autoComplete;
   private TextField inputField;
   private StackPane suggestionBox;
@@ -31,60 +25,112 @@ public class CompletionController {
     this.suggestionList = suggestionList;
   }
 
+  /*
+   * Handle various KeyEvents.
+   * 1. Tab - will insert the best suggestion, if there are
+   * 2. Space - will cancel the suggestion
+   * 3. Any other character that can be displayed, plus backspace -
+   *    will show possible completions
+   */
   public void handle(KeyEvent event) {
     KeyCode code = event.getCode();
-    if (code == KeyCode.ENTER || code == KeyCode.TAB) {
-      Text suggestedText = (Text) suggestionList.getChildren().get(0);
-      inputField.setText(suggestedText.getText());
-      mode = Mode.INSERT;
-      inputField.insertText(inputField.getLength(), " ");
-      inputField.end();
-      hideSuggestions();
-      return;
-    } else if (code.isWhitespaceKey()) {
-      mode = Mode.INSERT;
-      clearSuggestions();
-      hideSuggestions();
-    } else if (event.getCode().isDigitKey() || event.getCode().isLetterKey()) {
-      clearSuggestions();
-      int pos = inputField.getCaretPosition();
-      String content = inputField.getText();
-      int w;
-      for (w = pos - 1; w >= 0; w--) {
-        if (!Character.isLetter(content.charAt(w))) {
-          break;
-        }
-      }
-      String prefix = content.substring(w + 1, pos).toLowerCase();
-      List<String> completions = autoComplete.complete(prefix);
-      if (completions.size() == 0) {
-        mode = Mode.INSERT;
-        clearSuggestions();
-        hideSuggestions();
-      } else {
-        for (String completion : completions) {
-          String comp = completion.substring(pos - 1 - w);
-          addSuggestionToBeShown(inputField.getText() + comp);
-        }
-        mode = Mode.COMPLETION;
-        showSuggestions();
-      }
+    if (isCompletionCommitKey(code)) {
+      insertSuggestedText(getBestSuggestion());
+    } else if (isCancelCompletionKey(code)) {
+      cancelSuggestion();
+    } else if (shouldGetCompletion(event)) {
+      showCompletions();
     }
   }
 
+  private boolean isCompletionCommitKey(KeyCode code) {
+    return code == KeyCode.TAB;
+  }
+
+  private boolean isCancelCompletionKey(KeyCode code) {
+    return code.isWhitespaceKey();
+  }
+
+  private boolean shouldGetCompletion(KeyEvent event) {
+    return event.getCode().isDigitKey() || event.getCode().isLetterKey()
+        || event.getCode() == KeyCode.BACK_SPACE;
+  }
+
+  private void insertSuggestedText(Text suggestedText) {
+    if (suggestedText == null) {
+      return;
+    }
+    inputField.setText(suggestedText.getText() + " ");
+    inputField.end();
+    hideSuggestions();
+  }
+
+  private Text getBestSuggestion() {
+    if (suggestionList.getChildren().size() == 0) {
+      return null;
+    }
+    Text suggestedText = (Text) suggestionList.getChildren().get(0);
+    return suggestedText;
+  }
+
+  private void showCompletions() {
+    clearSuggestions();
+    List<String> completions = autoComplete.complete(getPrefixToBeCompleted());
+    if (completions.size() == 0) {
+      cancelSuggestion();
+    } else {
+      for (String completion : completions) {
+        String completionSuffix = completion.substring(getPrefixToBeCompleted()
+            .length());
+        addSuggestionToBeShown(inputField.getText() + completionSuffix);
+      }
+      showSuggestions();
+    }
+  }
+
+  private String getPrefixToBeCompleted() {
+    int caretPos = inputField.getCaretPosition();
+    String content = inputField.getText();
+    int w;
+    for (w = caretPos - 1; w >= 0; w--) {
+      if (!Character.isLetter(content.charAt(w))) {
+        break;
+      }
+    }
+    return content.substring(w + 1, caretPos).toLowerCase();
+  }
+
+  /*
+   * Shows the list of suggestions
+   */
   private void showSuggestions() {
     suggestionBox.setVisible(true);
   }
 
-  private void addSuggestionToBeShown(String string) {
-    suggestionList.getChildren().add(new Text(string));
-  }
-
+  /*
+   * Clears all suggestions from the list of suggestions
+   */
   private void clearSuggestions() {
     suggestionList.getChildren().clear();
   }
 
+  /*
+   * Hides the list of suggestion
+   */
   private void hideSuggestions() {
     suggestionBox.setVisible(false);
   }
+
+  private void cancelSuggestion() {
+    clearSuggestions();
+    hideSuggestions();
+  }
+
+  /*
+   * Adds a suggestion to the list of suggestions
+   */
+  private void addSuggestionToBeShown(String suggestion) {
+    suggestionList.getChildren().add(new Text(suggestion));
+  }
+
 }
