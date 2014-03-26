@@ -87,7 +87,7 @@ public class LocalFileStorage implements Storage {
       while (line != null) {
         Gson gson = new Gson();
         Task task = gson.fromJson(line, Task.class);
-        tasklist.addTask(task);
+        tasklist.addTaskWithoutSettingId(task);
         line = br.readLine();
       }
     }

@@ -4,6 +4,7 @@ import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,7 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class TaskList implements Iterable<Task> {
-  private static Integer count = 0;
+  private static Integer runningId = 1;
+  private static List<Integer> unusedId = new ArrayList<Integer>();
 
   private ObservableList<Task> _list;
 
@@ -19,8 +21,16 @@ public class TaskList implements Iterable<Task> {
     _list = FXCollections.observableArrayList();
   }
 
+  private int makeId() {
+    if (unusedId.size() > 0) {
+      return unusedId.remove(0);
+    }
+    return runningId++;
+  }
+
   public int addTask(Task task) {
-    task.setId(++count);
+    int id = makeId();
+    task.setId(id);
     boolean success = _list.add(task);
     return success ? task.getId() : -1;
   }
@@ -64,6 +74,9 @@ public class TaskList implements Iterable<Task> {
   }
 
   public Task deleteTaskByIndex(int index) {
+    Task t = getTaskByIndex(index);
+    unusedId.add(t.getId());
+    Collections.sort(unusedId);
     return _list.remove(index);
   }
 
