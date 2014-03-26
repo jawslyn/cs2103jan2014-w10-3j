@@ -27,7 +27,16 @@
 	-fx-padding: 5 20 5 20;
 }
 
+#outputField {
+	-fx-font-size: 20;
+}
+
 .task {
+	-fx-font-size: 20;
+}
+
+.task-id {
+	
 }
 
 .task-title {
