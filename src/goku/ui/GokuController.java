@@ -9,7 +9,6 @@ import goku.action.DisplayAction;
 import goku.action.ExitAction;
 import goku.action.MakeActionException;
 import goku.action.SearchAction;
-import goku.autocomplete.WordAutocomplete;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
 import goku.util.DateOutput;
@@ -36,6 +35,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -58,6 +58,12 @@ public class GokuController {
   private TextField inputField;
 
   @FXML
+  private StackPane suggestionBox;
+
+  @FXML
+  private VBox suggestionList;
+
+  @FXML
   private VBox outputField;
 
   private GOKU goku;
@@ -65,8 +71,6 @@ public class GokuController {
   private InputParser parser;
 
   private Storage storage;
-
-  private WordAutocomplete autoComplete;
 
   private static enum Mode {
     INSERT, COMPLETION
@@ -77,6 +81,8 @@ public class GokuController {
   private static final Logger LOGGER = Logger
       .getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+  private CompletionController completionController;
+
   @FXML
   void initialize() {
     assert inputField != null : "fx:id=\"inputField\" was not injected: check your FXML file 'Main.fxml'.";
@@ -85,7 +91,8 @@ public class GokuController {
 
     goku = FXGUI.getGokuInstance();
 
-    autoComplete = new WordAutocomplete();
+    completionController = new CompletionController(inputField, suggestionBox,
+        suggestionList);
 
     parser = new InputParser(goku);
     storage = StorageFactory.getDefaultStorage();
@@ -180,7 +187,6 @@ public class GokuController {
     HBox hbox = new HBox();
     hbox.getChildren().add(new Text(output));
     outputField.getChildren().add(hbox);
-    // outputField.getChildren().add(new Text(output));
   }
 
   public void addNewLineCentered(String output) {
@@ -191,54 +197,36 @@ public class GokuController {
   }
 
   public void keyPressOnInputField(KeyEvent event) {
-    if (event.getCode().isDigitKey() || event.getCode().isLetterKey()) {
-      int pos = inputField.getCaretPosition();
-      String content = inputField.getText();
-      int w;
-      for (w = pos - 1; w >= 0; w--) {
-        if (!Character.isLetter(content.charAt(w))) {
-          break;
-        }
-      }
-      String prefix = content.substring(w + 1, pos).toLowerCase();
-      List<String> completions = autoComplete.complete(prefix);
-      if (completions.size() == 0) {
-        mode = Mode.INSERT;
-      } else {
-        String match = completions.get(0);
-        String completion = match.substring(pos - 1 - w);
-        inputField.insertText(pos, completion);
-        inputField.selectRange(w + 1 + match.length(), w + 1 + prefix.length());
-        mode = Mode.COMPLETION;
-      }
-    } else if (event.getCode() == KeyCode.ENTER) {
-      if (mode == Mode.COMPLETION) {
-        int pos = inputField.getLength();
-        inputField.insertText(pos, " ");
-        mode = Mode.INSERT;
-        inputField.end();
-        return;
-      } else {
-        Action action = null;
-        String input = null;
-        try {
-          input = inputField.getText();
-          action = parser.parse(input);
-          if (action instanceof ExitAction) {
-          }
-          doAction(action);
-        } catch (MakeActionException e) {
-          addNewLine(e.getMessage());
-        }
-        if (action instanceof ExitAction) {
-          addNewLine("Goodbye!");
-          Platform.exit();
+    if (event.getCode() == KeyCode.ENTER) {
+      Action action = null;
+      String input = null;
+      try {
+        input = inputField.getText().toLowerCase().trim();
+        if (input.isEmpty()) {
           return;
         }
-        inputField.setText("");
+        action = parser.parse(input);
+        if (action instanceof ExitAction) {
+        }
+        doAction(action);
+      } catch (MakeActionException e) {
+        addNewLine(e.getMessage());
+      }
+      if (action instanceof ExitAction) {
+        addNewLine("Goodbye!");
+        Platform.exit();
         return;
       }
+      inputField.setText("");
+      hideSuggestions();
+      return;
+    } else {
+      completionController.handle(event);
     }
+  }
+
+  private void hideSuggestions() {
+    suggestionBox.setVisible(false);
   }
 
   private void doAction(Action action) throws MakeActionException {
@@ -300,7 +288,6 @@ public class GokuController {
     HBox hbox = new HBox();
     // hbox.setAlignment(Pos.BASELINE_CENTER);
     Text t = new Text("Error!");
-    t.setStrokeWidth(10);
     t.setStroke(Color.RED);
     hbox.getChildren().add(t);
     return hbox;

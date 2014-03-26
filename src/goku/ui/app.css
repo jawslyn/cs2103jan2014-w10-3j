@@ -26,10 +26,23 @@
 	-fx-text-fill: rgba(250,250,250,1);
 	-fx-font-size: 26;
 	-fx-padding: 5 20 5 20;
+	-fx-font-family: 'Inconsolata';
+}
+
+#suggestionBox {
+	-fx-background-color: white;
+	-fx-effect: dropshadow(three-pass-box, rgba(40,40,40,0.5), 11, 0.3, 5, 5);
+	-fx-padding: 3 20 3 20;
+}
+
+#suggestionList {
+	-fx-font-size: 24;
+	-fx-text-origin: baseline;
 }
 
 #outputField {
 	-fx-font-size: 20;
+	-fx-padding: 5 20 5 20;
 }
 
 .separator {
