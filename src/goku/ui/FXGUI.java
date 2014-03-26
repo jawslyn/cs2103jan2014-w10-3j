@@ -35,7 +35,6 @@ public class FXGUI extends Application implements UserInterface {
     try {
       Font g = Font.loadFont(FXGUI.class.getResource("Inconsolata.otf")
           .toExternalForm(), 20);
-      Font.loadFont(FXGUI.class.getResource("A.ttf").toExternalForm(), 18);
       AnchorPane page = (AnchorPane) FXMLLoader.load(FXGUI.class
           .getResource("Main.fxml"));
       Scene scene = new Scene(page);

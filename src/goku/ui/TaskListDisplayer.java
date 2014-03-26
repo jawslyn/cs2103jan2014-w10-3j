@@ -7,6 +7,7 @@ import hirondelle.date4j.DateTime;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -19,6 +20,33 @@ public class TaskListDisplayer {
 
   DateTime now = DateUtil.getNow();
   DateTime tmr = now.plusDays(1);
+
+  public Hashtable<String, List<Task>> build(List<Task> list) {
+    Hashtable<String, List<Task>> ht = new Hashtable<>();
+    if (list == null) {
+      return ht;
+    }
+    ArrayList<Task> past = new ArrayList<Task>();
+    ArrayList<Task> today = new ArrayList<Task>();
+    ArrayList<Task> tomorrow = new ArrayList<Task>();
+    ArrayList<Task> remaining = new ArrayList<Task>();
+
+    for (Task task : list) {
+      if (isOver(task)) {
+        past.add(task);
+      } else if (isToday(task)) {
+        today.add(task);
+      } else if (isTomorrow(task)) {
+        tomorrow.add(task);
+      } else {
+        remaining.add(task);
+      }
+    }
+    ht.put("today", today);
+    ht.put("tomorrow", tomorrow);
+    ht.put("remaining", remaining);
+    return ht;
+  }
 
   public void display(List<Task> list) {
     if (list == null) {

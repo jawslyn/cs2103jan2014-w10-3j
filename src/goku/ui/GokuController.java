@@ -17,11 +17,15 @@ import goku.util.DateOutput;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
@@ -91,6 +95,16 @@ public class GokuController {
     } catch (IOException e) {
       LOGGER.warning("Error loading file, no tasks loaded.");
     }
+
+    scrollPane.widthProperty().addListener(new ChangeListener<Number>() {
+      @Override
+      public void changed(ObservableValue<? extends Number> width,
+          Number oldValue, Number newValue) {
+        outputField.setMaxWidth(newValue.doubleValue());
+        outputField.setMinWidth(newValue.doubleValue());
+        outputField.setPrefWidth(newValue.doubleValue());
+      }
+    });
   }
 
   public Text makeId(Task task) {
@@ -120,7 +134,6 @@ public class GokuController {
     Text title = makeTitle(t);
     HBox date = makeDate(t);
     hbox.getChildren().addAll(id, impt, title, date);
-    // HBox.setHgrow(title, Priority.ALWAYS);
     return hbox;
   }
 
@@ -159,7 +172,18 @@ public class GokuController {
   }
 
   public void addNewLine(String output) {
-    outputField.getChildren().add(new Text(output));
+    HBox hbox = new HBox();
+    hbox.getChildren().add(new Text(output));
+    outputField.getChildren().add(hbox);
+    // outputField.getChildren().add(new Text(output));
+  }
+
+  public void addNewLineCentered(String output) {
+    HBox hbox = new HBox();
+    hbox.setAlignment(Pos.BASELINE_CENTER);
+    hbox.getChildren().add(new Text(output));
+    outputField.getChildren().add(hbox);
+    // outputField.getChildren().add(new Text(output));
   }
 
   public void keyPressOnInputField(KeyEvent event) {
@@ -202,6 +226,8 @@ public class GokuController {
         } catch (MakeActionException e) {
         }
         if (action instanceof ExitAction) {
+          addNewLine("Goodbye!");
+          Platform.exit();
           return;
         }
         inputField.setText("");
@@ -253,21 +279,41 @@ public class GokuController {
       if (result.getSuccessMsg() != null) {
         addNewLine(result.getSuccessMsg());
       }
-      if (result.getTasks() != null) {
-        for (Task t : result.getTasks()) {
-          addNewLine(makeDisplayBoxForTask(t));
-        }
-      }
+      displayTasks(result.getTasks());
+      // for (Task t : result.getTasks()) {
+      // addNewLine(makeDisplayBoxForTask(t));
+      // }
     } else {
       if (result.getErrorMsg() != null) {
         addNewLine(result.getErrorMsg());
       }
       if (result.getTasks() != null) {
-        for (Task t : result.getTasks()) {
-          addNewLine(makeDisplayBoxForTask(t));
-          // addNewLine(t.toString());
-        }
+        displayTasks(result.getTasks());
+        // for (Task t : result.getTasks()) {
+        // addNewLine(makeDisplayBoxForTask(t));
+        // // addNewLine(t.toString());
+        // }
       }
+    }
+  }
+
+  public void displayTasks(List<Task> tasks) {
+    if (tasks == null) {
+      return;
+    }
+    TaskListDisplayer tld = new TaskListDisplayer(System.out);
+    Hashtable<String, List<Task>> ht = tld.build(tasks);
+    addNewLineCentered("today");
+    for (Task task : ht.get("today")) {
+      addNewLine(makeDisplayBoxForTask(task));
+    }
+    addNewLineCentered("tomorrow");
+    for (Task task : ht.get("tomorrow")) {
+      addNewLine(makeDisplayBoxForTask(task));
+    }
+    addNewLineCentered("soon");
+    for (Task task : ht.get("remaining")) {
+      addNewLine(makeDisplayBoxForTask(task));
     }
   }
 
