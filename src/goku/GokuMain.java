@@ -14,18 +14,18 @@ public class GokuMain {
   }
 
   private static UserInterface setUserInterface(String[] args) {
-    if (shouldRunGui(args)) {
-      return new FXGUI(goku);
-    } else {
+    if (shouldRunCli(args)) {
       return new CLUserInterface(goku);
+    } else {
+      return new FXGUI(goku);
     }
   }
 
-  private static boolean shouldRunGui(String[] args) {
+  private static boolean shouldRunCli(String[] args) {
     if (args.length == 0) {
       return false;
     }
-    return args[0].equalsIgnoreCase("gui");
+    return args[0].equalsIgnoreCase("cli");
   }
 
 }
