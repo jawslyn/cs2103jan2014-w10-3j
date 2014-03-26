@@ -1,12 +1,11 @@
 package goku.ui;
 
+import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.action.Action;
-import goku.action.DeleteAction;
 import goku.action.DisplayAction;
-import goku.action.EditAction;
 import goku.action.ExitAction;
 import goku.action.MakeActionException;
 import goku.action.SearchAction;
@@ -22,28 +21,17 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
+import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.util.Callback;
-import javafx.util.Duration;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 public class GokuController {
 
@@ -57,24 +45,14 @@ public class GokuController {
   private AnchorPane page;
 
   @FXML
-  private StackPane editPane;
-
-  @FXML
-  private TextField editPaneTitle;
-
-  @FXML
-  private CheckBox editComplete;
+  private ScrollPane scrollPane;
 
   @FXML
   private TextField inputField;
 
   @FXML
-  private ListView<Task> listView;
+  private VBox outputField;
 
-  @FXML
-  private TextField feedbackField;
-
-  private ObservableList<Task> tasks;
   private GOKU goku;
 
   private InputParser parser;
@@ -82,8 +60,6 @@ public class GokuController {
   private Storage storage;
 
   private WordAutocomplete autoComplete;
-
-  private Integer selectedTaskId;
 
   private static enum Mode {
     INSERT, COMPLETION
@@ -97,8 +73,8 @@ public class GokuController {
   @FXML
   void initialize() {
     assert inputField != null : "fx:id=\"inputField\" was not injected: check your FXML file 'Main.fxml'.";
-    assert listView != null : "fx:id=\"listView\" was not injected: check your FXML file 'Main.fxml'.";
-    assert feedbackField != null : "fx:id=\"feedbackField\" was not injected: check your FXML file 'Main.fxml'.";
+    assert outputField != null : "fx:id=\"outputField\" was not injected: check your FXML file 'Main.fxml'.";
+    assert scrollPane != null : "fx:id=\"scrollPane\" was not injected: check your FXML file 'Main.fxml'.";
 
     goku = FXGUI.getGokuInstance();
 
@@ -113,57 +89,65 @@ public class GokuController {
     } catch (IOException e) {
       LOGGER.warning("Error loading file, no tasks loaded.");
     }
-    tasks = goku.getObservable();
-    listView.setItems(tasks);
-
-    listView.setCellFactory(new Callback<ListView<Task>, ListCell<Task>>() {
-      @Override
-      public ListCell<Task> call(ListView<Task> list) {
-        return new TaskCell();
-      }
-    });
-
-    listView.focusedProperty().addListener(new ChangeListener<Boolean>() {
-      @Override
-      public void changed(ObservableValue<? extends Boolean> observable,
-          Boolean oldValue, Boolean newValue) {
-        if (newValue == false) {
-          listView.getSelectionModel().clearSelection();
-        }
-      }
-    });
-
-    listView.setEditable(true);
-
-    listView.getSelectionModel().selectedItemProperty()
-        .addListener(new ChangeListener<Task>() {
-          @Override
-          public void changed(ObservableValue<? extends Task> observable,
-              Task oldValue, Task newValue) {
-          }
-        });
-
   }
 
-  public void clickOnTask(MouseEvent arg0) {
-    Task selectedTask = listView.getSelectionModel().getSelectedItem();
-    if (selectedTask != null && selectedTask.getTitle() != null) {
-      editPaneTitle.setText(selectedTask.getTitle());
-      editPane.setVisible(true);
-      showEditPane();
-      selectedTaskId = selectedTask.getId();
-      editComplete.setSelected(selectedTask.getStatus() == null ? false
-          : selectedTask.getStatus());
-      editPaneTitle.requestFocus();
-    }
+  public Text makeId(Task task) {
+    Text id = new Text(String.valueOf(task.getId()));
+    id.getStyleClass().addAll("task-id");
+    return id;
   }
 
-  public void keyPressOnEditPane(KeyEvent arg0) {
-    if (arg0.getCode() == KeyCode.ENTER) {
-      commitEdit();
-      hideEditPane();
-      inputField.requestFocus();
+  public Text makeTitle(Task task) {
+    Text title = new Text(task.getTitle());
+    title.getStyleClass().addAll("task-title");
+    return title;
+  }
+
+  public Text makeImpt(Task task) {
+    Text impt = new Text(task.getImpt() ? "(!)" : "");
+    impt.setFill(Color.RED);
+    return impt;
+  }
+
+  public HBox makeDisplayBoxForTask(Task t) {
+    HBox hbox = new HBox();
+    hbox.getStyleClass().add("task");
+    hbox.setSpacing(5);
+    Text id = makeId(t);
+    Text impt = makeImpt(t);
+    Text title = makeTitle(t);
+    Text date = new Text();
+    if (t.getDeadline() != null) {
+      date = makeDeadline(t);
+    } else if (t.getDateRange() != null) {
+      date = makeDateRange(t);
     }
+    hbox.getChildren().addAll(id, impt, title, date);
+    return hbox;
+  }
+
+  private Text makeDateRange(Task t) {
+    Text range = new Text();
+    DateRange period = t.getDateRange();
+    range.getStyleClass().addAll("task-date-range");
+    range.setText("from " + period.getStartDate() + " to "
+        + period.getEndDate());
+    return range;
+  }
+
+  private Text makeDeadline(Task t) {
+    Text deadline = new Text();
+    deadline.getStyleClass().addAll("task-deadline");
+    deadline.setText("by " + DateOutput.format(t.getDeadline()));
+    return deadline;
+  }
+
+  public void addNewLine(HBox hbox) {
+    outputField.getChildren().add(hbox);
+  }
+
+  public void addNewLine(String output) {
+    outputField.getChildren().add(new Text(output));
   }
 
   public void keyPressOnInputField(KeyEvent event) {
@@ -214,105 +198,10 @@ public class GokuController {
     }
   }
 
-  public void keyPressOnListView(KeyEvent event) {
-    if (event.getCode() == KeyCode.BACK_SPACE
-        || event.getCode() == KeyCode.DELETE) {
-      Task selected = listView.getSelectionModel().getSelectedItem();
-      if (selected == null) {
-        return;
-      }
-      DeleteAction deleteAction = new DeleteAction(goku);
-      deleteAction.id = selected.getId();
-      try {
-        doAction(deleteAction);
-      } catch (MakeActionException e) {
-      }
-    } else if (event.getCode() == KeyCode.ENTER) {
-      editPane.setVisible(true);
-    }
-
-  }
-
-  void showEditPane() {
-    final Timeline timeline = new Timeline();
-    final KeyValue kv = new KeyValue(editPane.translateXProperty(), -500,
-        Interpolator.EASE_IN);
-    final KeyFrame kf = new KeyFrame(Duration.millis(300), kv);
-    timeline.getKeyFrames().add(kf);
-    timeline.play();
-  }
-
-  void hideEditPane() {
-    final Timeline timeline = new Timeline();
-    final KeyValue kv = new KeyValue(editPane.translateXProperty(), 0,
-        Interpolator.EASE_BOTH);
-    final KeyFrame kf = new KeyFrame(Duration.millis(300), kv);
-    timeline.getKeyFrames().add(kf);
-    timeline.play();
-  }
-
-  void commitEdit() {
-    String title = editPaneTitle.getText();
-    Boolean completed = editComplete.selectedProperty().getValue();
-    EditAction edit = new EditAction(goku);
-    edit.id = selectedTaskId;
-    edit.title = title;
-    edit.isComplete = completed;
-    edit.doIt();
-    try {
-      doAction(edit);
-    } catch (MakeActionException e) {
-      e.printStackTrace();
-    }
-    tasks = goku.getObservable();
-    listView.setItems(null);
-    listView.setItems(tasks);
-  }
-
-  static class TaskCell extends ListCell<Task> {
-    @Override
-    protected void updateItem(Task item, boolean empty) {
-      super.updateItem(item, empty);
-      if (item != null) {
-        this.setFocusTraversable(false);
-        HBox hbox = new HBox();
-        hbox.getStyleClass().add("task-cell");
-        hbox.setSpacing(20f);
-
-        Label id = new Label(String.valueOf(item.getId()));
-
-        id.getStyleClass().add("task-cell-id");
-        Label title = new Label(item.getTitle());
-
-        if (item.isDone() != null && item.isDone()) {
-          hbox.getStyleClass().add("completed");
-        } else {
-        }
-
-        HBox.setHgrow(title, Priority.ALWAYS);
-
-        Label deadline, start, end;
-        hbox.getChildren().addAll(id, title);
-        HBox dates = new HBox();
-        dates.setSpacing(5);
-        if (item.getDeadline() != null) {
-          deadline = new Label(DateOutput.format(item.getDeadline()));
-          dates.getChildren().addAll(new Label("by"), deadline);
-        } else if (item.getDateRange() != null) {
-          start = new Label(DateOutput.format(item.getStartDate()));
-          end = new Label(DateOutput.format(item.getEndDate()));
-          dates.getChildren().addAll(new Label("from"), start, new Label("to"),
-              end);
-        }
-        hbox.getChildren().add(dates);
-        setGraphic(hbox);
-      }
-    }
-  }
-
   private void doAction(Action action) throws MakeActionException {
-    clearFeedback();
     if (action instanceof DisplayAction) {
+      Result result = action.doIt();
+      feedBack(result);
     } else if (action instanceof SearchAction) {
       Result result = action.doIt();
       feedBack(result);
@@ -321,6 +210,27 @@ public class GokuController {
       feedBack(result);
       save();
     }
+    scrollToBottom();
+  }
+
+  private void scrollToBottom() {
+    AnimationTimer timer = new AnimationTimer() {
+      long lng = 0;
+
+      @Override
+      public void handle(long l) {
+        if (lng == 0) {
+          lng = l;
+        }
+        if (l > lng + 100000000) {
+          scrollPane.setVvalue(scrollPane.getVvalue() + 0.05);
+          if (scrollPane.getVvalue() == 1) {
+            this.stop();
+          }
+        }
+      }
+    };
+    timer.start();
   }
 
   private void feedBack(Result result) {
@@ -329,24 +239,24 @@ public class GokuController {
     }
     if (result.isSuccess()) {
       if (result.getSuccessMsg() != null) {
-        feedbackField.setText(result.getSuccessMsg());
+        addNewLine(result.getSuccessMsg());
       }
       if (result.getTasks() != null) {
+        for (Task t : result.getTasks()) {
+          addNewLine(makeDisplayBoxForTask(t));
+        }
       }
     } else {
       if (result.getErrorMsg() != null) {
-        feedbackField.setText(result.getErrorMsg());
+        addNewLine(result.getErrorMsg());
       }
       if (result.getTasks() != null) {
+        for (Task t : result.getTasks()) {
+          addNewLine(makeDisplayBoxForTask(t));
+          // addNewLine(t.toString());
+        }
       }
     }
-  }
-
-  private void clearFeedback() {
-    if (feedbackField == null) {
-      return;
-    }
-    feedbackField.setText("");
   }
 
   public void save() {

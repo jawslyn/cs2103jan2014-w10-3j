@@ -2,13 +2,12 @@ package goku.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
 import goku.TaskList;
+
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -34,6 +33,7 @@ public class AddActionTest {
   }
 
   @Test
+  // This tests whether adding a task to the task list works
   public void doIt_TaskWithName_returnsSuccessfulResult() throws Exception {
     AddAction add = new AddAction(goku);
     add.title = "hi";
@@ -48,6 +48,7 @@ public class AddActionTest {
   }
 
   @Test
+  // This tests whether adding different tasks works
   public void doIt_MultipleTasksWithName() throws Exception {
     AddAction add1 = new AddAction(goku);
     add1.title = "hi abc";
