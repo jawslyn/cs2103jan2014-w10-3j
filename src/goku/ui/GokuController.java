@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -100,9 +101,9 @@ public class GokuController {
       @Override
       public void changed(ObservableValue<? extends Number> width,
           Number oldValue, Number newValue) {
-        outputField.setMaxWidth(newValue.doubleValue());
-        outputField.setMinWidth(newValue.doubleValue());
-        outputField.setPrefWidth(newValue.doubleValue());
+        outputField.setMaxWidth(newValue.doubleValue() - 10);
+        outputField.setMinWidth(newValue.doubleValue() - 10);
+        outputField.setPrefWidth(newValue.doubleValue() - 10);
       }
     });
   }
@@ -132,16 +133,20 @@ public class GokuController {
     Text id = makeId(t);
     Text impt = makeImpt(t);
     Text title = makeTitle(t);
+    HBox separator = new HBox();
+    HBox.setHgrow(separator, Priority.ALWAYS);
+    separator.getStyleClass().add("separator");
     HBox date = makeDate(t);
-    hbox.getChildren().addAll(id, impt, title, date);
+    hbox.getChildren().addAll(id, impt, title, separator, date);
     return hbox;
   }
 
   private HBox makeDate(Task t) {
     HBox hbox = new HBox();
-    hbox.setAlignment(Pos.TOP_RIGHT);
-    HBox.setHgrow(hbox, Priority.ALWAYS);
+    // hbox.setAlignment(Pos.TOP_RIGHT);
+    // HBox.setHgrow(hbox, Priority.ALWAYS);
     Text date = new Text();
+    // date.setTextAlignment(TextAlignment.RIGHT);
     if (t.getDeadline() != null) {
       date = makeDeadline(t);
     } else if (t.getDateRange() != null) {
@@ -183,7 +188,6 @@ public class GokuController {
     hbox.setAlignment(Pos.BASELINE_CENTER);
     hbox.getChildren().add(new Text(output));
     outputField.getChildren().add(hbox);
-    // outputField.getChildren().add(new Text(output));
   }
 
   public void keyPressOnInputField(KeyEvent event) {
@@ -224,6 +228,7 @@ public class GokuController {
           }
           doAction(action);
         } catch (MakeActionException e) {
+          addNewLine(e.getMessage());
         }
         if (action instanceof ExitAction) {
           addNewLine("Goodbye!");
@@ -280,21 +285,25 @@ public class GokuController {
         addNewLine(result.getSuccessMsg());
       }
       displayTasks(result.getTasks());
-      // for (Task t : result.getTasks()) {
-      // addNewLine(makeDisplayBoxForTask(t));
-      // }
     } else {
       if (result.getErrorMsg() != null) {
-        addNewLine(result.getErrorMsg());
+        addNewLine(makeErrorMessage(result));
+        // addNewLine(result.getErrorMsg());
       }
       if (result.getTasks() != null) {
         displayTasks(result.getTasks());
-        // for (Task t : result.getTasks()) {
-        // addNewLine(makeDisplayBoxForTask(t));
-        // // addNewLine(t.toString());
-        // }
       }
     }
+  }
+
+  public HBox makeErrorMessage(Result result) {
+    HBox hbox = new HBox();
+    // hbox.setAlignment(Pos.BASELINE_CENTER);
+    Text t = new Text("Error!");
+    t.setStrokeWidth(10);
+    t.setStroke(Color.RED);
+    hbox.getChildren().add(t);
+    return hbox;
   }
 
   public void displayTasks(List<Task> tasks) {
@@ -303,18 +312,22 @@ public class GokuController {
     }
     TaskListDisplayer tld = new TaskListDisplayer(System.out);
     Hashtable<String, List<Task>> ht = tld.build(tasks);
-    addNewLineCentered("today");
-    for (Task task : ht.get("today")) {
-      addNewLine(makeDisplayBoxForTask(task));
+    for (Map.Entry<String, List<Task>> entry : ht.entrySet()) {
+      System.out.println(entry.getKey());
+      addNewLine(makeDateHeader(entry.getKey()));
+      for (Task task : ht.get(entry.getKey())) {
+        addNewLine(makeDisplayBoxForTask(task));
+      }
     }
-    addNewLineCentered("tomorrow");
-    for (Task task : ht.get("tomorrow")) {
-      addNewLine(makeDisplayBoxForTask(task));
-    }
-    addNewLineCentered("soon");
-    for (Task task : ht.get("remaining")) {
-      addNewLine(makeDisplayBoxForTask(task));
-    }
+  }
+
+  private HBox makeDateHeader(String header) {
+    HBox hbox = new HBox();
+    hbox.setAlignment(Pos.BASELINE_CENTER);
+    Text t = new Text(header.toUpperCase());
+    t.setUnderline(true);
+    hbox.getChildren().add(t);
+    return hbox;
   }
 
   public void save() {

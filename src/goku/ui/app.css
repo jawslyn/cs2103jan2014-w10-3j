@@ -3,6 +3,7 @@
 		rgba(255,214,94,1) 0%,
 		rgba(254,191,4,1) 100%);
 	-fx-background-image: url("bg.png");
+	-fx-font-family: 'Inconsolata';
 }
 
 .input-field {
@@ -29,7 +30,12 @@
 
 #outputField {
 	-fx-font-size: 20;
-	-fx-font-family: 'Inconsolata';
+}
+
+.separator {
+	-fx-border-width: 0 0 1 0;
+	-fx-border-color: gray;
+	-fx-border-style: dotted;
 }
 
 .task {
@@ -41,14 +47,6 @@
 }
 
 .task-title {
-	/*
-    -fx-background-color: rgba(0,0,0,0);
-    -fx-padding: 2px;
-    -fx-font-weight: normal;
-    -fx-font-style: normal;
-    -fx-font-size: 24;
-    -fx-font-family: sans-serif;
-    */
 }
 
 .check-box {

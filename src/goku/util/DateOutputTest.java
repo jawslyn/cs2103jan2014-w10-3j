@@ -9,8 +9,8 @@ import org.junit.Test;
 
 public class DateOutputTest {
   public static final String TOMORROW = "tomorrow";
-  public static final String HOURS_LATER = " hours later";
-  public static final String DAYS_LATER = " days later";
+  public static final String HOURS_LATER = "h later";
+  public static final String DAYS_LATER = "d later";
   public static final String NEXT_WEEK = "next week";
 
   DateTime base; // Has the same year, month, day as the date now, but set is

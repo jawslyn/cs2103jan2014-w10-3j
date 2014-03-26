@@ -24,14 +24,14 @@ public class DateOutput {
     int daysDifference = now.numDaysFrom(date);
     if (daysDifference == 0) {
       int hoursDifference = getDifferenceInHours(now, date);
-      return hoursDifference + " hours later";
+      return hoursDifference + "h later";
     } else if (daysDifference == 1) {
       return date.getHour() + ":" + date.getMinute();
     } else if (daysDifference < 7) {
       if (daysDifference < 0) {
         return "expired";
       } else {
-        return daysDifference + " days later";
+        return daysDifference + "d later";
       }
     } else {
       return date.getDay() + "/" + date.getMonth();
