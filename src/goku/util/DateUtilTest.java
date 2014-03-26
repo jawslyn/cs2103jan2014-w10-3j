@@ -8,6 +8,10 @@ import org.junit.Test;
 
 public class DateUtilTest {
 
+  /*
+   * Combination heuristics. All inputs below are well-formed
+   * and should pass.
+   */
   @Test
   public void looksLikeTime_success() throws Exception {
     assertTrue(DateUtil.looksLikeTime("1:45"));
@@ -19,6 +23,10 @@ public class DateUtilTest {
     assertTrue(DateUtil.looksLikeTime("1.45am"));
   }
 
+  /*
+   * Combination heuristics. All inputs below are well-formed
+   * and should pass.
+   */
   @Test
   public void looksLikeDate_success() throws Exception {
     assertTrue(DateUtil.looksLikeDay("sUn"));
@@ -45,6 +53,10 @@ public class DateUtilTest {
     assertTrue(DateUtil.looksLikeDate("4-3-12"));
   }
 
+  /*
+   * Combination heuristics. All inputs below are well-formed
+   * and should pass.
+   */
   @Test
   public void parseDay_success() throws Exception {
     DateTime now = DateUtil.getNow();
@@ -57,11 +69,14 @@ public class DateUtilTest {
     assertTrue(expected.isSameDayAs(result));
     result = DateUtil.parseDay("tMr");
     assertTrue(expected.isSameDayAs(result));
-
     result = DateUtil.parseDay("todaY");
     assertTrue(now.isSameDayAs(result));
   }
 
+  /*
+   * Combination heuristics. All inputs below are well-formed
+   * and should pass.
+   */
   @Test
   public void parseDate_success() throws Exception {
     DateTime now = DateUtil.getNow(), actual, expected;
@@ -83,6 +98,10 @@ public class DateUtilTest {
     assertTrue(expected.isSameDayAs(actual));
   }
 
+  /*
+   * Combination heuristics. All inputs below are well-formed
+   * and should pass.
+   */
   @Test
   public void parseTime_success() throws Exception {
     DateTime date, expected;
@@ -123,6 +142,10 @@ public class DateUtilTest {
     assertEquals(expected.getMinute(), date.getMinute());
   }
 
+  /*
+   * Combination heuristics. All inputs below are well-formed
+   * and should pass.
+   */
   @Test
   public void getNearestDateToWeekday_success() {
     DateTime start, nearest, result;
@@ -142,6 +165,10 @@ public class DateUtilTest {
     assertTrue(nearest.isSameDayAs(result));
   }
 
+  /*
+   * Combination heuristics. All inputs below are well-formed
+   * and should pass.
+   */
   @Test
   public void mergeDateAndTime_success() throws Exception {
     DateTime date = null, time = null, result, expected;
