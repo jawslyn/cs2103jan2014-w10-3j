@@ -38,9 +38,11 @@ public class FeedbackController {
     Hashtable<String, List<Task>> ht = tld.build(tasks);
     String[] headers = { "today", "tomorrow", "remaining" };
     for (String header : Arrays.asList(headers)) {
-      addNewLine(makeDateHeader(header));
-      for (Task task : ht.get(header)) {
-        addNewLine(makeDisplayBoxForTask(task));
+      if (ht.get(header).size() != 0) {
+        addNewLine(makeDateHeader(header));
+        for (Task task : ht.get(header)) {
+          addNewLine(makeDisplayBoxForTask(task));
+        }
       }
     }
   }
