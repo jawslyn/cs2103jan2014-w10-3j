@@ -103,20 +103,15 @@ public class GokuController {
       String input = null;
       try {
         input = inputField.getText().toLowerCase().trim();
-        if (input.isEmpty()) {
-          return;
-        }
+        System.out.println(input.isEmpty() ? "empty" : "no");
         action = parser.parse(input);
         if (action instanceof ExitAction) {
+          feedbackController.sayGoodbye();
+          Platform.exit();
         }
         doAction(action);
       } catch (MakeActionException e) {
-        feedbackController.addNewLine(e.getMessage());
-      }
-      if (action instanceof ExitAction) {
-        feedbackController.sayGoodbye();
-        Platform.exit();
-        return;
+        feedbackController.displayError(e.getMessage());
       }
       inputField.setText("");
       hideSuggestions();
@@ -141,20 +136,20 @@ public class GokuController {
     scrollToBottom();
   }
 
+  private void feedBack(Result result) {
+    if (result == null) {
+      return;
+    } else {
+      feedbackController.displayResult(result);
+    }
+  }
+
   public void save() {
     try {
       storage.saveAll(goku.getTaskList());
     } catch (IOException e) {
       e.printStackTrace();
       System.out.println("Error saving tasks.");
-    }
-  }
-
-  private void feedBack(Result result) {
-    if (result == null) {
-      return;
-    } else {
-      feedbackController.displayResult(result);
     }
   }
 

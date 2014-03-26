@@ -202,7 +202,11 @@ public class FeedbackController {
   }
 
   public void displayError(Result result) {
-    addNewLine(makeErrorMessage(result));
+    HBox hbox = new HBox();
+    Text t = new Text("Error! " + result.getErrorMsg());
+    t.setFill(Color.RED);
+    hbox.getChildren().add(t);
+    addNewLine(hbox);
   }
 
   public void addNewLineCentered(String output) {
@@ -214,8 +218,8 @@ public class FeedbackController {
 
   public HBox makeErrorMessage(Result result) {
     HBox hbox = new HBox();
-    Text t = new Text("Error!");
-    t.setStroke(Color.RED);
+    Text t = new Text("Error! " + result.getErrorMsg());
+    t.setFill(Color.RED);
     hbox.getChildren().add(t);
     return hbox;
   }

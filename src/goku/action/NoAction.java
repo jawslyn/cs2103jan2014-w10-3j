@@ -3,15 +3,17 @@ package goku.action;
 import goku.GOKU;
 import goku.Result;
 
+/*
+ * Represents an empty Action, an Action that does nothing,
+ * has no feedback, but is successful.
+ */
 public class NoAction extends Action {
-  private static final String MSG_NONE = "Command invalid";
-
   public NoAction(GOKU goku) {
     super(goku);
   }
 
   @Override
   public Result doIt() {
-    return new Result(true, MSG_NONE, null, null);
+    return new Result(true, null, null, null);
   }
 }
