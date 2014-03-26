@@ -1,9 +1,7 @@
 package goku.ui;
 
-import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
-import goku.Task;
 import goku.action.Action;
 import goku.action.DisplayAction;
 import goku.action.ExitAction;
@@ -11,34 +9,23 @@ import goku.action.MakeActionException;
 import goku.action.SearchAction;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
-import goku.util.DateOutput;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 public class GokuController {
 
@@ -72,16 +59,11 @@ public class GokuController {
 
   private Storage storage;
 
-  private static enum Mode {
-    INSERT, COMPLETION
-  };
-
-  private Mode mode = Mode.INSERT;
-
   private static final Logger LOGGER = Logger
       .getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   private CompletionController completionController;
+  private FeedbackController feedbackController;
 
   @FXML
   void initialize() {
@@ -94,6 +76,8 @@ public class GokuController {
     completionController = new CompletionController(inputField, suggestionBox,
         suggestionList);
 
+    feedbackController = new FeedbackController(outputField);
+
     parser = new InputParser(goku);
     storage = StorageFactory.getDefaultStorage();
     try {
@@ -103,99 +87,16 @@ public class GokuController {
     } catch (IOException e) {
       LOGGER.warning("Error loading file, no tasks loaded.");
     }
-
-    scrollPane.widthProperty().addListener(new ChangeListener<Number>() {
-      @Override
-      public void changed(ObservableValue<? extends Number> width,
-          Number oldValue, Number newValue) {
-        outputField.setMaxWidth(newValue.doubleValue() - 10);
-        outputField.setMinWidth(newValue.doubleValue() - 10);
-        outputField.setPrefWidth(newValue.doubleValue() - 10);
-      }
-    });
   }
 
-  public Text makeId(Task task) {
-    Text id = new Text("[" + String.valueOf(task.getId()) + "]");
-    id.getStyleClass().addAll("task-id");
-    return id;
-  }
-
-  public Text makeTitle(Task task) {
-    Text title = new Text(task.getTitle());
-    title.getStyleClass().addAll("task-title");
-    return title;
-  }
-
-  public Text makeImpt(Task task) {
-    Text impt = new Text(task.getImpt() ? "(!)" : "   ");
-    impt.setFill(Color.RED);
-    return impt;
-  }
-
-  public HBox makeDisplayBoxForTask(Task t) {
-    HBox hbox = new HBox();
-    hbox.getStyleClass().add("task");
-    hbox.setSpacing(5);
-    Text id = makeId(t);
-    Text impt = makeImpt(t);
-    Text title = makeTitle(t);
-    HBox separator = new HBox();
-    HBox.setHgrow(separator, Priority.ALWAYS);
-    separator.getStyleClass().add("separator");
-    HBox date = makeDate(t);
-    hbox.getChildren().addAll(id, impt, title, separator, date);
-    return hbox;
-  }
-
-  private HBox makeDate(Task t) {
-    HBox hbox = new HBox();
-    // hbox.setAlignment(Pos.TOP_RIGHT);
-    // HBox.setHgrow(hbox, Priority.ALWAYS);
-    Text date = new Text();
-    // date.setTextAlignment(TextAlignment.RIGHT);
-    if (t.getDeadline() != null) {
-      date = makeDeadline(t);
-    } else if (t.getDateRange() != null) {
-      date = makeDateRange(t);
-    }
-    hbox.getChildren().add(date);
-    return hbox;
-  }
-
-  private Text makeDateRange(Task t) {
-    Text range = new Text();
-    DateRange period = t.getDateRange();
-    range.getStyleClass().addAll("task-date-range");
-    range.setText("from " + DateOutput.format(period.getStartDate()) + "\nto "
-        + DateOutput.format(period.getEndDate()));
-    return range;
-  }
-
-  private Text makeDeadline(Task t) {
-    Text deadline = new Text();
-    deadline.getStyleClass().addAll("task-deadline");
-    deadline.setText("by " + DateOutput.format(t.getDeadline()));
-    return deadline;
-  }
-
-  public void addNewLine(HBox hbox) {
-    outputField.getChildren().add(hbox);
-  }
-
-  public void addNewLine(String output) {
-    HBox hbox = new HBox();
-    hbox.getChildren().add(new Text(output));
-    outputField.getChildren().add(hbox);
-  }
-
-  public void addNewLineCentered(String output) {
-    HBox hbox = new HBox();
-    hbox.setAlignment(Pos.BASELINE_CENTER);
-    hbox.getChildren().add(new Text(output));
-    outputField.getChildren().add(hbox);
-  }
-
+  /*
+   * This method is called when a keypress in inputField is detected.
+   * A "Enter" keypress means the user wants to run the command.
+   * Any other key will be handled by CompletionController,
+   * which will suggestion completions.
+   * User can then use tab to *select* a completion and have it 
+   * fill up the inputField.
+   */
   public void keyPressOnInputField(KeyEvent event) {
     if (event.getCode() == KeyCode.ENTER) {
       Action action = null;
@@ -210,10 +111,10 @@ public class GokuController {
         }
         doAction(action);
       } catch (MakeActionException e) {
-        addNewLine(e.getMessage());
+        feedbackController.addNewLine(e.getMessage());
       }
       if (action instanceof ExitAction) {
-        addNewLine("Goodbye!");
+        feedbackController.sayGoodbye();
         Platform.exit();
         return;
       }
@@ -223,10 +124,6 @@ public class GokuController {
     } else {
       completionController.handle(event);
     }
-  }
-
-  private void hideSuggestions() {
-    suggestionBox.setVisible(false);
   }
 
   private void doAction(Action action) throws MakeActionException {
@@ -244,6 +141,27 @@ public class GokuController {
     scrollToBottom();
   }
 
+  public void save() {
+    try {
+      storage.saveAll(goku.getTaskList());
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Error saving tasks.");
+    }
+  }
+
+  private void feedBack(Result result) {
+    if (result == null) {
+      return;
+    } else {
+      feedbackController.displayResult(result);
+    }
+  }
+
+  /*
+   * I got this from online, this allows us to scroll the pane down
+   * to the bottom whenever we display something that is too long.
+   */
   private void scrollToBottom() {
     AnimationTimer timer = new AnimationTimer() {
       long lng = 0;
@@ -264,65 +182,7 @@ public class GokuController {
     timer.start();
   }
 
-  private void feedBack(Result result) {
-    if (result == null) {
-      return;
-    }
-    if (result.isSuccess()) {
-      if (result.getSuccessMsg() != null) {
-        addNewLine(result.getSuccessMsg());
-      }
-      displayTasks(result.getTasks());
-    } else {
-      if (result.getErrorMsg() != null) {
-        addNewLine(makeErrorMessage(result));
-        // addNewLine(result.getErrorMsg());
-      }
-      if (result.getTasks() != null) {
-        displayTasks(result.getTasks());
-      }
-    }
-  }
-
-  public HBox makeErrorMessage(Result result) {
-    HBox hbox = new HBox();
-    // hbox.setAlignment(Pos.BASELINE_CENTER);
-    Text t = new Text("Error!");
-    t.setStroke(Color.RED);
-    hbox.getChildren().add(t);
-    return hbox;
-  }
-
-  public void displayTasks(List<Task> tasks) {
-    if (tasks == null) {
-      return;
-    }
-    TaskListDisplayer tld = new TaskListDisplayer(System.out);
-    Hashtable<String, List<Task>> ht = tld.build(tasks);
-    for (Map.Entry<String, List<Task>> entry : ht.entrySet()) {
-      System.out.println(entry.getKey());
-      addNewLine(makeDateHeader(entry.getKey()));
-      for (Task task : ht.get(entry.getKey())) {
-        addNewLine(makeDisplayBoxForTask(task));
-      }
-    }
-  }
-
-  private HBox makeDateHeader(String header) {
-    HBox hbox = new HBox();
-    hbox.setAlignment(Pos.BASELINE_CENTER);
-    Text t = new Text(header.toUpperCase());
-    t.setUnderline(true);
-    hbox.getChildren().add(t);
-    return hbox;
-  }
-
-  public void save() {
-    try {
-      storage.saveAll(goku.getTaskList());
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Error saving tasks.");
-    }
+  private void hideSuggestions() {
+    suggestionBox.setVisible(false);
   }
 }
