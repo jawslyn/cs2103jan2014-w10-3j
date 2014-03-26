@@ -59,6 +59,7 @@ public class Task implements Storeable {
     impt = other.impt == null ? impt : other.impt;
   }
 
+  @Override
   public String toStorageFormat() {
     Gson gson = new Gson();
     return gson.toJson(this);
@@ -67,25 +68,25 @@ public class Task implements Storeable {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-  
+
     sb.append(impt ? "(!) " : "");
     sb.append("[" + id + "] ");
     sb.append(title);
-  
+
     if (deadline != null) {
       sb.append(" | by ");
       sb.append(DateOutput.format(deadline));
     }
-  
+
     if (period != null) {
       sb.append(" | from ");
-      sb.append(period.getStartDate());
+      sb.append(DateOutput.format(period.getStartDate()));
       sb.append(" to ");
-      sb.append(period.getEndDate());
+      sb.append(DateOutput.format(period.getEndDate()));
     }
-  
+
     return sb.toString();
-  
+
   }
 
   @Override
@@ -152,22 +153,30 @@ public class Task implements Storeable {
   }
 
   public void setStatus(Boolean status) {
-    if (status == null) return;
+    if (status == null) {
+      return;
+    }
     complete = status;
   }
 
   public void setDeadline(DateTime deadline) {
-    if (deadline == null) return;
+    if (deadline == null) {
+      return;
+    }
     this.deadline = deadline;
   }
 
   public void setPeriod(DateRange period) {
-    if (period == null) return;
+    if (period == null) {
+      return;
+    }
     this.period = period;
   }
 
   public void setImpt(Boolean impt) {
-    if (impt == null) return;
+    if (impt == null) {
+      return;
+    }
     this.impt = impt;
   }
 }

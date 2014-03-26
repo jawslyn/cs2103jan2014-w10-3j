@@ -23,12 +23,14 @@ import java.util.logging.Logger;
 
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -92,7 +94,7 @@ public class GokuController {
   }
 
   public Text makeId(Task task) {
-    Text id = new Text(String.valueOf(task.getId()));
+    Text id = new Text("[" + String.valueOf(task.getId()) + "]");
     id.getStyleClass().addAll("task-id");
     return id;
   }
@@ -104,7 +106,7 @@ public class GokuController {
   }
 
   public Text makeImpt(Task task) {
-    Text impt = new Text(task.getImpt() ? "(!)" : "");
+    Text impt = new Text(task.getImpt() ? "(!)" : "   ");
     impt.setFill(Color.RED);
     return impt;
   }
@@ -116,13 +118,23 @@ public class GokuController {
     Text id = makeId(t);
     Text impt = makeImpt(t);
     Text title = makeTitle(t);
+    HBox date = makeDate(t);
+    hbox.getChildren().addAll(id, impt, title, date);
+    // HBox.setHgrow(title, Priority.ALWAYS);
+    return hbox;
+  }
+
+  private HBox makeDate(Task t) {
+    HBox hbox = new HBox();
+    hbox.setAlignment(Pos.TOP_RIGHT);
+    HBox.setHgrow(hbox, Priority.ALWAYS);
     Text date = new Text();
     if (t.getDeadline() != null) {
       date = makeDeadline(t);
     } else if (t.getDateRange() != null) {
       date = makeDateRange(t);
     }
-    hbox.getChildren().addAll(id, impt, title, date);
+    hbox.getChildren().add(date);
     return hbox;
   }
 
@@ -130,8 +142,8 @@ public class GokuController {
     Text range = new Text();
     DateRange period = t.getDateRange();
     range.getStyleClass().addAll("task-date-range");
-    range.setText("from " + period.getStartDate() + " to "
-        + period.getEndDate());
+    range.setText("from " + DateOutput.format(period.getStartDate()) + "\nto "
+        + DateOutput.format(period.getEndDate()));
     return range;
   }
 

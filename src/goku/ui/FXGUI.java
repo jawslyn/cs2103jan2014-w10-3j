@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class FXGUI extends Application implements UserInterface {
@@ -32,6 +33,9 @@ public class FXGUI extends Application implements UserInterface {
       System.out.println("NULL");
     }
     try {
+      Font g = Font.loadFont(FXGUI.class.getResource("Inconsolata.otf")
+          .toExternalForm(), 20);
+      Font.loadFont(FXGUI.class.getResource("A.ttf").toExternalForm(), 18);
       AnchorPane page = (AnchorPane) FXMLLoader.load(FXGUI.class
           .getResource("Main.fxml"));
       Scene scene = new Scene(page);
