@@ -5,9 +5,9 @@ import goku.Result;
 import goku.Task;
 import goku.util.DateOutput;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
@@ -36,10 +36,10 @@ public class FeedbackController {
     }
     TaskListDisplayer tld = new TaskListDisplayer(System.out);
     Hashtable<String, List<Task>> ht = tld.build(tasks);
-    for (Map.Entry<String, List<Task>> entry : ht.entrySet()) {
-      System.out.println(entry.getKey());
-      addNewLine(makeDateHeader(entry.getKey()));
-      for (Task task : ht.get(entry.getKey())) {
+    String[] headers = { "today", "tomorrow", "remaining" };
+    for (String header : Arrays.asList(headers)) {
+      addNewLine(makeDateHeader(header));
+      for (Task task : ht.get(header)) {
         addNewLine(makeDisplayBoxForTask(task));
       }
     }
