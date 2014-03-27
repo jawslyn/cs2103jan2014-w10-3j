@@ -3,10 +3,8 @@ package goku.ui;
 import goku.GOKU;
 import goku.Result;
 import goku.action.Action;
-import goku.action.DisplayAction;
 import goku.action.ExitAction;
 import goku.action.MakeActionException;
-import goku.action.SearchAction;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
 
@@ -96,60 +94,44 @@ public class GokuController {
    * which will suggestion completions.
    * User can then use tab to *select* a completion and have it 
    * fill up the inputField.
+   * Ctrl + Z and Ctrl + Y is a shortcut for Undo and Redo, respectively.
    */
   public void keyPressOnInputField(KeyEvent event) {
     if (event.getCode() == KeyCode.ENTER) {
-      Action action = null;
-      String input = null;
-      try {
-        input = inputField.getText().toLowerCase().trim();
-        action = parser.parse(input);
-        if (action instanceof ExitAction) {
-          feedbackController.sayGoodbye();
-          Platform.exit();
-        }
-        doAction(action);
-      } catch (MakeActionException e) {
-        feedbackController.displayErrorMessage(e.getMessage());
-      }
-      inputField.setText("");
-      hideSuggestions();
-      return;
+      commitInput();
     } else if (event.isControlDown()) {
       if (event.getCode() == KeyCode.Z) {
         inputField.setText("undo");
-        try {
-          doAction(parser.parse("undo"));
-        } catch (MakeActionException e) {
-          feedbackController.displayErrorMessage(e.getMessage());
-        }
-        inputField.clear();
+        commitInput();
       } else if (event.getCode() == KeyCode.Y) {
         inputField.setText("redo");
-        try {
-          doAction(parser.parse("redo"));
-        } catch (MakeActionException e) {
-          feedbackController.displayErrorMessage(e.getMessage());
-        }
-        inputField.clear();
+        commitInput();
       }
     } else {
       completionController.handle(event);
     }
   }
 
-  private void doAction(Action action) throws MakeActionException {
-    if (action instanceof DisplayAction) {
-      Result result = action.doIt();
-      feedBack(result);
-    } else if (action instanceof SearchAction) {
-      Result result = action.doIt();
-      feedBack(result);
-    } else {
-      Result result = action.doIt();
-      feedBack(result);
-      save();
+  private void commitInput() {
+    try {
+      String input = inputField.getText().toLowerCase().trim();
+      Action action = parser.parse(input);
+      if (action instanceof ExitAction) {
+        feedbackController.sayGoodbye();
+        Platform.exit();
+      }
+      doAction(action);
+    } catch (MakeActionException e) {
+      feedbackController.displayErrorMessage(e.getMessage());
     }
+    clearInput();
+    hideSuggestions();
+  }
+
+  private void doAction(Action action) throws MakeActionException {
+    Result result = action.doIt();
+    feedBack(result);
+    save();
   }
 
   private void feedBack(Result result) {
@@ -167,6 +149,11 @@ public class GokuController {
       e.printStackTrace();
       System.out.println("Error saving tasks.");
     }
+  }
+
+  private void clearInput() {
+    inputField.clear();
+    ;
   }
 
   private void hideSuggestions() {
