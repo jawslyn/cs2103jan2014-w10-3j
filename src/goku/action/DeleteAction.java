@@ -25,7 +25,7 @@ public class DeleteAction extends Action {
   private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
   public static final String ERR_INSUFFICIENT_ARGS = "Can't delete. Need an ID. Try \"delete 1\"";
 
-  public int id;
+  public Integer id;
 
   public String title;
 
@@ -43,22 +43,16 @@ public class DeleteAction extends Action {
 
   public Result deleteTask() {
     addToUndoList();
-    // boolean success;
-    Task success = tryDeleteById();
-    if (success != null) {
-      return new Result(true,
-          String.format(MSG_SUCCESS, id, success.getTitle()), null, null);
+    Task deletedTask = tryDeleteById();
+    if (deletedTask != null) {
+      return new Result(true, String.format(MSG_SUCCESS, id,
+          deletedTask.getTitle()), null, null);
     }
-    if (title == null) {
-      return new Result(false, null, String.format(ERR_NOT_FOUND, id), null);
-    }
-
     List<Task> possibleDeletion = list.deleteTaskByTitle(title);
     if (possibleDeletion.size() == 0) {
       return new Result(false, null, NO_MATCHES, null);
-    }
-    if (possibleDeletion.size() == 1) {
-      Task deletedTask = possibleDeletion.get(0);
+    } else if (possibleDeletion.size() == 1) {
+      deletedTask = possibleDeletion.get(0);
       return new Result(true, String.format(MSG_SUCCESS, deletedTask.getId(),
           deletedTask.getTitle()), null, null);
     } else {
@@ -74,6 +68,9 @@ public class DeleteAction extends Action {
   }
 
   private Task tryDeleteById() {
+    if (id == null) {
+      return null;
+    }
     return list.deleteTaskById(id);
   }
 

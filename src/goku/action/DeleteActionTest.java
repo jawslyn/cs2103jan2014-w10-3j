@@ -53,6 +53,22 @@ public class DeleteActionTest {
   }
 
   @Test
+  public void deleteTask_withIdNotFoundTitleNotFound_returnsFailure()
+      throws Exception {
+    Task aTask = new Task();
+    aTask.setTitle("abc");
+    int id = list.addTask(aTask);
+
+    DeleteAction delete = new DeleteAction(goku);
+    delete.id = id + 1;
+    Result result = delete.doIt();
+    delete.title = null;
+
+    assertEquals(1, list.size());
+    assertFalse(result.isSuccess());
+  }
+
+  @Test
   public void deleteTask_withIdNotFoundButTitleFound_returnsSuccess()
       throws Exception {
     Task aTask = new Task();
