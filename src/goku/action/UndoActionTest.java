@@ -1,6 +1,7 @@
 package goku.action;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import goku.GOKU;
 import goku.Task;
 import goku.TaskList;
@@ -14,9 +15,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class UndoActionTest {
+  GOKU goku;
   TaskList list;
   Deque<TaskList> undoList;
-  GOKU goku;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+    undoList = goku.getUndoList();
+  }
 
   @After
   public void cleanUp() {
@@ -59,7 +67,7 @@ public class UndoActionTest {
     AddAction add3 = new AddAction(goku);
     add3.title = "hi def";
     DeleteAction delete = new DeleteAction(goku);
-    delete.id = 6; // HAVE TO EDIT THIS ONCE THE ID THING IS FIXED
+    delete.id = 3; // HAVE TO EDIT THIS ONCE THE ID THING IS FIXED
     UndoAction undo = new UndoAction(goku);
 
     Task task1 = new Task();
@@ -87,38 +95,33 @@ public class UndoActionTest {
     DateTime prevDeadline = DateUtil.parse("monday");
     add1.dline = prevDeadline;
     EditAction editTitle = new EditAction(goku);
-    editTitle.id = 7;
+    editTitle.id = 1;
     editTitle.title = "bye abc";
     UndoAction undo = new UndoAction(goku);
 
     add1.doIt();
     assertEquals(1, undoList.size());
+    assertEquals(1, list.size());
     editTitle.doIt();
     assertEquals(2, undoList.size());
-    Task task1 = goku.getTaskList().getTaskById(7);
+    Task task1 = goku.getTaskList().getTaskById(1);
     assertEquals("bye abc", task1.getTitle());
     undo.doIt();
     assertEquals(1, undoList.size());
-    Task task2 = goku.getTaskList().getTaskById(7);
+    Task task2 = goku.getTaskList().getTaskById(1);
     assertEquals("hi abc", task2.getTitle());
 
     EditAction editDate = new EditAction(goku);
-    editDate.id = 7;
+    editDate.id = 1;
     DateTime newDeadline = DateUtil.parse("tuesday");
     editDate.dline = newDeadline;
+    assertNotNull(editDate.dline);
     editDate.doIt();
-    task1 = goku.getTaskList().getTaskById(7);
+    task1 = goku.getTaskList().getTaskById(1);
     assertEquals(newDeadline, task1.getDeadline());
     undo.doIt();
-    task2 = goku.getTaskList().getTaskById(7);
+    task2 = goku.getTaskList().getTaskById(1);
     assertEquals(prevDeadline, task2.getDeadline());
 
-  }
-
-  @Before
-  public void setup() {
-    goku = new GOKU();
-    list = goku.getTaskList();
-    undoList = goku.getUndoList();
   }
 }

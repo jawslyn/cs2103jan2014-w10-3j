@@ -12,8 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class TaskList implements Iterable<Task> {
-  private static Integer runningId = 1;
-  private static List<Integer> unusedId = new ArrayList<Integer>();
+  private Integer runningId = 1;
+  private List<Integer> unusedId = new ArrayList<Integer>();
 
   private ObservableList<Task> _list;
 
@@ -29,8 +29,7 @@ public class TaskList implements Iterable<Task> {
   }
 
   public int addTask(Task task) {
-    int id = makeId();
-    task.setId(id);
+    task.setId(makeId());
     boolean success = _list.add(task);
     return success ? task.getId() : -1;
   }
