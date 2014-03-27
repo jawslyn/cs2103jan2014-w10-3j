@@ -131,7 +131,9 @@ public class GokuController {
   private void doAction(Action action) throws MakeActionException {
     Result result = action.doIt();
     feedBack(result);
-    save();
+    if (action.shouldSave()) {
+      save();
+    }
   }
 
   private void feedBack(Result result) {

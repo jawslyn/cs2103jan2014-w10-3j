@@ -15,6 +15,7 @@ public class DisplayAction extends Action {
 
   public DisplayAction(GOKU goku) {
     super(goku);
+    shouldSaveAfter = false;
   }
 
   public Result displayAll() {

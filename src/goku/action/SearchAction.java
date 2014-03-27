@@ -1,7 +1,5 @@
 package goku.action;
 
-import java.util.List;
-
 import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
@@ -9,6 +7,8 @@ import goku.Task;
 import goku.TaskList;
 import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
+
+import java.util.List;
 
 public class SearchAction extends Action {
 
@@ -23,6 +23,7 @@ public class SearchAction extends Action {
 
   public SearchAction(GOKU goku) {
     super(goku);
+    shouldSaveAfter = false;
   }
 
   private static final String MSG_SUCCESS = "Found tasks!";
