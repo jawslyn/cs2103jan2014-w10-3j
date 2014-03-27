@@ -31,10 +31,10 @@ public class TaskListTest {
 
   @Test
   public void addTask_willAlwaysMaintainSequentialId() {
-    int first = list.addTask(new Task());
+    list.addTask(new Task());
     int second = list.addTask(new Task());
     int third = list.addTask(new Task());
-    int forth = list.addTask(new Task());
+    list.addTask(new Task());
     list.deleteTaskById(third);
     list.deleteTaskById(second);
     int shouldBeSecond = list.addTask(new Task());
@@ -198,7 +198,6 @@ public class TaskListTest {
     list.addTask(otherTask);
     assertListIsSize(2);
 
-    // Task toDelete = makeTaskWithTitle("abc");
     returnList = list.deleteTaskByTitle("abc");
     assertReturnListIsSize(2);
 
