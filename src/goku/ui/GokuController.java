@@ -103,7 +103,6 @@ public class GokuController {
       String input = null;
       try {
         input = inputField.getText().toLowerCase().trim();
-        System.out.println(input.isEmpty() ? "empty" : "no");
         action = parser.parse(input);
         if (action instanceof ExitAction) {
           feedbackController.sayGoodbye();
@@ -116,6 +115,24 @@ public class GokuController {
       inputField.setText("");
       hideSuggestions();
       return;
+    } else if (event.isControlDown()) {
+      if (event.getCode() == KeyCode.Z) {
+        inputField.setText("undo");
+        try {
+          doAction(parser.parse("undo"));
+        } catch (MakeActionException e) {
+          feedbackController.displayError(e.getMessage());
+        }
+        inputField.clear();
+      } else if (event.getCode() == KeyCode.Y) {
+        inputField.setText("redo");
+        try {
+          doAction(parser.parse("redo"));
+        } catch (MakeActionException e) {
+          feedbackController.displayError(e.getMessage());
+        }
+        inputField.clear();
+      }
     } else {
       completionController.handle(event);
     }
