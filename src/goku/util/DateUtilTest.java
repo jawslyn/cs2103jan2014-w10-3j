@@ -7,6 +7,10 @@ import hirondelle.date4j.DateTime;
 import org.junit.Test;
 
 public class DateUtilTest {
+  @Test
+  public void looksLikeOffset() throws Exception {
+    assertTrue(DateUtil.isOffsetWord("next"));
+  }
 
   /*
    * Combination heuristics. All inputs below are well-formed
@@ -71,6 +75,26 @@ public class DateUtilTest {
     assertTrue(expected.isSameDayAs(result));
     result = DateUtil.parseDay("todaY");
     assertTrue(now.isSameDayAs(result));
+  }
+
+  @Test
+  public void parseWithWeekOffset_success() throws Exception {
+    DateTime base = new DateTime(2014, 3, 27, 0, 0, 0, 0); // this is a thursday
+    DateTime result, expected;
+
+    expected = base.plusDays(8);
+
+    result = DateUtil.parse("next friday".split(" "));
+    assertTrue(expected.isSameDayAs(result));
+
+    // TODO is this expected result?
+    expected = base.plusDays(14);
+    result = DateUtil.parse("next thursday".split(" "));
+    assertTrue(expected.isSameDayAs(result));
+
+    expected = base.plusDays(11);
+    result = DateUtil.parse("Next monday".split(" "));
+    assertTrue(expected.isSameDayAs(result));
   }
 
   /*

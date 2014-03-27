@@ -13,6 +13,7 @@ public class DateUtil {
       "sunday" };
   private static String[] dateDelimiters = { "-", "/" };
   private static String[] timeDelimiters = { "pm", "am", ":", "." };
+  private static String[] weekOffsets = { "coming", "next" };
 
   /*
    * Parses and array of String into a DateTime.
@@ -27,8 +28,11 @@ public class DateUtil {
    */
   public static DateTime parse(final String[] inputs) {
     DateTime date = null, time = null;
+    int daysOffsets = 0;
     for (String input : inputs) {
-      if (looksLikeDay(input)) {
+      if (isOffsetWord(input)) {
+        daysOffsets = parseOffset(input);
+      } else if (looksLikeDay(input)) {
         date = parseDay(input);
       } else if (looksLikeDate(input)) {
         date = parseDate(input);
@@ -36,11 +40,34 @@ public class DateUtil {
         time = parseTime(input);
       }
     }
-    return mergeDateAndTime(date, time);
+    return mergeDateAndTime(date.plusDays(daysOffsets), time);
+  }
+
+  private static int parseOffset(String string) {
+    string = string.toLowerCase();
+    switch (string) {
+      case "coming" :
+        return 0;
+      case "next" :
+        return 7;
+      default :
+        return 0;
+    }
+
+  }
+
+  static boolean isOffsetWord(String candidate) {
+    candidate = candidate.trim().toLowerCase();
+    for (String offsetWord : weekOffsets) {
+      if (offsetWord.contains(candidate)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static DateTime parse(String string) {
-    String[] s = { string };
+    String[] s = string.split(" ");
     return parse(s);
   }
 
@@ -276,22 +303,30 @@ public class DateUtil {
   }
 
   public static boolean isEarlierThan(DateTime aDate, DateTime otherDate) {
-    if (aDate == null) return false;
+    if (aDate == null) {
+      return false;
+    }
     return aDate.lt(otherDate);
   }
 
   public static boolean isLaterThan(DateTime aDate, DateTime otherDate) {
-    if (aDate == null) return false;
+    if (aDate == null) {
+      return false;
+    }
     return aDate.gt(otherDate);
   }
-  
+
   public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
-    if (aDate == null) return false;
+    if (aDate == null) {
+      return false;
+    }
     return aDate.lteq(otherDate);
   }
-  
+
   public static boolean isLaterOrOn(DateTime aDate, DateTime otherDate) {
-    if (aDate == null) return false;
+    if (aDate == null) {
+      return false;
+    }
     return aDate.gteq(otherDate);
   }
 }
