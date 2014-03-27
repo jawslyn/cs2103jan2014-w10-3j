@@ -58,15 +58,6 @@ public class TaskList implements Iterable<Task> {
     return cloned;
   }
 
-  private List<Task> deleteTask(List<Task> matches) {
-    if (matches.size() == 1) {
-      deleteTaskById(matches.get(0).getId());
-      return new ArrayList<Task>();
-    } else {
-      return matches;
-    }
-  }
-
   public Task deleteTaskById(int id) {
     int index = getIndexOfTaskById(id);
     return index < 0 ? null : deleteTaskByIndex(index);
@@ -77,10 +68,6 @@ public class TaskList implements Iterable<Task> {
     unusedId.add(t.getId());
     Collections.sort(unusedId);
     return _list.remove(index);
-  }
-
-  public List<Task> deleteTaskByTitle(String title) {
-    return deleteTask(findTaskByTitle(title));
   }
 
   public List<Task> findTaskByDeadline(DateTime deadline) {
@@ -104,6 +91,10 @@ public class TaskList implements Iterable<Task> {
     return matches;
   }
 
+  public List<Task> deleteTaskByTitle(String title) {
+    return deleteTask(findTaskByTitle(title));
+  }
+
   public List<Task> findTaskByTitle(String title) {
     List<Task> matches = new ArrayList<>();
     for (Task task : _list) {
@@ -112,6 +103,17 @@ public class TaskList implements Iterable<Task> {
       }
     }
     return matches;
+  }
+
+  private List<Task> deleteTask(List<Task> matches) {
+    if (matches.size() == 1) {
+      Task deleted = deleteTaskById(matches.get(0).getId());
+      List<Task> results = new ArrayList<>();
+      results.add(deleted);
+      return results;
+    } else {
+      return matches;
+    }
   }
 
   public List<Task> getAllCompleted() {

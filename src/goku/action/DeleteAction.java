@@ -52,15 +52,15 @@ public class DeleteAction extends Action {
     if (title == null) {
       return new Result(false, null, String.format(ERR_NOT_FOUND, id), null);
     }
-    Task task = new Task();
-    task.setTitle(title);
-    if (list.findTaskByTitle(title).size() == 0) {
-      return new Result(false, null, NO_MATCHES, null);
-    }
+
     List<Task> possibleDeletion = list.deleteTaskByTitle(title);
     if (possibleDeletion.size() == 0) {
-      return new Result(true, String.format(MSG_SUCCESS, task.getId(),
-          task.getTitle()), null, null);
+      return new Result(false, null, NO_MATCHES, null);
+    }
+    if (possibleDeletion.size() == 1) {
+      Task deletedTask = possibleDeletion.get(0);
+      return new Result(true, String.format(MSG_SUCCESS, deletedTask.getId(),
+          deletedTask.getTitle()), null, null);
     } else {
       return new Result(false, null, String.format(ERR_FAILURE, title),
           possibleDeletion);
