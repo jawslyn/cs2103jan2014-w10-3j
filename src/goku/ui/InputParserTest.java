@@ -134,7 +134,7 @@ public class InputParserTest {
     a = p.parse("delete 1");
     assertTrue(a instanceof DeleteAction);
     da = (DeleteAction) a;
-    assertEquals(1, da.id);
+    assertEquals(new Integer(1), da.id);
     assertNull(da.title);
 
     a = p.parse("delete 1 task");
@@ -237,13 +237,13 @@ public class InputParserTest {
     assertNotNull(sa.title);
     assertNotNull(sa.dline);
   }
-  
-  @Test (expected = MakeActionException.class)
+
+  @Test(expected = MakeActionException.class)
   public void parse_SearchAction_CheckFree_throwsException() throws Exception {
     a = p.parse("free");
     assertTrue(a instanceof NoAction);
   }
-  
+
   /*
    * SearchAction - Check Free Feature (multiple inputs all combinations)
    * At the parser level, search action is created first then the testFree parameter
@@ -256,30 +256,30 @@ public class InputParserTest {
   public void parse_SearchAction_CheckFreeIsTrue() throws Exception {
     a = p.parse("free today");
     assertTrue(a instanceof SearchAction);
-    
+
     SearchAction sa = (SearchAction) a;
-    assertTrue(sa.testFree);    
+    assertTrue(sa.testFree);
   }
-  
+
   @Test
   public void parse_SearchAction_CheckFreeIsFalse() throws Exception {
     a = p.parse("search today");
     assertTrue(a instanceof SearchAction);
-    
+
     SearchAction sa = (SearchAction) a;
     assertFalse(sa.testFree);
   }
-  
+
   @Test
   public void parse_SearchAction_CheckFreeDateQueryValid() throws Exception {
     a = p.parse("free tmr 10am");
     assertTrue(a instanceof SearchAction);
-    
+
     SearchAction sa = (SearchAction) a;
     assertNotNull(sa.dateQuery);
   }
-  
-  @Test (expected = MakeActionException.class)
+
+  @Test(expected = MakeActionException.class)
   public void parse_SearchAction_CheckFreeDateQueryInvalid() throws Exception {
     a = p.parse("free meh");
     assertTrue(a instanceof NoAction);
