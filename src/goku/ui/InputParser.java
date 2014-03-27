@@ -170,6 +170,7 @@ public class InputParser {
         int id = Integer.parseInt(params[0]);
         da.id = id;
       } catch (NumberFormatException e) {
+        da.id = null;
         da.title = params[0];
       }
     } else {
@@ -301,6 +302,9 @@ public class InputParser {
       action = new RedoAction(goku);
     } else {
       action = new UnknownAction(goku, command);
+    }
+    if (action == null) {
+      action = new NoAction(goku);
     }
     return action;
   }
