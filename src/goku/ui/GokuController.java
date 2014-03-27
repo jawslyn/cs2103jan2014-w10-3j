@@ -16,7 +16,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
@@ -67,19 +66,20 @@ public class GokuController {
 
   @FXML
   void initialize() {
-    assert inputField != null : "fx:id=\"inputField\" was not injected: check your FXML file 'Main.fxml'.";
-    assert outputField != null : "fx:id=\"outputField\" was not injected: check your FXML file 'Main.fxml'.";
+    assert page != null : "fx:id=\"page\" was not injected: check your FXML file 'Main.fxml'.";
     assert scrollPane != null : "fx:id=\"scrollPane\" was not injected: check your FXML file 'Main.fxml'.";
+    assert inputField != null : "fx:id=\"inputField\" was not injected: check your FXML file 'Main.fxml'.";
+    assert suggestionBox != null : "fx:id=\"suggestionBox\" was not injected: check your FXML file 'Main.fxml'.";
+    assert suggestionList != null : "fx:id=\"suggestionList\" was not injected: check your FXML file 'Main.fxml'.";
+    assert outputField != null : "fx:id=\"outputField\" was not injected: check your FXML file 'Main.fxml'.";
 
     goku = FXGUI.getGokuInstance();
-
     completionController = new CompletionController(inputField, suggestionBox,
         suggestionList);
-
     feedbackController = new FeedbackController(outputField);
-
     parser = new InputParser(goku);
     storage = StorageFactory.getDefaultStorage();
+
     try {
       goku.setTaskList(storage.loadStorage());
     } catch (FileNotFoundException e) {
@@ -110,7 +110,7 @@ public class GokuController {
         }
         doAction(action);
       } catch (MakeActionException e) {
-        feedbackController.displayError(e.getMessage());
+        feedbackController.displayErrorMessage(e.getMessage());
       }
       inputField.setText("");
       hideSuggestions();
@@ -121,7 +121,7 @@ public class GokuController {
         try {
           doAction(parser.parse("undo"));
         } catch (MakeActionException e) {
-          feedbackController.displayError(e.getMessage());
+          feedbackController.displayErrorMessage(e.getMessage());
         }
         inputField.clear();
       } else if (event.getCode() == KeyCode.Y) {
@@ -129,7 +129,7 @@ public class GokuController {
         try {
           doAction(parser.parse("redo"));
         } catch (MakeActionException e) {
-          feedbackController.displayError(e.getMessage());
+          feedbackController.displayErrorMessage(e.getMessage());
         }
         inputField.clear();
       }
@@ -150,7 +150,6 @@ public class GokuController {
       feedBack(result);
       save();
     }
-    scrollToBottom();
   }
 
   private void feedBack(Result result) {
@@ -168,30 +167,6 @@ public class GokuController {
       e.printStackTrace();
       System.out.println("Error saving tasks.");
     }
-  }
-
-  /*
-   * I got this from online, this allows us to scroll the pane down
-   * to the bottom whenever we display something that is too long.
-   */
-  private void scrollToBottom() {
-    AnimationTimer timer = new AnimationTimer() {
-      long lng = 0;
-
-      @Override
-      public void handle(long l) {
-        if (lng == 0) {
-          lng = l;
-        }
-        if (l > lng + 100000000) {
-          scrollPane.setVvalue(scrollPane.getVvalue() + 0.05);
-          if (scrollPane.getVvalue() == 1) {
-            this.stop();
-          }
-        }
-      }
-    };
-    timer.start();
   }
 
   private void hideSuggestions() {

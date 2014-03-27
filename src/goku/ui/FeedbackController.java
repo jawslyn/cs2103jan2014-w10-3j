@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
 /*
@@ -23,6 +24,9 @@ import javafx.scene.text.Text;
  * Each line is a child of the VBox.
  */
 public class FeedbackController {
+  private static final Paint ERROR_COLOUR = Color.RED;
+  private static final Paint IMPT_COLOUR = Color.RED;
+  private static final Paint SUCCESS_COLOUR = Color.GREEN;
 
   private VBox output;
 
@@ -30,10 +34,56 @@ public class FeedbackController {
     output = outputArea;
   }
 
+  /*
+   * Displays the Result of an Action.
+   * Shows the success/error message, then displays
+   * any tasks that are in the result.
+   */
+  public void displayResult(Result result) {
+    clearArea();
+
+    HBox hbox = new HBox();
+    hbox.setSpacing(10);
+    Text status, message;
+
+    if (result.isSuccess()) {
+      status = new Text("Yay!");
+      status.setFill(SUCCESS_COLOUR);
+      message = new Text(result.getSuccessMsg());
+    } else {
+      status = new Text("Error!");
+      message = new Text(result.getErrorMsg());
+      status.setFill(ERROR_COLOUR);
+    }
+    hbox.getChildren().addAll(status, message);
+    displayLine(hbox);
+    displayLine("");
+    displayTasks(result.getTasks());
+  }
+
+  /*
+   * Displays a simple error message to the user
+   * @param message error message to be displayed
+   */
+  public void displayErrorMessage(String message) {
+    clearArea();
+    HBox hbox = new HBox();
+    Text t = new Text("Error: " + message);
+    t.setFill(ERROR_COLOUR);
+    hbox.getChildren().add(t);
+    displayLine(hbox);
+  }
+
   public void clearArea() {
     output.getChildren().clear();
   }
 
+  /*
+   * Displays a list of task.
+   * Shows header, and then list the tasks under that header.
+   * This is very coupled to TaskListDisplayer, as the header
+   * that is displayed depends on it.
+   */
   public void displayTasks(List<Task> tasks) {
     if (tasks == null) {
       return;
@@ -43,9 +93,9 @@ public class FeedbackController {
     String[] headers = { "today", "tomorrow", "remaining" };
     for (String header : Arrays.asList(headers)) {
       if (ht.get(header).size() != 0) {
-        addNewLine(makeDateHeader(header));
+        displayLine(makeDateHeader(header));
         for (Task task : ht.get(header)) {
-          addNewLine(makeDisplayBoxForTask(task));
+          displayLine(makeDisplayBoxForTask(task));
         }
       }
     }
@@ -81,7 +131,7 @@ public class FeedbackController {
    */
   public Text makeImpt(Task task) {
     Text impt = new Text(task.getImpt() ? "(!)" : "   ");
-    impt.setFill(Color.RED);
+    impt.setFill(IMPT_COLOUR);
     return impt;
   }
 
@@ -164,7 +214,7 @@ public class FeedbackController {
    * Prints a string to output
    * @param message the string to be printed
    */
-  public void addNewLine(String message) {
+  public void displayLine(String message) {
     HBox hbox = new HBox();
     hbox.getChildren().add(new Text(message));
     output.getChildren().add(hbox);
@@ -176,66 +226,13 @@ public class FeedbackController {
    * This HBox needs to be built by the caller
    * @param message message to be printed
    */
-  public void addNewLine(HBox message) {
+  public void displayLine(HBox message) {
     output.getChildren().add(message);
-  }
-
-  /*
-   * Displays a simple error message to the user
-   * @param message error message to be displayed
-   */
-  public void displayError(String message) {
-    clearArea();
-    HBox hbox = new HBox();
-    Text t = new Text("Error: " + message);
-    t.setFill(Color.RED);
-    hbox.getChildren().add(t);
-    addNewLine(hbox);
-  }
-
-  public void displayResult(Result result) {
-    clearArea();
-    if (result.isSuccess()) {
-      if (result.getSuccessMsg() != null) {
-        addNewLine(result.getSuccessMsg());
-      }
-      displayTasks(result.getTasks());
-    } else {
-      if (result.getErrorMsg() != null) {
-        displayError(result);
-      }
-      if (result.getTasks() != null) {
-        displayTasks(result.getTasks());
-      }
-    }
-  }
-
-  public void displayError(Result result) {
-    HBox hbox = new HBox();
-    Text t = new Text("Error! " + result.getErrorMsg());
-    t.setFill(Color.RED);
-    hbox.getChildren().add(t);
-    addNewLine(hbox);
-  }
-
-  public void addNewLineCentered(String output) {
-    HBox hbox = new HBox();
-    hbox.setAlignment(Pos.BASELINE_CENTER);
-    hbox.getChildren().add(new Text(output));
-    addNewLine(hbox);
-  }
-
-  public HBox makeErrorMessage(Result result) {
-    HBox hbox = new HBox();
-    Text t = new Text("Error! " + result.getErrorMsg());
-    t.setFill(Color.RED);
-    hbox.getChildren().add(t);
-    return hbox;
   }
 
   public void sayGoodbye() {
     clearArea();
-    addNewLine("Goodbye!");
+    displayLine("Goodbye!");
   }
 
 }
