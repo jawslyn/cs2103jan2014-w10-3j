@@ -187,7 +187,7 @@ public class TaskListTest {
 
     returnList = list.deleteTaskByTitle("ab");
     assertListIsSize(1);
-    assertReturnListIsSize(0);
+    assertReturnListIsSize(1);
   }
 
   @Test
