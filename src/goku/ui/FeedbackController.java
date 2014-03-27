@@ -30,6 +30,10 @@ public class FeedbackController {
     output = outputArea;
   }
 
+  public void clearArea() {
+    output.getChildren().clear();
+  }
+
   public void displayTasks(List<Task> tasks) {
     if (tasks == null) {
       return;
@@ -181,13 +185,16 @@ public class FeedbackController {
    * @param message error message to be displayed
    */
   public void displayError(String message) {
+    clearArea();
     HBox hbox = new HBox();
-    Text t = new Text("Error!");
-    t.setStroke(Color.RED);
+    Text t = new Text("Error: " + message);
+    t.setFill(Color.RED);
+    hbox.getChildren().add(t);
     addNewLine(hbox);
   }
 
   public void displayResult(Result result) {
+    clearArea();
     if (result.isSuccess()) {
       if (result.getSuccessMsg() != null) {
         addNewLine(result.getSuccessMsg());
@@ -227,6 +234,7 @@ public class FeedbackController {
   }
 
   public void sayGoodbye() {
+    clearArea();
     addNewLine("Goodbye!");
   }
 
