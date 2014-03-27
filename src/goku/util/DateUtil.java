@@ -40,7 +40,7 @@ public class DateUtil {
         time = parseTime(input);
       }
     }
-    return mergeDateAndTime(date.plusDays(daysOffsets), time);
+    return mergeDateAndTime(date, time, daysOffsets);
   }
 
   private static int parseOffset(String string) {
@@ -242,7 +242,8 @@ public class DateUtil {
    * @return null when both params are null, or when only one is null,
    * it tries to merge intelligently, using the current date or midnight time.
    */
-  public static DateTime mergeDateAndTime(DateTime date, DateTime time) {
+  public static DateTime mergeDateAndTime(DateTime date, DateTime time,
+      Integer offsetDays) {
     if (date == null && time == null) {
       return null;
     }
@@ -252,9 +253,10 @@ public class DateUtil {
     if (time == null) {
       time = DateTime.forTimeOnly(23, 59, 0, 0);
     }
-    return new DateTime(date.getYear(), date.getMonth(), date.getDay(),
-        time.getHour(), time.getMinute(), time.getSecond(),
+    DateTime result = new DateTime(date.getYear(), date.getMonth(),
+        date.getDay(), time.getHour(), time.getMinute(), time.getSecond(),
         time.getNanoseconds());
+    return result.plusDays(offsetDays);
   }
 
   public static Date toDate(DateTime dateTime) {

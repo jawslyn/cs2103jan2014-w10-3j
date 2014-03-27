@@ -85,6 +85,7 @@ public class DateUtilTest {
     expected = base.plusDays(8);
 
     result = DateUtil.parse("next friday".split(" "));
+    assertEquals(expected.getDay(), result.getDay());
     assertTrue(expected.isSameDayAs(result));
 
     // TODO is this expected result?
@@ -198,12 +199,12 @@ public class DateUtilTest {
     DateTime date = null, time = null, result, expected;
     date = DateTime.forDateOnly(2014, 3, 4);
     expected = DateTime.forDateOnly(2014, 3, 4);
-    result = DateUtil.mergeDateAndTime(date, null);
+    result = DateUtil.mergeDateAndTime(date, null, 0);
     assertTrue(expected.isSameDayAs(result));
 
     time = DateTime.forTimeOnly(12, 13, 14, 0);
     expected = DateUtil.getNow();
-    result = DateUtil.mergeDateAndTime(null, time);
+    result = DateUtil.mergeDateAndTime(null, time, 0);
     assertTrue(expected.isSameDayAs(result));
     assertTrue(result.getHour() == 12);
     assertTrue(result.getMinute() == 13);
@@ -212,7 +213,7 @@ public class DateUtilTest {
     date = DateTime.forDateOnly(2014, 3, 4);
     time = DateTime.forTimeOnly(12, 13, 14, 0);
     expected = new DateTime(2014, 3, 4, 12, 13, 14, 0);
-    result = DateUtil.mergeDateAndTime(date, time);
+    result = DateUtil.mergeDateAndTime(date, time, 0);
     assertEquals(expected, result);
   }
 }
