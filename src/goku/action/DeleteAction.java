@@ -19,7 +19,7 @@ import java.util.List;
  *      returns a failure Result with TaskList.size() > 1
  */
 public class DeleteAction extends Action {
-  private static final String MSG_SUCCESS = "Deleted \"%s\"";
+  private static final String MSG_SUCCESS = "Deleted [%s] %s. *hint* undo to undo ;)";
   private static final String NO_MATCHES = "No matches found";
   private static final String ERR_FAILURE = "Many matches found for \"%s\".";
   private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
@@ -43,10 +43,11 @@ public class DeleteAction extends Action {
 
   public Result deleteTask() {
     addToUndoList();
-    boolean success;
-    success = tryDeleteById();
-    if (success) {
-      return new Result(true, String.format(MSG_SUCCESS, id), null, null);
+    // boolean success;
+    Task success = tryDeleteById();
+    if (success != null) {
+      return new Result(true,
+          String.format(MSG_SUCCESS, id, success.getTitle()), null, null);
     }
     if (title == null) {
       return new Result(false, null, String.format(ERR_NOT_FOUND, id), null);
@@ -58,8 +59,8 @@ public class DeleteAction extends Action {
     }
     List<Task> possibleDeletion = list.deleteTaskByTitle(title);
     if (possibleDeletion.size() == 0) {
-      return new Result(true, String.format(MSG_SUCCESS, task.getTitle()),
-          null, null);
+      return new Result(true, String.format(MSG_SUCCESS, task.getId(),
+          task.getTitle()), null, null);
     } else {
       return new Result(false, null, String.format(ERR_FAILURE, title),
           possibleDeletion);
@@ -72,9 +73,8 @@ public class DeleteAction extends Action {
     return deleteTask();
   }
 
-  private boolean tryDeleteById() {
-    Task deleted = list.deleteTaskById(id);
-    return deleted != null;
+  private Task tryDeleteById() {
+    return list.deleteTaskById(id);
   }
 
 }
