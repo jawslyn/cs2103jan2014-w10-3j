@@ -305,6 +305,7 @@ public class DateUtil {
   }
 
   public static boolean isEarlierThan(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
     if (aDate == null) {
       return false;
     }
@@ -312,6 +313,7 @@ public class DateUtil {
   }
 
   public static boolean isLaterThan(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
     if (aDate == null) {
       return false;
     }
@@ -319,6 +321,7 @@ public class DateUtil {
   }
 
   public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
     if (aDate == null) {
       return false;
     }
@@ -326,9 +329,62 @@ public class DateUtil {
   }
 
   public static boolean isLaterOrOn(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
     if (aDate == null) {
       return false;
     }
     return aDate.gteq(otherDate);
+  }
+  
+  public static boolean isEarlierThanOrOnByDate(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+    
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(), aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+    
+    return aDateOnly.gteq(otherDateOnly);
+  }
+  
+  public static boolean isLaterThanOrOnByDate(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+    
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(), aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+    
+    return aDateOnly.lteq(otherDateOnly);
+  }
+  
+  public static boolean isEarlierThanByDate(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+    
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(), aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+    
+    return aDateOnly.gt(otherDateOnly);
+  }
+  
+  public static boolean isLaterThanByDate(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+    
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(), aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+    
+    return aDateOnly.lt(otherDateOnly);
   }
 }
