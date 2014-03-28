@@ -40,12 +40,15 @@ public class WordAutoComplete {
     prefix = prefix.toLowerCase();
     int index = Collections.binarySearch(corpus, prefix);
     if (isCompleted(index)) {
+      // what if i type a single letter 'd' which is itself a completed word
+      // but i want to see other words that start with d as well?
       return suggestions;
     } else {
       int insertionPoint = getInsertionPoint(index);
       List<String> possibleCompletion = getPossibleCompletions(insertionPoint);
       for (String possibility : possibleCompletion) {
         if (isPossibleCompletion(possibility, prefix)) {
+          System.out.println("added suggestion " + corpus.get(insertionPoint));
           suggestions.add(corpus.get(insertionPoint));
           insertionPoint++;
         }
@@ -96,5 +99,12 @@ public class WordAutoComplete {
 
   private void setDefaultCorpus() {
     setCorpus(DEFAULT_CORPUS);
+  }
+
+  public void addToCorpus(String... words) {
+    for (String word : words) {
+      corpus.add(word);
+    }
+    Collections.sort(corpus);
   }
 }

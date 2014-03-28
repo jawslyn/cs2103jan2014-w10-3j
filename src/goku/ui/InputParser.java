@@ -13,6 +13,7 @@ import goku.action.NoAction;
 import goku.action.RedoAction;
 import goku.action.SearchAction;
 import goku.action.UndoAction;
+import goku.autocomplete.Commands;
 import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
@@ -38,16 +39,15 @@ public class InputParser {
   /*
    * Keywords that are used to associate an input to a particular action.
    */
-  private String[] addKeywords = { "add", "a", "add!" };
-  private String[] deleteKeywords = { "delete", "d", "remove", "r" };
-  private String[] editKeywords = { "edit", "e", "update", "u" };
-  private String[] completeKeywords = { "done", "complete", "do", "finish",
-      "fin" };
-  private String[] displayKeywords = { "display", "view", "show", "v" };
-  private String[] searchKeywords = { "search", "find", "f", "free" };
-  private String[] exitKeywords = { "quit", "exit", "q" };
-  private String[] undoKeywords = { "undo", "revert", "rollback" };
-  private String[] redoKeywords = { "redo" };
+  private String[] addKeywords = Commands.addKeywords;
+  private String[] deleteKeywords = Commands.deleteKeywords;
+  private String[] editKeywords = Commands.editKeywords;
+  private String[] completeKeywords = Commands.completeKeywords;
+  private String[] displayKeywords = Commands.displayKeywords;
+  private String[] searchKeywords = Commands.searchKeywords;
+  private String[] exitKeywords = Commands.exitKeywords;
+  private String[] undoKeywords = Commands.undoKeywords;
+  private String[] redoKeywords = Commands.redoKeywords;
 
   private GOKU goku;
   private String[] params;
