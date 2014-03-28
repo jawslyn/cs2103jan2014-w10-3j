@@ -1,7 +1,6 @@
 package goku.autocomplete;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -19,9 +18,7 @@ public class CommandAutoComplete extends WordAutoComplete {
 
   private static List<String> makeCommandCorpus() {
     List<String> defaultCorpus = new ArrayList<String>();
-    defaultCorpus.addAll(Arrays.asList((new String[] { "add", "edit", "delete",
-        "update", "completed", "do", "finish", "display", "view", "show",
-        "search", "find", "quit", "exit", "undo" })));
+    defaultCorpus.addAll(Commands.getAllKeywords());
     return defaultCorpus;
   }
 }
