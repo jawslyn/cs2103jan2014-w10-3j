@@ -5,13 +5,13 @@ import java.util.List;
 
 public class InputHistory {
   List<String> history;
-  public int counter; // index of current history pointed to
+  public int current; // index of current history pointed to
+  boolean pointing;
 
   public InputHistory() {
     history = new ArrayList<>();
-    // history.add("");
-    // counter = 0;
-    counter = -1;
+    current = -1;
+    pointing = false;
   }
 
   public int size() {
@@ -20,29 +20,41 @@ public class InputHistory {
 
   public void write(String string) {
     history.add(string);
-    counter = history.size() - 1;
-  }
-
-  public String getLatest() {
-    counter = history.size() - 1;
-    return history.get(counter);
+    current = history.size() - 1;
+    pointing = false;
   }
 
   public String getPrevious() {
-    if (counter < 0) {
-      return "";
-      // return history.get(0);
+    String prev = "";
+    if (pointing) {
+      if (current > 0) {
+        current--;
+        prev = history.get(current);
+      } else {
+        pointing = false;
+      }
     } else {
-      return history.get(counter--);
+      if (current != 0) {
+        prev = history.get(current);
+        pointing = true;
+      }
     }
+    return prev;
   }
 
   public String getNext() {
-    if (counter == history.size() - 1) {
-      return "";
+    String next = "";
+    if (pointing) {
+      if (current < size() - 1) {
+        current++;
+        next = history.get(current);
+      } else {
+        pointing = false;
+      }
     } else {
-      counter++;
-      return history.get(counter);
+      next = history.get(current);
+      pointing = true;
     }
+    return next;
   }
 }

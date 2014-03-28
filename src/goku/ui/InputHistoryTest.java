@@ -12,16 +12,15 @@ public class InputHistoryTest {
     history.write("1");
     history.write("2");
     history.write("3");
-    assertEquals(4, history.size());
+    assertEquals(3, history.size());
   }
 
   @Test
   public void history_getLastestFew() throws Exception {
-    assertEquals("", history.getLatest());
     history.write("1");
     history.write("2");
     history.write("3");
-    assertEquals("3", history.getLatest());
+    assertEquals("3", history.getPrevious());
     assertEquals("2", history.getPrevious());
     assertEquals("1", history.getPrevious());
     assertEquals("", history.getPrevious());
@@ -29,12 +28,10 @@ public class InputHistoryTest {
     assertEquals("1", history.getNext());
     assertEquals("2", history.getNext());
     assertEquals("3", history.getNext());
-    assertEquals("3", history.getNext());
-    assertEquals("3", history.getNext());
-    assertEquals("2", history.getPrevious());
-    assertEquals("3", history.getLatest());
+    assertEquals("", history.getNext());
+    assertEquals("3", history.getPrevious());
     history.write("4");
-    assertEquals("4", history.getNext());
+    assertEquals("4", history.getPrevious());
     assertEquals("3", history.getPrevious());
   }
 }
