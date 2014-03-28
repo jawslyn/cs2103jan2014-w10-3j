@@ -70,17 +70,17 @@ public class WordAutocompleteTest {
 
   }
 
-  private String[] listToArray(List<String> list) {
+  String[] listToArray(List<String> list) {
     return list.toArray(new String[list.size()]);
   }
 
-  private void assertArraysHaveSameElements(String[] expecteds, String[] actuals) {
+  void assertArraysHaveSameElements(String[] expecteds, String[] actuals) {
     Arrays.sort(expecteds);
     Arrays.sort(actuals);
     try {
       Assert.assertArrayEquals(expecteds, actuals);
     } catch (AssertionError e) {
-      Assert.fail("Arrays do not have same elements");
+      Assert.fail(e.getMessage());
     }
   }
 

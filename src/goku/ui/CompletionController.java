@@ -1,5 +1,6 @@
 package goku.ui;
 
+import goku.autocomplete.CommandAutoComplete;
 import goku.autocomplete.WordAutocomplete;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import javafx.scene.text.Text;
 
 public class CompletionController {
   private WordAutocomplete autoComplete;
+  private CommandAutoComplete commandAutoComplete;
   private TextField inputField;
   private StackPane suggestionBox;
   private VBox suggestionList;
@@ -20,6 +22,7 @@ public class CompletionController {
   public CompletionController(TextField inputField, StackPane suggestionBox,
       VBox suggestionList) {
     autoComplete = new WordAutocomplete();
+    commandAutoComplete = new CommandAutoComplete();
     this.inputField = inputField;
     this.suggestionBox = suggestionBox;
     this.suggestionList = suggestionList;
@@ -39,8 +42,22 @@ public class CompletionController {
     } else if (isCancelCompletionKey(code)) {
       cancelSuggestion();
     } else if (shouldGetCompletion(event)) {
-      showCompletions();
+      List<String> completions = retrieveCompletions();
+      showCompletions(completions);
     }
+  }
+
+  private List<String> retrieveCompletions() {
+    // TODO add context aware stuff here
+    // something like check the location of caret, if i'm completing
+    // the first run, run the command completion engine
+    // else run the title engine
+    int posStartOfWord = getCaretPositionOfNearestWhitespaceBefore();
+    if (posStartOfWord < 0) {
+      System.out.println("command complete");
+      return commandAutoComplete.complete(getPrefixToBeCompleted());
+    }
+    return autoComplete.complete(getPrefixToBeCompleted());
   }
 
   private boolean isCompletionCommitKey(KeyCode code) {
@@ -73,9 +90,8 @@ public class CompletionController {
     return suggestedText;
   }
 
-  private void showCompletions() {
+  private void showCompletions(List<String> completions) {
     clearSuggestions();
-    List<String> completions = autoComplete.complete(getPrefixToBeCompleted());
     if (completions.size() == 0) {
       cancelSuggestion();
     } else {
@@ -89,6 +105,18 @@ public class CompletionController {
   }
 
   private String getPrefixToBeCompleted() {
+    int w = getCaretPositionOfNearestWhitespaceBefore();
+    int caretPos = inputField.getCaretPosition();
+    String content = inputField.getText();
+    return content.substring(w + 1, caretPos).toLowerCase();
+  }
+
+  /*
+   * Gets the index of the nearest whitespace just before the current caret position.
+   * @returns w -1 if there is no whitespace before, else the index of the whitespace
+   * in the content string
+   */
+  private int getCaretPositionOfNearestWhitespaceBefore() {
     int caretPos = inputField.getCaretPosition();
     String content = inputField.getText();
     int w;
@@ -97,7 +125,7 @@ public class CompletionController {
         break;
       }
     }
-    return content.substring(w + 1, caretPos).toLowerCase();
+    return w;
   }
 
   /*
