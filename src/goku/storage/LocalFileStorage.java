@@ -82,7 +82,8 @@ public class LocalFileStorage implements Storage {
   }
 
   @Override
-  public TaskList loadStorage() throws FileNotFoundException, IOException {
+  public TaskList loadStorage() throws FileNotFoundException, IOException,
+      LoadTasksException {
     List<Integer> errorLines = new ArrayList<Integer>();
     int currentLine = 1;
     LOGGER.info("Loading from file: " + file.getName());
@@ -95,13 +96,36 @@ public class LocalFileStorage implements Storage {
           Task task = gson.fromJson(line, Task.class);
           tasklist.addTask(task);
         } catch (JsonSyntaxException e) {
-          // can't read store.goku
+          LOGGER.warning("Error loading on json on line " + currentLine + ": "
+              + line + "\n" + e.getMessage());
           errorLines.add(currentLine);
         }
         line = br.readLine();
         currentLine++;
       }
     }
+    if (errorLines.size() != 0) {
+      makeBackupFile();
+      throw new LoadTasksException(errorLines, tasklist);
+    }
     return tasklist;
+  }
+
+  private void makeBackupFile() {
+    File backup = new File("store.goku.backup");
+    LOGGER.info("Making a backup for " + file.getName() + " at "
+        + backup.getName());
+    try (BufferedReader br = new BufferedReader(new FileReader("store.goku"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(backup))) {
+      String line = br.readLine();
+      while (line != null) {
+        bw.write(line);
+        bw.write(System.lineSeparator());
+        line = br.readLine();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
   }
 }

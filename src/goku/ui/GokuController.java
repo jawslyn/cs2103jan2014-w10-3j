@@ -5,6 +5,7 @@ import goku.Result;
 import goku.action.Action;
 import goku.action.ExitAction;
 import goku.action.MakeActionException;
+import goku.storage.LoadTasksException;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
 
@@ -86,6 +87,10 @@ public class GokuController {
       LOGGER.warning("File cannot be found, no tasks loaded.");
     } catch (IOException e) {
       LOGGER.warning("Error loading file, no tasks loaded.");
+    } catch (LoadTasksException e) {
+      feedbackController.displayErrorMessage(e.getMessage());
+      System.out.println(e.getLoadedTasks().size());
+      goku.setTaskList(e.getLoadedTasks());
     }
   }
 

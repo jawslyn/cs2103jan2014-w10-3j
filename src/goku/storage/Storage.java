@@ -18,5 +18,6 @@ public interface Storage {
 
   public void delete();
 
-  public TaskList loadStorage() throws FileNotFoundException, IOException;
+  public TaskList loadStorage() throws FileNotFoundException, IOException,
+      LoadTasksException;
 }
