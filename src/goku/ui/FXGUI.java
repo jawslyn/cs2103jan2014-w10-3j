@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class FXGUI extends Application implements UserInterface {
   private static GOKU goku;
@@ -33,8 +34,9 @@ public class FXGUI extends Application implements UserInterface {
       System.out.println("NULL");
     }
     try {
-      Font g = Font.loadFont(FXGUI.class.getResource("Inconsolata.otf")
-          .toExternalForm(), 20);
+      primaryStage.initStyle(StageStyle.UNDECORATED);
+      Font.loadFont(
+          FXGUI.class.getResource("Inconsolata.otf").toExternalForm(), 20);
       AnchorPane page = (AnchorPane) FXMLLoader.load(FXGUI.class
           .getResource("Main.fxml"));
       Scene scene = new Scene(page);
@@ -50,13 +52,11 @@ public class FXGUI extends Application implements UserInterface {
 
   @Override
   public String getUserInput() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public void feedBack(Result result) {
-    // TODO Auto-generated method stub
   }
 
   @Override

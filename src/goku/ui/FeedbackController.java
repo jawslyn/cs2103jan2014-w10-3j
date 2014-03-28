@@ -24,9 +24,10 @@ import javafx.scene.text.Text;
  * Each line is a child of the VBox.
  */
 public class FeedbackController {
-  private static final Paint ERROR_COLOUR = Color.RED;
+  private static final Paint ERROR_COLOUR = Color.rgb(255, 10, 0);
   private static final Paint IMPT_COLOUR = Color.RED;
-  private static final Paint SUCCESS_COLOUR = Color.GREEN;
+  private static final Paint SUCCESS_COLOUR = Color.rgb(13, 255, 166);
+  private static final Paint NORMAL_COLOUR = Color.rgb(86, 255, 0);
 
   private VBox output;
 
@@ -47,13 +48,11 @@ public class FeedbackController {
     Text status, message;
 
     if (result.isSuccess()) {
-      status = new Text("Yay!");
-      status.setFill(SUCCESS_COLOUR);
-      message = new Text(result.getSuccessMsg());
+      status = makeSuccessText("Yay!");
+      message = makeNormalText(result.getSuccessMsg());
     } else {
-      status = new Text("Error!");
-      message = new Text(result.getErrorMsg());
-      status.setFill(ERROR_COLOUR);
+      status = makeErrorText("Error!");
+      message = makeNormalText(result.getErrorMsg());
     }
     hbox.getChildren().addAll(status, message);
     displayLine(hbox);
@@ -68,9 +67,8 @@ public class FeedbackController {
   public void displayErrorMessage(String message) {
     clearArea();
     HBox hbox = new HBox();
-    Text t = new Text("Error: " + message);
-    t.setFill(ERROR_COLOUR);
-    hbox.getChildren().add(t);
+    Text text = makeErrorText("Error: " + message);
+    hbox.getChildren().add(text);
     displayLine(hbox);
   }
 
@@ -119,7 +117,7 @@ public class FeedbackController {
    * @param task task to be shown
    */
   public Text makeId(Task task) {
-    Text id = new Text("[" + String.valueOf(task.getId()) + "]");
+    Text id = makeNormalText("[" + String.valueOf(task.getId()) + "]");
     id.getStyleClass().addAll("task-id");
     return id;
   }
@@ -130,8 +128,7 @@ public class FeedbackController {
    * @param task task to be shown
    */
   public Text makeImpt(Task task) {
-    Text impt = new Text(task.getImpt() ? "(!)" : "   ");
-    impt.setFill(IMPT_COLOUR);
+    Text impt = makeImptText(task.getImpt() ? "(!)" : "   ");
     return impt;
   }
 
@@ -139,10 +136,13 @@ public class FeedbackController {
    * Builds a Text that shows the title of a task.
    * @param task task to be shown
    */
-  public Text makeTitle(Task task) {
-    Text title = new Text(task.getTitle());
-    title.getStyleClass().addAll("task-title");
-    return title;
+  public HBox makeTitle(Task task) {
+    HBox hbox = new HBox();
+    Text title = makeNormalText(task.getTitle());
+    title.setWrappingWidth(output.getWidth() - 300);
+    hbox.getChildren().add(title);
+    HBox.setHgrow(title, Priority.NEVER);
+    return hbox;
   }
 
   /*
@@ -168,7 +168,7 @@ public class FeedbackController {
     } else if (t.getDateRange() != null) {
       return makeDateRange(t);
     } else {
-      return new Text();
+      return makeNormalText("");
     }
   }
 
@@ -177,11 +177,11 @@ public class FeedbackController {
    * @param t task to be shown
    */
   private Text makeDateRange(Task t) {
-    Text range = new Text();
     DateRange period = t.getDateRange();
-    range.getStyleClass().addAll("task-date-range");
-    range.setText("from " + DateOutput.format(period.getStartDate()) + "\nto "
+    Text range = makeNormalText("from "
+        + DateOutput.format(period.getStartDate()) + "\nto "
         + DateOutput.format(period.getEndDate()));
+    range.getStyleClass().addAll("task-date-range");
     return range;
   }
 
@@ -190,9 +190,8 @@ public class FeedbackController {
    * @param t task to be shown
    */
   private Text makeDeadline(Task t) {
-    Text deadline = new Text();
+    Text deadline = makeNormalText("by " + DateOutput.format(t.getDeadline()));
     deadline.getStyleClass().addAll("task-deadline");
-    deadline.setText("by " + DateOutput.format(t.getDeadline()));
     return deadline;
   }
 
@@ -204,7 +203,7 @@ public class FeedbackController {
   private HBox makeDateHeader(String header) {
     HBox hbox = new HBox();
     hbox.setAlignment(Pos.BASELINE_CENTER);
-    Text t = new Text(header.toUpperCase());
+    Text t = makeNormalText(header.toUpperCase());
     t.setUnderline(true);
     hbox.getChildren().add(t);
     return hbox;
@@ -216,7 +215,7 @@ public class FeedbackController {
    */
   public void displayLine(String message) {
     HBox hbox = new HBox();
-    hbox.getChildren().add(new Text(message));
+    hbox.getChildren().add(makeNormalText(message));
     output.getChildren().add(hbox);
 
   }
@@ -233,6 +232,30 @@ public class FeedbackController {
   public void sayGoodbye() {
     clearArea();
     displayLine("Goodbye!");
+  }
+
+  public Text makeNormalText(String message) {
+    Text text = new Text(message);
+    text.setFill(NORMAL_COLOUR);
+    return text;
+  }
+
+  public Text makeImptText(String message) {
+    Text text = new Text(message);
+    text.setFill(IMPT_COLOUR);
+    return text;
+  }
+
+  public Text makeSuccessText(String message) {
+    Text text = new Text(message);
+    text.setFill(SUCCESS_COLOUR);
+    return text;
+  }
+
+  public Text makeErrorText(String message) {
+    Text text = new Text(message);
+    text.setFill(ERROR_COLOUR);
+    return text;
   }
 
 }

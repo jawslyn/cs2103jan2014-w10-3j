@@ -1,33 +1,21 @@
 .page {
-	-fx-background-color: linear-gradient(to bottom,
-		rgba(255,214,94,1) 0%,
-		rgba(254,191,4,1) 100%);
-	-fx-background-image: url("bg.png");
+	-fx-background-color: rgba(30, 30, 30, 1);
 	-fx-font-family: 'Inconsolata';
+	-fx-text-fill: rgba(86, 255, 0, 1);
+	-fx-font-size: 22;
 }
 
 .input-field {
-	-fx-background-radius: 5;
-	-fx-background-color: linear-gradient(to bottom,
-		rgba(43,43,43,1) 0%,
-		rgba(79,79,79,0.8) 5%,
-		rgba(145,145,145,0.45) 10%,
-		rgba(0,0,0,0.2) 50%,
-		rgba(0,0,0,0.2) 90%,
-		rgba(79,79,79,0.8) 98%,
-		rgba(43,43,43,1.0) 100%),
-	 linear-gradient(to right,
-		rgba(43,43,43,0.7) 0%,
-		rgba(0,0,0,0.2) 0.5%,
-		rgba(0,0,0,0.1) 1%,
-		rgba(0,0,0,0.1) 99.5%,
-		rgba(0,0,0,0.2) 99.5%,
-		rgba(43,43,43,0.7) 100%);
-	-fx-text-fill: rgba(250,250,250,1);
 	-fx-font-size: 26;
 	-fx-padding: 5 20 5 20;
-	-fx-font-family: 'Inconsolata';
+	-fx-background-color: rgba(40, 40, 40, 1);
+	-fx-text-fill: rgba(86, 255, 0, 1);
 }
+
+.input-field:focused {
+	
+}
+
 
 #suggestionBox {
 	-fx-background-color: white;
@@ -36,19 +24,24 @@
 }
 
 #suggestionList {
-	-fx-font-size: 24;
 	-fx-text-origin: baseline;
 }
 
+#scrollPane {
+	-fx-background-color: rgba(0, 0, 0, 0);
+}
+
 #outputField {
-	-fx-font-size: 20;
+	-fx-background-color: rgba(0, 0, 0, 0);
 	-fx-padding: 15 20 5 20;
 }
 
 .separator {
+	/*
 	-fx-border-width: 0 0 1 0;
-	-fx-border-color: gray;
+	-fx-border-color: rgba(86, 255, 0, 1);
 	-fx-border-style: dotted;
+	*/
 }
 
 .task {
