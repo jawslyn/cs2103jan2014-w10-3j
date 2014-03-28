@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CommandAutoComplete extends WordAutocomplete {
+/*
+ * CommandAutoComplete completes prefixes that is likely to be a command.
+ * This words exactly like a @see WordAutoComplete but just with
+ * a corpus that has all the commands GOKU accepts and recognizes
+ */
+public class CommandAutoComplete extends WordAutoComplete {
 
   private final static List<String> DEFAULT_CORPUS = makeCommandCorpus();
 

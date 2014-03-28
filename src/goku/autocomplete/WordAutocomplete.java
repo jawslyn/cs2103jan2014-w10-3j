@@ -5,19 +5,27 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class WordAutocomplete {
+/*
+ * Completes a prefix that has been entered by the user.
+ * For completing command keywords, @see CommandAutoComplete
+ * WordAutoComplete makes a default corpus and completion suggestions are
+ * based of this default corpus.
+ * User has the ability to add more words to this corpus for
+ * WordAutoComplete to be able to suggest completions from them as well
+ */
+public class WordAutoComplete {
   private final List<String> DEFAULT_CORPUS = makeDefaultCorpus();
   private List<String> corpus;
 
-  public WordAutocomplete() {
+  public WordAutoComplete() {
     setDefaultCorpus();
   }
 
-  public WordAutocomplete(List<String> corpus) {
+  public WordAutoComplete(List<String> corpus) {
     setCorpus(corpus);
   }
 
-  public WordAutocomplete(List<String> corpus, boolean addToDefault) {
+  public WordAutoComplete(List<String> corpus, boolean addToDefault) {
     if (addToDefault) {
       corpus.addAll(DEFAULT_CORPUS);
       setCorpus(corpus);
@@ -73,10 +81,10 @@ public class WordAutocomplete {
 
   private List<String> makeDefaultCorpus() {
     List<String> defaultCorpus = new ArrayList<String>();
-    defaultCorpus.addAll(Arrays.asList((new String[] { "add", "edit", "delete",
-        "remove", "update", "done", "completed", "do", "finish", "display",
-        "view", "show", "search", "find", "quit", "exit", "undo", "revert",
-        "rollback" })));
+    defaultCorpus.addAll(Arrays.asList((new String[] { "the", "and", "with",
+        "next", "monday", "tuesday", "wednesday", "thursday", "friday",
+        "saturday", "sunday", "week", "from", "by", "on", "do", "find", "play",
+        "meet", "meeting", "homework", "project" })));
 
     return defaultCorpus;
   }

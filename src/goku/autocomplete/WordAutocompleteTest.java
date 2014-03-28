@@ -7,8 +7,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WordAutocompleteTest {
-  private WordAutocomplete auto;
+public class WordAutoCompleteTest {
+  private WordAutoComplete auto;
   private static final String[] TEST_CORPUS_STRING_ARRAY = { "add", "edit",
       "update", "delete", "assignment", "activity" };
   private static final List<String> TEST_CORPUS = Arrays
@@ -27,7 +27,7 @@ public class WordAutocompleteTest {
 
   @Before
   public void setup() {
-    auto = new WordAutocomplete(TEST_CORPUS);
+    auto = new WordAutoComplete(TEST_CORPUS);
   }
 
   @Test

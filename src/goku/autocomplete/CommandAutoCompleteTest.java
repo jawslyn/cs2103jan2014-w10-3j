@@ -2,7 +2,7 @@ package goku.autocomplete;
 
 import org.junit.Test;
 
-public class CommandAutoCompleteTest extends WordAutocompleteTest {
+public class CommandAutoCompleteTest extends WordAutoCompleteTest {
   CommandAutoComplete auto = new CommandAutoComplete();
 
   @Test

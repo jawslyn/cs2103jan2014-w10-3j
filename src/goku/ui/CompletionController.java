@@ -1,7 +1,6 @@
 package goku.ui;
 
-import goku.autocomplete.CommandAutoComplete;
-import goku.autocomplete.WordAutocomplete;
+import goku.autocomplete.AutoCompleteEngine;
 
 import java.util.List;
 
@@ -13,16 +12,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class CompletionController {
-  private WordAutocomplete autoComplete;
-  private CommandAutoComplete commandAutoComplete;
+  private AutoCompleteEngine auto;
   private TextField inputField;
   private StackPane suggestionBox;
   private VBox suggestionList;
 
   public CompletionController(TextField inputField, StackPane suggestionBox,
       VBox suggestionList) {
-    autoComplete = new WordAutocomplete();
-    commandAutoComplete = new CommandAutoComplete();
+    auto = new AutoCompleteEngine();
     this.inputField = inputField;
     this.suggestionBox = suggestionBox;
     this.suggestionList = suggestionList;
@@ -47,17 +44,21 @@ public class CompletionController {
     }
   }
 
+  /*
+   * Get all possible completions based on the current context.
+   * There are 2 different kinds of context,
+   * 1. Entering a command,
+   * 2. Others
+   * Commands must be the first word that is entered, so the way
+   * to decide what is context is to check if the current word
+   * is the first word.
+   */
   private List<String> retrieveCompletions() {
-    // TODO add context aware stuff here
-    // something like check the location of caret, if i'm completing
-    // the first run, run the command completion engine
-    // else run the title engine
-    int posStartOfWord = getCaretPositionOfNearestWhitespaceBefore();
-    if (posStartOfWord < 0) {
-      System.out.println("command complete");
-      return commandAutoComplete.complete(getPrefixToBeCompleted());
+    int context = 1;
+    if (getPositionOfNearestWhitespaceBeforeCaret() < 0) {
+      context = AutoCompleteEngine.commandContext;
     }
-    return autoComplete.complete(getPrefixToBeCompleted());
+    return auto.complete(getPrefixToBeCompleted(), context);
   }
 
   private boolean isCompletionCommitKey(KeyCode code) {
@@ -90,12 +91,18 @@ public class CompletionController {
     return suggestedText;
   }
 
+  /*
+   * Shows a list of completion to the user
+   */
   private void showCompletions(List<String> completions) {
     clearSuggestions();
     if (completions.size() == 0) {
       cancelSuggestion();
     } else {
       for (String completion : completions) {
+        // completions are only word completions for the current prefix,
+        // so we need to calculate and only add those letters that were not
+        // typed
         String completionSuffix = completion.substring(getPrefixToBeCompleted()
             .length());
         addSuggestionToBeShown(inputField.getText() + completionSuffix);
@@ -105,10 +112,10 @@ public class CompletionController {
   }
 
   private String getPrefixToBeCompleted() {
-    int w = getCaretPositionOfNearestWhitespaceBefore();
-    int caretPos = inputField.getCaretPosition();
+    int start = getPositionOfNearestWhitespaceBeforeCaret() + 1;
     String content = inputField.getText();
-    return content.substring(w + 1, caretPos).toLowerCase();
+    return content.substring(start, inputField.getCaretPosition())
+        .toLowerCase();
   }
 
   /*
@@ -116,7 +123,7 @@ public class CompletionController {
    * @returns w -1 if there is no whitespace before, else the index of the whitespace
    * in the content string
    */
-  private int getCaretPositionOfNearestWhitespaceBefore() {
+  private int getPositionOfNearestWhitespaceBeforeCaret() {
     int caretPos = inputField.getCaretPosition();
     String content = inputField.getText();
     int w;
