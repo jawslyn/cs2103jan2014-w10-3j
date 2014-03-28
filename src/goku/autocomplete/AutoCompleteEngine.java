@@ -3,12 +3,12 @@ package goku.autocomplete;
 import java.util.List;
 
 public class AutoCompleteEngine {
-  private WordAutocomplete wordAuto;
+  private WordAutoComplete wordAuto;
   private CommandAutoComplete commandAuto;
   public static final int commandContext = -1;
 
   public AutoCompleteEngine() {
-    wordAuto = new WordAutocomplete();
+    wordAuto = new WordAutoComplete();
     commandAuto = new CommandAutoComplete();
   }
 
