@@ -61,6 +61,7 @@ public class GokuController {
 
   private CompletionController completionController;
   private FeedbackController feedbackController;
+  private HistoryController historyController;
 
   @FXML
   void initialize() {
@@ -75,6 +76,7 @@ public class GokuController {
     completionController = new CompletionController(inputField, suggestionBox,
         suggestionList);
     feedbackController = new FeedbackController(outputField);
+    historyController = new HistoryController(inputField);
     parser = new InputParser(goku);
     storage = StorageFactory.getDefaultStorage();
 
@@ -107,6 +109,8 @@ public class GokuController {
         inputField.setText("redo");
         commitInput();
       }
+    } else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+      historyController.handle(event);
     } else {
       completionController.handle(event);
     }
@@ -120,6 +124,7 @@ public class GokuController {
         feedbackController.sayGoodbye();
         Platform.exit();
       }
+      historyController.addInput(input);
       doAction(action);
     } catch (MakeActionException e) {
       feedbackController.displayErrorMessage(e.getMessage());
