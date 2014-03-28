@@ -118,13 +118,13 @@ public class GokuController {
 
   private void commitInput() {
     try {
+      historyController.addInput(inputField.getText());
       String input = inputField.getText().toLowerCase().trim();
       Action action = parser.parse(input);
       if (action instanceof ExitAction) {
         feedbackController.sayGoodbye();
         Platform.exit();
       }
-      historyController.addInput(input);
       doAction(action);
     } catch (MakeActionException e) {
       feedbackController.displayErrorMessage(e.getMessage());

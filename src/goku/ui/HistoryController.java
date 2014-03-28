@@ -14,11 +14,9 @@ public class HistoryController {
   }
 
   public void handle(KeyEvent event) {
-    System.out.println(history.counter);
     if (event.getCode() == KeyCode.UP) {
       inputField.setText(history.getPrevious());
       inputField.end();
-      System.out.println(history.counter);
     } else if (event.getCode() == KeyCode.DOWN) {
       inputField.setText(history.getNext());
       inputField.end();
