@@ -1,9 +1,8 @@
-package goku.ui;
+package goku.action;
 
+import goku.CommandSuggester;
 import goku.GOKU;
 import goku.Result;
-import goku.action.Action;
-import goku.action.MakeActionException;
 
 /*
  * UnknownAction represents some action which GOKU does not know of.

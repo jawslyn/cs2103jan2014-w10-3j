@@ -1,4 +1,4 @@
-package goku.ui;
+package goku;
 
 import static org.junit.Assert.assertEquals;
 

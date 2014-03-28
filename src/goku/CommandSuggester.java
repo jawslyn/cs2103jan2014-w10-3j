@@ -1,6 +1,4 @@
-package goku.ui;
-
-import goku.autocomplete.Commands;
+package goku;
 
 import java.util.List;
 import java.util.SortedSet;

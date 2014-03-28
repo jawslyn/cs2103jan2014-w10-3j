@@ -1,5 +1,6 @@
 package goku.ui;
 
+import goku.Commands;
 import goku.DateRange;
 import goku.GOKU;
 import goku.action.Action;
@@ -13,7 +14,7 @@ import goku.action.NoAction;
 import goku.action.RedoAction;
 import goku.action.SearchAction;
 import goku.action.UndoAction;
-import goku.autocomplete.Commands;
+import goku.action.UnknownAction;
 import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 

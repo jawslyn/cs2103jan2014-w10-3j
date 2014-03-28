@@ -1,4 +1,4 @@
-package goku.autocomplete;
+package goku;
 
 import java.util.Arrays;
 import java.util.List;
