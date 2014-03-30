@@ -311,7 +311,7 @@ public class DateUtil {
       case "tomorrow" :
       case "tml" :
       case "tmr" :
-        return now.plusDays(1);
+        return DateTime.today(TimeZone.getDefault()).plusDays(1);
       default :
         return getNearestDateToWeekday(string);
     }
