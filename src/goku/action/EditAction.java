@@ -24,6 +24,9 @@ public class EditAction extends Action {
   public DateTime dline;
   public DateRange period;
   public Boolean isComplete;
+  public Boolean removeDeadline;
+  public Boolean removePeriod;
+  public Boolean removeImportant;
 
   public EditAction(GOKU goku) {
     super(goku);
@@ -47,8 +50,30 @@ public class EditAction extends Action {
 
   @Override
   public Result doIt() {
+    if (removeDeadline) {
+      doRemoveDealine();
+    } else if (removeImportant) {
+      doRemoveImportant();
+    } else if (removePeriod) {
+      doRemovePeriod();
+    }
     addToUndoList();
     return updateTask();
+  }
+
+  private void doRemovePeriod() {
+    Task t = list.getTaskById(id);
+    t.setPeriod(null);
+  }
+
+  private void doRemoveImportant() {
+    Task t = list.getTaskById(id);
+    t.setStatus(false);
+  }
+
+  private void doRemoveDealine() {
+    Task t = list.getTaskById(id);
+    t.setDeadline(null);
   }
 
   public Result updateTask() {

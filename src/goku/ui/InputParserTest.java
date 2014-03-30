@@ -5,10 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-import java.util.TimeZone;
-
 import goku.DateRange;
 import goku.GOKU;
 import goku.action.Action;
@@ -22,6 +18,9 @@ import goku.action.NoAction;
 import goku.action.SearchAction;
 import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
+
+import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.After;
 import org.junit.Before;
@@ -195,6 +194,25 @@ public class InputParserTest {
     a = p.parse("edit a abc");
     assertTrue(a instanceof NoAction);
 
+    a = p.parse("edit 1 remove");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, "remove");
+
+    a = p.parse("edit 1 remove rubbish");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, "remove rubbish");
+
+    a = p.parse("edit 1 remove deadline");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, null);
+    assertTrue(ea.removeDeadline);
+
     a = p.parse("do 1 abc");
     assertTrue(a instanceof EditAction);
     ea = (EditAction) a;
@@ -202,7 +220,6 @@ public class InputParserTest {
     assertTrue(ea.isComplete);
     assertNull(ea.dline);
     assertNull(ea.period);
-
   }
 
   @Test
@@ -315,7 +332,7 @@ public class InputParserTest {
     a = p.parse("q");
     assertTrue(a instanceof ExitAction);
   }
-  
+
   /*
    * extractDeadline() Specifics
    * 1) Contains date and time => returns DateTime with date and time
@@ -325,57 +342,58 @@ public class InputParserTest {
    */
   @Test
   public void extractDeadline_SpecificDateSpecificTime() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("by tmr 10am");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by tmr 10am");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateTime resultDate = p.extractDeadline();
-    
+
     assertNotNull(resultDate.getDay());
     assertEquals((Integer) 10, resultDate.getHour());
   }
-  
+
   @Test
   public void extractDeadline_SpecificDateOnly() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("by tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateTime resultDate = p.extractDeadline();
-    
+
     assertNotNull(resultDate.getDay());
     assertEquals((Integer) 23, resultDate.getHour());
     assertEquals((Integer) 59, resultDate.getMinute());
   }
-  
+
   @Test
   public void extractDeadline_SpecificTimeOnly() {
-	  List<String> input = Splitter.on(' ').omitEmptyStrings().
-	      trimResults().splitToList("by 12pm");
-		    String[] inputArray = input.toArray(new String[input.size()]);
-		    p.params = inputArray;
-		    
-		    DateTime resultDate = p.extractDeadline();
-		    
-		    assertEquals(DateTime.today(TimeZone.getDefault()).getDay(), resultDate.getDay());
-		    assertEquals((Integer) 12, resultDate.getHour());
-		    assertEquals((Integer) 00, resultDate.getMinute());
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by 12pm");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+
+    assertEquals(DateTime.today(TimeZone.getDefault()).getDay(),
+        resultDate.getDay());
+    assertEquals((Integer) 12, resultDate.getHour());
+    assertEquals((Integer) 00, resultDate.getMinute());
   }
-  
+
   @Test
   public void extractDeadline_NoValidInput() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("by aaa");
-        String[] inputArray = input.toArray(new String[input.size()]);
-        p.params = inputArray;
-        
-        DateTime resultDate = p.extractDeadline();
-        
-        assertNull(resultDate);
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by aaa");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+
+    assertNull(resultDate);
   }
-  
+
   @Test
   public void extractPeriod_SpecificDatesOnly() {
     List<String> input = Splitter.on(' ').omitEmptyStrings().
@@ -387,34 +405,34 @@ public class InputParserTest {
         
         assertEquals(DateTime.today(TimeZone.getDefault()), resultRange.getStartDate());
   }
-  
+
   @Test
   public void extractPeriod_SpecificDatesSpecificTimes() {
-    
+
   }
-  
+
   @Test
   public void extractPeriod_SpecificTimesOnly() {
-    
+
   }
-  
+
   @Test
   public void extractPeriod_SpecificDatesStartTimeOnly() {
-    
+
   }
-  
+
   @Test
   public void extractPeriod_SpecificDatesEndTimeOnly() {
-    
+
   }
-  
+
   @Test
   public void extractPeriod_SpecificStartTimeSpecificEndDateTime() {
-    
+
   }
-  
+
   @Test
   public void extractPeriod_InvalidPeriodStartDateAfterEndDate() {
-    
+
   }
 }
