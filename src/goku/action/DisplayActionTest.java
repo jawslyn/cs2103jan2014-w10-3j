@@ -51,7 +51,7 @@ public class DisplayActionTest {
     da.viewComplete = false;
     da.viewOverdue = false;
     Result onlyIncomplete = da.doIt();
-    assertEquals(2, onlyIncomplete.getTasks().size());
+    assertEquals(1, onlyIncomplete.getTasks().size());
   }
 
 }
