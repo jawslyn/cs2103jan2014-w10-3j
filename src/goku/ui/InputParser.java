@@ -114,7 +114,7 @@ public class InputParser {
         
         DateTime start = DateUtil.parse(startCandidates);
         
-        if (start.getHour() == null) {
+        if (start!=null && start.getHour()==null) {
           start = initTimeToStartOfDay(start);
         }
         
@@ -125,11 +125,11 @@ public class InputParser {
             params.length);
         DateTime end = DateUtil.parse(endCandidates);
         
-        if (end.getHour() == null) {
+        if (end!=null && end.getHour() == null) {
           end = initTimeToEndOfDay(end);
         }
 
-        if (start != null && end != null) {
+        if (start != null && end != null && DateUtil.isEarlierThan(start, end)) {
           dr = new DateRange(start, end);
           params = Arrays.copyOfRange(params, 0, indexOfFrom);
         }
