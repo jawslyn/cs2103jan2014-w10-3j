@@ -226,14 +226,12 @@ public class DateUtil {
     if (date == null) {
       date = getNow();
       result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
-          time.getHour(), time.getMinute(), time.getSecond(),
-          time.getNanoseconds());
+          time.getHour(), time.getMinute(), time.getSecond(), null);
     } else if (time == null) {
       result = date;
     } else {
       result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
-          time.getHour(), time.getMinute(), time.getSecond(),
-          time.getNanoseconds());
+          time.getHour(), time.getMinute(), time.getSecond(), null);
     }
 
     return result.plusDays(offsetDays);
@@ -311,10 +309,10 @@ public class DateUtil {
    */
   public static DateTime parseDay(String string) {
     string = string.toLowerCase();
-    DateTime now = getNow();
+    DateTime today = getNowDate();
     switch (string) {
       case "today" :
-        return now;
+        return today;
       case "tomorrow" :
       case "tml" :
       case "tmr" :

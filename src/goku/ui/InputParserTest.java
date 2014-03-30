@@ -406,12 +406,28 @@ public class InputParserTest {
         
         DateRange resultRange = p.extractPeriod();
         
-        assertEquals(DateUtil.getNowDate(), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().getStartOfDay().truncate(DateTime.Unit.SECOND),
+            resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().plusDays(1).getEndOfDay().truncate(DateTime.Unit.SECOND),
+            resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificDatesSpecificTimes() {
-
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from today 10am to tmr 2pm");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertEquals(DateUtil.getNowDate().getStartOfDay().
+            plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().plusDays(1).getStartOfDay().
+            plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND).truncate(DateTime.Unit.SECOND),
+            resultRange.getEndDate());
   }
 
   @Test
@@ -438,4 +454,5 @@ public class InputParserTest {
   public void extractPeriod_InvalidPeriodStartDateAfterEndDate() {
 
   }
+  
 }
