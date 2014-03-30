@@ -20,7 +20,7 @@ public class UnknownAction extends Action {
   }
 
   @Override
-  public Result doIt() throws MakeActionException {
+  public Result doIt() {
     String suggestion = getCommandSuggestion(command);
     return new Result(false, null, String.format(ERR_UNKNOWN_ACTION, command)
         + " " + String.format(ERR_SUGGEST_ACTION, suggestion), null);

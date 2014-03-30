@@ -94,7 +94,7 @@ public class SearchAction extends Action {
   }
 
   @Override
-  public Result doIt() throws MakeActionException {
+  public Result doIt() {
 
     Result result = null;
 
@@ -116,11 +116,11 @@ public class SearchAction extends Action {
   /*
    * Searches for tasks within a given period that has the specified deadline.
    */
-  private Result searchByDeadlineInPeriod() throws MakeActionException {
+  private Result searchByDeadlineInPeriod() {
     // check for conflicting deadline and period
     if (DateUtil.isEarlierThan(dline, period.getStartDate())
         || DateUtil.isLaterThan(dline, period.getEndDate())) {
-      throw new MakeActionException(ERR_DEADLINE_PERIOD_CONFLICT);
+      return new Result(false, null, ERR_DEADLINE_PERIOD_CONFLICT, null);
     }
 
     Result byPeriod = searchByPeriod();

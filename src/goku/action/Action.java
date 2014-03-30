@@ -19,5 +19,5 @@ public abstract class Action {
     return shouldSaveAfter;
   }
 
-  public abstract Result doIt() throws MakeActionException;
+  public abstract Result doIt();
 }
