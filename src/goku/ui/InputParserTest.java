@@ -334,7 +334,7 @@ public class InputParserTest {
   }
 
   /*
-   * extractDeadline() Specifics
+   * extractDate() Specifics
    * 1) Contains date and time => returns DateTime with date and time
    * 2) Contains date only => returns DateTime with date only
    * 3) Contains time only => returns DateTime with today as date and time
@@ -347,7 +347,7 @@ public class InputParserTest {
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
 
-    DateTime resultDate = p.extractDeadline();
+    DateTime resultDate = p.extractDate();
 
     assertNotNull(resultDate.getDay());
     assertEquals((Integer) 10, resultDate.getHour());
@@ -360,7 +360,7 @@ public class InputParserTest {
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
 
-    DateTime resultDate = p.extractDeadline();
+    DateTime resultDate = p.extractDate();
 
     assertNotNull(resultDate.getDay());
     assertEquals((Integer) 23, resultDate.getHour());
@@ -374,7 +374,7 @@ public class InputParserTest {
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
 
-    DateTime resultDate = p.extractDeadline();
+    DateTime resultDate = p.extractDate();
 
     assertEquals(DateUtil.getNowDate().getDay(), resultDate.getDay());
     assertEquals((Integer) 12, resultDate.getHour());
@@ -388,7 +388,7 @@ public class InputParserTest {
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
 
-    DateTime resultDate = p.extractDeadline();
+    DateTime resultDate = p.extractDate();
 
     assertNull(resultDate);
   }

@@ -57,7 +57,7 @@ public class InputParser {
     this.goku = goku;
   }
 
-  DateTime extractDeadline() {
+  DateTime extractDate() {
     int indexOfBy = Arrays.asList(params).indexOf("by");
     if (indexOfBy < 0) {
       return null;
@@ -143,7 +143,7 @@ public class InputParser {
     if (impt == true) {
       addAction.isImpt = true;
     }
-    DateTime dl = extractDeadline();
+    DateTime dl = extractDate();
     DateRange dr = extractPeriod();
     addAction.dline = dl;
     addAction.period = dr;
@@ -240,7 +240,7 @@ public class InputParser {
         }
       }
 
-      DateTime dl = extractDeadline();
+      DateTime dl = extractDate();
       DateRange dr = extractPeriod();
       editAction.dline = dl;
       editAction.period = dr;
@@ -275,7 +275,7 @@ public class InputParser {
       }
     } else {
       // search normally
-      DateTime dl = extractDeadline();
+      DateTime dl = extractDate();
       DateRange dr = extractPeriod();
       searchAction.dline = dl;
       searchAction.period = dr;
