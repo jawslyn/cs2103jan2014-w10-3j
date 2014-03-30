@@ -376,8 +376,7 @@ public class InputParserTest {
 
     DateTime resultDate = p.extractDeadline();
 
-    assertEquals(DateTime.today(TimeZone.getDefault()).getDay(),
-        resultDate.getDay());
+    assertEquals(DateUtil.getNowDate().getDay(), resultDate.getDay());
     assertEquals((Integer) 12, resultDate.getHour());
     assertEquals((Integer) 00, resultDate.getMinute());
   }
@@ -403,7 +402,7 @@ public class InputParserTest {
         
         DateRange resultRange = p.extractPeriod();
         
-        assertEquals(DateTime.today(TimeZone.getDefault()), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate(), resultRange.getStartDate());
   }
 
   @Test
