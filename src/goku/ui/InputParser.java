@@ -71,12 +71,12 @@ public class InputParser {
     } else {
       return null;
     }
-    
+
     // add time 23:59 to deadline if no time was specified
     if (parsed.getHour() == null) {
       String parsedString = parsed.format("YYYY-MM-DD");
       parsedString = parsedString.concat(" 23:59:59");
-    
+
       return new DateTime(parsedString);
     } else {
       return parsed;
@@ -221,6 +221,24 @@ public class InputParser {
       int id = Integer.parseInt(params[0]);
       editAction.id = id;
       params = Arrays.copyOfRange(params, 1, params.length);
+
+      if (params[0].equalsIgnoreCase("remove") && params.length > 1) {
+        // removing a certain field of task
+        switch (params[1]) {
+          case "deadline" :
+            editAction.removeDeadline = true;
+            params = Arrays.copyOfRange(params, 2, params.length);
+            break;
+          case "period" :
+            editAction.removePeriod = true;
+            params = Arrays.copyOfRange(params, 2, params.length);
+            break;
+          case "important" :
+            editAction.removeImportant = true;
+            params = Arrays.copyOfRange(params, 2, params.length);
+            break;
+        }
+      }
 
       DateTime dl = extractDeadline();
       DateRange dr = extractPeriod();
