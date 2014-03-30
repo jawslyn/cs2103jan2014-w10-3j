@@ -57,7 +57,9 @@ public class DateUtil {
   }
 
   public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
-    assert otherDate != null;
+    if (otherDate == null) {
+      return false;
+    }
     if (aDate == null) {
       return false;
     }

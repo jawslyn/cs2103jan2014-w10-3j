@@ -9,17 +9,20 @@ import java.util.List;
 
 public class DisplayAction extends Action {
 
-  private static final String MSG_SUCCESS = "displaying list of task:";
+  private static final String MSG_SUCCESS = "Here are your tasks!";
+  private static final String MSG_SUCCESS_OVERDUE = "Here are your overdue tasks!";
+  private static final String MSG_HAS_OVERDUE = "You have overdue tasks, \"view overdue\" to see them.";
   DateTime byDeadline;
   public boolean viewComplete;
+  public boolean viewOverdue;
 
   public DisplayAction(GOKU goku) {
     super(goku);
     shouldSaveAfter = false;
   }
 
-  public Result displayAll() {
-    return new Result(true, MSG_SUCCESS, null, list.asList());
+  public Result displayOverdue() {
+    return new Result(true, MSG_SUCCESS_OVERDUE, null, list.getOverdue());
   }
 
   public Result displayComplete() {
@@ -36,15 +39,21 @@ public class DisplayAction extends Action {
   }
 
   public Result displayIncomplete() {
-    return new Result(true, MSG_SUCCESS, null, list.getAllIncomplete());
+    String message = MSG_SUCCESS;
+    if (list.getOverdue().size() != 0) {
+      message += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return new Result(true, message, null, list.getAllIncomplete());
   }
 
   @Override
   public Result doIt() {
-    if (viewComplete == false) {
-      return displayIncomplete();
-    } else {
+    if (viewComplete == true) {
       return displayComplete();
+    } else if (viewOverdue == true) {
+      return displayOverdue();
+    } else {
+      return displayIncomplete();
     }
   }
 

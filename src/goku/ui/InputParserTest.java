@@ -202,6 +202,20 @@ public class InputParserTest {
   public void parse_DisplayAction() throws Exception {
     a = p.parse("display");
     assertTrue(a instanceof DisplayAction);
+
+    a = p.parse("display completed");
+    assertTrue(a instanceof DisplayAction);
+    DisplayAction da = (DisplayAction) a;
+    assertTrue(da.viewComplete);
+
+    a = p.parse("display overdue");
+    assertTrue(a instanceof DisplayAction);
+    da = (DisplayAction) a;
+    assertTrue(da.viewOverdue);
+
+    a = p.parse("display over");
+    assertTrue(a instanceof DisplayAction);
+    da = (DisplayAction) a;
   }
 
   @Test(expected = MakeActionException.class)

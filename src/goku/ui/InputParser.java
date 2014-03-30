@@ -184,9 +184,11 @@ public class InputParser {
 
     DisplayAction da = new DisplayAction(goku);
 
-    String nonArrayParams = Joiner.on(" ").join(params);
+    String nonArrayParams = Joiner.on(" ").join(params).toLowerCase();
     if (nonArrayParams.contains("completed")) {
       da.viewComplete = true;
+    } else if (nonArrayParams.contains("overdue")) {
+      da.viewOverdue = true;
     }
 
     return da;

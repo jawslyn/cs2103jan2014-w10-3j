@@ -88,7 +88,7 @@ public class FeedbackController {
     }
     TaskListDisplayer tld = new TaskListDisplayer(System.out);
     Hashtable<String, List<Task>> ht = tld.build(tasks);
-    String[] headers = { "today", "tomorrow", "remaining" };
+    String[] headers = { "past", "today", "tomorrow", "remaining" };
     for (String header : Arrays.asList(headers)) {
       if (ht.get(header).size() != 0) {
         displayLine(makeDateHeader(header));

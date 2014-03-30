@@ -128,8 +128,11 @@ public class TaskList implements Iterable<Task> {
 
   public List<Task> getAllIncomplete() {
     List<Task> incomplete = new ArrayList<Task>();
+    DateTime now = DateUtil.getNow();
     for (Task task : _list) {
-      if ((task.getStatus()) == null || !task.getStatus()) {
+      if ((((task.getStatus()) == null || !task.getStatus()))
+          && (task.getDeadline() == null || DateUtil.isEarlierOrOn(now,
+              task.getDeadline()))) {
         incomplete.add(task);
       }
     }
@@ -186,6 +189,17 @@ public class TaskList implements Iterable<Task> {
     }
 
     return result;
+  }
+
+  public List<Task> getOverdue() {
+    DateTime now = DateUtil.getNow();
+    List<Task> overdue = new ArrayList<>();
+    for (Task task : _list) {
+      if (DateUtil.isEarlierOrOn(task.getDeadline(), now)) {
+        overdue.add(task);
+      }
+    }
+    return overdue;
   }
 
   @Override

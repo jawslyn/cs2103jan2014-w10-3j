@@ -42,6 +42,7 @@ public class TaskListDisplayer {
         remaining.add(task);
       }
     }
+    ht.put("past", past);
     ht.put("today", today);
     ht.put("tomorrow", tomorrow);
     ht.put("remaining", remaining);
