@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import goku.GOKU;
 import goku.action.Action;
@@ -329,11 +330,27 @@ public class InputParserTest {
   
   @Test
   public void extractDeadline_SpecificTimeOnly() {
-    
+	  List<String> input = Splitter.on(' ').omitEmptyStrings().
+	      trimResults().splitToList("by 12pm");
+		    String[] inputArray = input.toArray(new String[input.size()]);
+		    p.params = inputArray;
+		    
+		    DateTime resultDate = p.extractDeadline();
+		    
+		    assertEquals(DateTime.today(TimeZone.getDefault()).getDay(), resultDate.getDay());
+		    assertEquals((Integer) 12, resultDate.getHour());
+		    assertEquals((Integer) 00, resultDate.getMinute());
   }
   
   @Test
   public void extractDeadline_NoValidInput() {
-    
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("by aaa");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateTime resultDate = p.extractDeadline();
+        
+        assertNull(resultDate);
   }
 }

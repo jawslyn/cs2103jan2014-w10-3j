@@ -68,6 +68,8 @@ public class InputParser {
     DateTime parsed = DateUtil.parse(candidates);
     if (parsed != null) {
       params = Arrays.copyOfRange(params, 0, indexOfBy);
+    } else {
+      return null;
     }
     
     // add time 23:59 to deadline if no time was specified

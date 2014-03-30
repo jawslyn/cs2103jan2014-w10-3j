@@ -216,7 +216,7 @@ public class DateUtil {
     DateTime result = null;
     
     if (date == null) {
-      date = getNow();
+      date = DateTime.today(TimeZone.getDefault());
       
       result = new DateTime(date.getYear(), date.getMonth(),
           date.getDay(), time.getHour(), time.getMinute(), time.getSecond(),
@@ -311,7 +311,7 @@ public class DateUtil {
       case "tomorrow" :
       case "tml" :
       case "tmr" :
-        return now.plusDays(1);
+        return DateTime.today(TimeZone.getDefault()).plusDays(1);
       default :
         return getNearestDateToWeekday(string);
     }
