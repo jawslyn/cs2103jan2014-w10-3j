@@ -57,7 +57,7 @@ public class InputParser {
     this.goku = goku;
   }
 
-  DateTime extractDeadline() {
+  DateTime extractDate() {
     int indexOfBy = Arrays.asList(params).indexOf("by");
     if (indexOfBy < 0) {
       return null;
@@ -74,10 +74,7 @@ public class InputParser {
 
     // add time 23:59 to deadline if no time was specified
     if (parsed.getHour() == null) {
-      String parsedString = parsed.format("YYYY-MM-DD");
-      parsedString = parsedString.concat(" 23:59:59");
-
-      return new DateTime(parsedString);
+      return initTimeToEndOfDay(parsed);
     } else {
       return parsed;
     }
@@ -109,13 +106,28 @@ public class InputParser {
     int indexOfTo = Arrays.asList(params).indexOf("to");
     if (indexOfFrom >= 0 && indexOfTo >= 0) {
       if (indexOfTo + 1 < params.length) {
+        /*
+         * Parse start date
+         */
         String[] startCandidates = Arrays.copyOfRange(params, indexOfFrom + 1,
             indexOfTo);
+        
         DateTime start = DateUtil.parse(startCandidates);
-
+        
+        if (start.getHour() == null) {
+          start = initTimeToStartOfDay(start);
+        }
+        
+        /*
+         * Parsed end date
+         */
         String[] endCandidates = Arrays.copyOfRange(params, indexOfTo + 1,
             params.length);
         DateTime end = DateUtil.parse(endCandidates);
+        
+        if (end.getHour() == null) {
+          end = initTimeToEndOfDay(end);
+        }
 
         if (start != null && end != null) {
           dr = new DateRange(start, end);
@@ -124,6 +136,20 @@ public class InputParser {
       }
     }
     return dr;
+  }
+  
+  private DateTime initTimeToStartOfDay(DateTime date) {
+    String parsedString = date.format("YYYY-MM-DD");
+    parsedString = parsedString.concat(" 00:00:00");
+    
+    return new DateTime(parsedString);
+  }
+  
+  private DateTime initTimeToEndOfDay(DateTime date) {
+    String parsedString = date.format("YYYY-MM-DD");
+    parsedString = parsedString.concat(" 23:59:59");
+    
+    return new DateTime(parsedString);
   }
 
   /*
@@ -143,7 +169,7 @@ public class InputParser {
     if (impt == true) {
       addAction.isImpt = true;
     }
-    DateTime dl = extractDeadline();
+    DateTime dl = extractDate();
     DateRange dr = extractPeriod();
     addAction.dline = dl;
     addAction.period = dr;
@@ -240,7 +266,7 @@ public class InputParser {
         }
       }
 
-      DateTime dl = extractDeadline();
+      DateTime dl = extractDate();
       DateRange dr = extractPeriod();
       editAction.dline = dl;
       editAction.period = dr;
@@ -275,7 +301,7 @@ public class InputParser {
       }
     } else {
       // search normally
-      DateTime dl = extractDeadline();
+      DateTime dl = extractDate();
       DateRange dr = extractPeriod();
       searchAction.dline = dl;
       searchAction.period = dr;

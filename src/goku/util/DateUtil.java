@@ -55,6 +55,13 @@ public class DateUtil {
   public static DateTime getNow() {
     return DateTime.now(TimeZone.getDefault());
   }
+  
+  /*
+   * Returns the current date (day) only
+   */
+  public static DateTime getNowDate() {
+    return DateTime.today(TimeZone.getDefault());
+  }
 
   public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
     if (otherDate == null) {
