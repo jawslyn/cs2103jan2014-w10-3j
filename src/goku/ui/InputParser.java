@@ -51,13 +51,13 @@ public class InputParser {
   private String[] redoKeywords = Commands.redoKeywords;
 
   private GOKU goku;
-  private String[] params;
+  String[] params;
 
   public InputParser(GOKU goku) {
     this.goku = goku;
   }
 
-  private DateTime extractDeadline() {
+  DateTime extractDeadline() {
     int indexOfBy = Arrays.asList(params).indexOf("by");
     if (indexOfBy < 0) {
       return null;
@@ -69,7 +69,16 @@ public class InputParser {
     if (parsed != null) {
       params = Arrays.copyOfRange(params, 0, indexOfBy);
     }
-    return parsed;
+    
+    // add time 23:59 to deadline if no time was specified
+    if (parsed.getHour() == null) {
+      String parsedString = parsed.format("YYYY-MM-DD");
+      parsedString = parsedString.concat(" 23:59:59");
+    
+      return new DateTime(parsedString);
+    } else {
+      return parsed;
+    }
   }
 
   private DateTime parseDate() {
@@ -92,7 +101,7 @@ public class InputParser {
    * successful @param params is modified such that the parsed strings,
    * including "from" and "to", is removed - essentially params is shortened.
    */
-  private DateRange extractPeriod() {
+  DateRange extractPeriod() {
     DateRange dr = null;
     int indexOfFrom = Arrays.asList(params).indexOf("from");
     int indexOfTo = Arrays.asList(params).indexOf("to");

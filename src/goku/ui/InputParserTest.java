@@ -5,6 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 import goku.GOKU;
 import goku.action.Action;
 import goku.action.AddAction;
@@ -21,6 +24,8 @@ import hirondelle.date4j.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.base.Splitter;
 
 public class InputParserTest {
   InputParser p;
@@ -293,5 +298,42 @@ public class InputParserTest {
     assertTrue(a instanceof ExitAction);
     a = p.parse("q");
     assertTrue(a instanceof ExitAction);
+  }
+  
+  @Test
+  public void extractDeadline_SpecificDateSpecificTime() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("by tmr 10am");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+    
+    DateTime resultDate = p.extractDeadline();
+    
+    assertNotNull(resultDate.getDay());
+    assertEquals((Integer) 10, resultDate.getHour());
+  }
+  
+  @Test
+  public void extractDeadline_SpecificDateOnly() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("by tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+    
+    DateTime resultDate = p.extractDeadline();
+    
+    assertNotNull(resultDate.getDay());
+    assertEquals((Integer) 23, resultDate.getHour());
+    assertEquals((Integer) 59, resultDate.getMinute());
+  }
+  
+  @Test
+  public void extractDeadline_SpecificTimeOnly() {
+    
+  }
+  
+  @Test
+  public void extractDeadline_NoValidInput() {
+    
   }
 }
