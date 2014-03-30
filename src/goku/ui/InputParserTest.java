@@ -353,4 +353,39 @@ public class InputParserTest {
         
         assertNull(resultDate);
   }
+  
+  @Test
+  public void extractPeriod_SpecificDatesOnly() {
+    
+  }
+  
+  @Test
+  public void extractPeriod_SpecificDatesSpecificTimes() {
+    
+  }
+  
+  @Test
+  public void extractPeriod_SpecificTimesOnly() {
+    
+  }
+  
+  @Test
+  public void extractPeriod_SpecificDatesStartTimeOnly() {
+    
+  }
+  
+  @Test
+  public void extractPeriod_SpecificDatesEndTimeOnly() {
+    
+  }
+  
+  @Test
+  public void extractPeriod_SpecificStartTimeSpecificEndDateTime() {
+    
+  }
+  
+  @Test
+  public void extractPeriod_InvalidPeriodStartDateAfterEndDate() {
+    
+  }
 }
