@@ -48,7 +48,6 @@ public class WordAutoComplete {
       List<String> possibleCompletion = getPossibleCompletions(insertionPoint);
       for (String possibility : possibleCompletion) {
         if (isPossibleCompletion(possibility, prefix)) {
-          System.out.println("added suggestion " + corpus.get(insertionPoint));
           suggestions.add(corpus.get(insertionPoint));
           insertionPoint++;
         }
@@ -87,7 +86,7 @@ public class WordAutoComplete {
     defaultCorpus.addAll(Arrays.asList((new String[] { "the", "and", "with",
         "next", "monday", "tuesday", "wednesday", "thursday", "friday",
         "saturday", "sunday", "week", "from", "by", "on", "do", "find", "play",
-        "meet", "meeting", "homework", "project" })));
+        "meet", "meeting", "homework", "project", "completed", "overdue" })));
 
     return defaultCorpus;
   }
