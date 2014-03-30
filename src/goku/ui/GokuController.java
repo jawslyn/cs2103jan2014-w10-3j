@@ -5,9 +5,11 @@ import goku.Result;
 import goku.action.Action;
 import goku.action.ExitAction;
 import goku.action.MakeActionException;
+import goku.action.SearchAction;
 import goku.storage.LoadTasksException;
 import goku.storage.Storage;
 import goku.storage.StorageFactory;
+import goku.util.DateUtil;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -92,6 +94,8 @@ public class GokuController {
       System.out.println(e.getLoadedTasks().size());
       goku.setTaskList(e.getLoadedTasks());
     }
+
+    doAction(new GreetAction(goku));
   }
 
   /*
@@ -141,7 +145,7 @@ public class GokuController {
     hideSuggestions();
   }
 
-  private void doAction(Action action) throws MakeActionException {
+  private void doAction(Action action) {
     Result result = action.doIt();
     feedBack(result);
     if (action.shouldSave()) {
@@ -174,4 +178,22 @@ public class GokuController {
   private void hideSuggestions() {
     suggestionBox.setVisible(false);
   }
+
+  private class GreetAction extends Action {
+    private static final String MSG = "Welcome to GOKU! Here's whats upcoming...";
+
+    public GreetAction(GOKU goku) {
+      super(goku);
+    }
+
+    @Override
+    public Result doIt() {
+      SearchAction sa = new SearchAction(goku);
+      sa.dline = DateUtil.getNow().plusDays(1);
+      Result result = sa.doIt();
+      return new Result(true, MSG, null, result.getTasks());
+    }
+
+  }
+
 }

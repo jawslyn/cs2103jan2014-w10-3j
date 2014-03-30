@@ -257,5 +257,4 @@ public class FeedbackController {
     text.setFill(ERROR_COLOUR);
     return text;
   }
-
 }
