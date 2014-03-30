@@ -20,7 +20,6 @@ import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
 import java.util.List;
-import java.util.TimeZone;
 
 import org.junit.After;
 import org.junit.Before;
@@ -341,7 +340,7 @@ public class InputParserTest {
    * 4) Returns null if input is not valid
    */
   @Test
-  public void extractDeadline_SpecificDateSpecificTime() {
+  public void extractDate_SpecificDateSpecificTime() {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by tmr 10am");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -354,7 +353,7 @@ public class InputParserTest {
   }
 
   @Test
-  public void extractDeadline_SpecificDateOnly() {
+  public void extractDate_SpecificDateOnly() {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -368,7 +367,7 @@ public class InputParserTest {
   }
 
   @Test
-  public void extractDeadline_SpecificTimeOnly() {
+  public void extractDate_SpecificTimeOnly() {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by 12pm");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -382,7 +381,7 @@ public class InputParserTest {
   }
 
   @Test
-  public void extractDeadline_NoValidInput() {
+  public void extractDate_NoValidInput() {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by aaa");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -393,6 +392,11 @@ public class InputParserTest {
     assertNull(resultDate);
   }
 
+  /*
+   * extractPeriod() Specifics
+   * 1) Start: date+time End: date+time => Start: date+time End: date+time
+   * 2) Start: date only End: date only => Start: date+00:00 End: date+23:59
+   */
   @Test
   public void extractPeriod_SpecificDatesOnly() {
     List<String> input = Splitter.on(' ').omitEmptyStrings().

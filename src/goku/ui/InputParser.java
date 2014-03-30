@@ -74,10 +74,7 @@ public class InputParser {
 
     // add time 23:59 to deadline if no time was specified
     if (parsed.getHour() == null) {
-      String parsedString = parsed.format("YYYY-MM-DD");
-      parsedString = parsedString.concat(" 23:59:59");
-
-      return new DateTime(parsedString);
+      return initTimeToEndOfDay(parsed);
     } else {
       return parsed;
     }
@@ -109,13 +106,28 @@ public class InputParser {
     int indexOfTo = Arrays.asList(params).indexOf("to");
     if (indexOfFrom >= 0 && indexOfTo >= 0) {
       if (indexOfTo + 1 < params.length) {
+        /*
+         * Parse start date
+         */
         String[] startCandidates = Arrays.copyOfRange(params, indexOfFrom + 1,
             indexOfTo);
+        
         DateTime start = DateUtil.parse(startCandidates);
-
+        
+        if (start.getHour() == null) {
+          start = initTimeToStartOfDay(start);
+        }
+        
+        /*
+         * Parsed end date
+         */
         String[] endCandidates = Arrays.copyOfRange(params, indexOfTo + 1,
             params.length);
         DateTime end = DateUtil.parse(endCandidates);
+        
+        if (end.getHour() == null) {
+          end = initTimeToEndOfDay(end);
+        }
 
         if (start != null && end != null) {
           dr = new DateRange(start, end);
@@ -124,6 +136,20 @@ public class InputParser {
       }
     }
     return dr;
+  }
+  
+  private DateTime initTimeToStartOfDay(DateTime date) {
+    String parsedString = date.format("YYYY-MM-DD");
+    parsedString = parsedString.concat(" 00:00:00");
+    
+    return new DateTime(parsedString);
+  }
+  
+  private DateTime initTimeToEndOfDay(DateTime date) {
+    String parsedString = date.format("YYYY-MM-DD");
+    parsedString = parsedString.concat(" 23:59:59");
+    
+    return new DateTime(parsedString);
   }
 
   /*
