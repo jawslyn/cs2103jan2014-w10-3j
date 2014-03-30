@@ -64,19 +64,25 @@ public class DateUtil {
   }
 
   public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
-    if (otherDate == null) {
+    if (aDate==null || otherDate==null) {
       return false;
     }
-    if (aDate == null) {
-      return false;
+    
+    //no time indicated => compare only by date
+    if(aDate.getHour()==null || otherDate.getHour()==null) {
+      return isEarlierThanOrOnByDate(aDate, otherDate);
     }
     return aDate.lteq(otherDate);
   }
 
   public static boolean isEarlierThan(DateTime aDate, DateTime otherDate) {
-    assert otherDate != null;
-    if (aDate == null) {
+    if (aDate==null || otherDate==null) {
       return false;
+    }
+    
+    //no time indicated => compare only by date
+    if(aDate.getHour()==null || otherDate.getHour()==null) {
+      return isEarlierThanByDate(aDate, otherDate);
     }
     return aDate.lt(otherDate);
   }
@@ -92,7 +98,7 @@ public class DateUtil {
     DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
         otherDate.getMonth(), otherDate.getDay());
 
-    return aDateOnly.gt(otherDateOnly);
+    return aDateOnly.lt(otherDateOnly);
   }
 
   public static boolean isEarlierThanOrOnByDate(DateTime aDate,
@@ -107,7 +113,7 @@ public class DateUtil {
     DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
         otherDate.getMonth(), otherDate.getDay());
 
-    return aDateOnly.gteq(otherDateOnly);
+    return aDateOnly.lteq(otherDateOnly);
   }
 
   public static boolean isLaterOrOn(DateTime aDate, DateTime otherDate) {
@@ -137,7 +143,7 @@ public class DateUtil {
     DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
         otherDate.getMonth(), otherDate.getDay());
 
-    return aDateOnly.lt(otherDateOnly);
+    return aDateOnly.gt(otherDateOnly);
   }
 
   public static boolean isLaterThanOrOnByDate(DateTime aDate, DateTime otherDate) {
@@ -151,7 +157,7 @@ public class DateUtil {
     DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
         otherDate.getMonth(), otherDate.getDay());
 
-    return aDateOnly.lteq(otherDateOnly);
+    return aDateOnly.gteq(otherDateOnly);
   }
 
   static boolean isOffsetWord(String candidate) {
@@ -226,14 +232,12 @@ public class DateUtil {
     if (date == null) {
       date = getNow();
       result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
-          time.getHour(), time.getMinute(), time.getSecond(),
-          time.getNanoseconds());
+          time.getHour(), time.getMinute(), time.getSecond(), null);
     } else if (time == null) {
       result = date;
     } else {
       result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
-          time.getHour(), time.getMinute(), time.getSecond(),
-          time.getNanoseconds());
+          time.getHour(), time.getMinute(), time.getSecond(), null);
     }
 
     return result.plusDays(offsetDays);
@@ -311,10 +315,10 @@ public class DateUtil {
    */
   public static DateTime parseDay(String string) {
     string = string.toLowerCase();
-    DateTime now = getNow();
+    DateTime today = getNowDate();
     switch (string) {
       case "today" :
-        return now;
+        return today;
       case "tomorrow" :
       case "tml" :
       case "tmr" :

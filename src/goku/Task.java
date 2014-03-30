@@ -141,7 +141,7 @@ public class Task implements Storeable {
   }
 
   public boolean isDueOn(DateTime date) {
-    return deadline != null && DateUtil.isEarlierOrOn(deadline, date);
+    return deadline != null && DateUtil.isEarlierOrOn(date, deadline);
   }
 
   public void setId(int id) {

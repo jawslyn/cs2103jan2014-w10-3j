@@ -49,9 +49,11 @@ public class SearchActionTest {
     assertEquals(1, result.getTasks().size());
   }
 
+  /*
+   * No Time Involved => Only compare by dates
+   */
   @Test
-  public void searchByDeadline_returnsTasksWithDeadlineBefore()
-      throws Exception {
+  public void searchByDeadline_returnsTasksWithDeadlineBeforeWithoutTime() throws Exception {
     Task a = makeTaskWithDeadlineDaysLater("task a", 1);
     Task b = makeTaskWithDeadlineDaysLater("task b", 2);
     Task c = makeTaskWithDeadlineDaysLater("task c", 3);
@@ -64,6 +66,25 @@ public class SearchActionTest {
     SearchAction search = new SearchAction(goku);
     search.dline = dueTask.getDeadline();
 
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(2, result.getTasks().size());
+  }
+  
+  @Test
+  public void searchByDeadline_returnsTaskWithDeadlineBeforeWithTime() throws Exception {
+    //Task a = makeTaskWithDeadlineDaysLaterWithTime("task a", 1, 10, 0, 0);
+    Task b = makeTaskWithDeadlineDaysLaterWithTime("task b", 2, 14, 0, 0);
+    Task c = makeTaskWithDeadlineDaysLater("task c", 3);
+    Task d = makeTaskWithPeriodDaysRelative("task d", 1, 3);
+    
+    addAllTasks(b, c, d);
+    
+    Task dueTask = makeTaskWithDeadlineDaysLaterWithTime("due task", 2, 14, 0, 0);
+    
+    SearchAction search = new SearchAction(goku);
+    search.dline = dueTask.getDeadline();
+    
     Result result = search.doIt();
     assertTrue(result.isSuccess());
     assertEquals(2, result.getTasks().size());
@@ -230,11 +251,21 @@ public class SearchActionTest {
   private Task makeTaskWithDeadlineDaysLater(String title, int daysLater) {
     Task task = new Task();
     task.setTitle(title);
-    DateTime deadline = DateUtil.getNow().plusDays(daysLater);
+    DateTime deadline = DateUtil.getNowDate().plusDays(daysLater);
     task.setDeadline(deadline);
     return task;
   }
-
+  
+  private Task makeTaskWithDeadlineDaysLaterWithTime(String title, int daysLater, int hour,
+      int min, int sec) {
+    Task task = new Task();
+    task.setTitle(title);
+    DateTime deadline = DateUtil.getNowDate().plusDays(daysLater).
+        plus(0, 0, 0, hour, min, sec, 0, DateTime.DayOverflow.Spillover);
+    task.setDeadline(deadline);
+    return task;
+  }
+  
   private void addAllTasks(Task... task) {
     for (Task t : task) {
       list.addTask(t);

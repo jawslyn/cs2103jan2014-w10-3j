@@ -56,7 +56,15 @@ public class InputParser {
   public InputParser(GOKU goku) {
     this.goku = goku;
   }
-
+  
+  /*
+   * extractDate() Specifics
+   * 1) Contains date and time => returns DateTime with date and time
+   * 2) Contains date only => returns DateTime with date only
+   * 3) Contains time only => returns DateTime with today as date and time
+   * 4) Returns null if input is not valid
+   * 5) Nanoseconds are truncated
+   */
   DateTime extractDate() {
     int indexOfBy = Arrays.asList(params).indexOf("by");
     if (indexOfBy < 0) {
@@ -99,6 +107,13 @@ public class InputParser {
    * Valid inputs are ["from", "2pm 12/2", "to" "3pm 12/2"]. When the parse is
    * successful @param params is modified such that the parsed strings,
    * including "from" and "to", is removed - essentially params is shortened.
+   * 
+   * extractPeriod() Specifics
+   * 1) Start: date+time End: date+time => Start: date+time End: date+time
+   * 2) Any uninitialised date will be set to today
+   * 3) Any uninitialised start time will be 00:00:00 (without nanoseconds)
+   * 4) Any uninitialised end time will be 23:59:59 (without nanoseconds)
+   * 5) If end date before start date, return null
    */
   DateRange extractPeriod() {
     DateRange dr = null;
@@ -114,7 +129,7 @@ public class InputParser {
         
         DateTime start = DateUtil.parse(startCandidates);
         
-        if (start.getHour() == null) {
+        if (start!=null && start.getHour()==null) {
           start = initTimeToStartOfDay(start);
         }
         
@@ -125,11 +140,11 @@ public class InputParser {
             params.length);
         DateTime end = DateUtil.parse(endCandidates);
         
-        if (end.getHour() == null) {
+        if (end!=null && end.getHour() == null) {
           end = initTimeToEndOfDay(end);
         }
 
-        if (start != null && end != null) {
+        if (start != null && end != null && DateUtil.isEarlierThan(start, end)) {
           dr = new DateRange(start, end);
           params = Arrays.copyOfRange(params, 0, indexOfFrom);
         }

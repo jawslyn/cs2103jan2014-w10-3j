@@ -338,6 +338,7 @@ public class InputParserTest {
    * 2) Contains date only => returns DateTime with date only
    * 3) Contains time only => returns DateTime with today as date and time
    * 4) Returns null if input is not valid
+   * 5) Nanoseconds are truncated
    */
   @Test
   public void extractDate_SpecificDateSpecificTime() {
@@ -395,7 +396,10 @@ public class InputParserTest {
   /*
    * extractPeriod() Specifics
    * 1) Start: date+time End: date+time => Start: date+time End: date+time
-   * 2) Start: date only End: date only => Start: date+00:00 End: date+23:59
+   * 2) Any uninitialised date will be set to today
+   * 3) Any uninitialised start time will be 00:00:00 (without nanoseconds)
+   * 4) Any uninitialised end time will be 23:59:59 (without nanoseconds)
+   * 5) If end date before start date, return null
    */
   @Test
   public void extractPeriod_SpecificDatesOnly() {
@@ -406,36 +410,119 @@ public class InputParserTest {
         
         DateRange resultRange = p.extractPeriod();
         
-        assertEquals(DateUtil.getNowDate(), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().getStartOfDay().truncate(DateTime.Unit.SECOND),
+            resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().plusDays(1).getEndOfDay().truncate(DateTime.Unit.SECOND),
+            resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificDatesSpecificTimes() {
-
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from today 10am to tmr 2pm");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertEquals(DateUtil.getNowDate().getStartOfDay().
+            plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().plusDays(1).getStartOfDay().
+            plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND).truncate(DateTime.Unit.SECOND),
+            resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificTimesOnly() {
-
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from 10am to 2pm");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertEquals(DateUtil.getNowDate().
+            plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().
+            plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificDatesStartTimeOnly() {
-
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from today 10am to tmr");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertEquals(DateUtil.getNowDate().
+            plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().plusDays(1).
+            plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificDatesEndTimeOnly() {
-
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from today to tmr 2pm");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertEquals(DateUtil.getNowDate().getStartOfDay().
+            truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().plusDays(1).
+            plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
   @Test
-  public void extractPeriod_SpecificStartTimeSpecificEndDateTime() {
-
+  public void extractPeriod_SpecificStartTimeSpecificEndDate() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from 10am to tmr");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertEquals(DateUtil.getNowDate().
+            plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+        assertEquals(DateUtil.getNowDate().plusDays(1).
+            plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover).
+            truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
-
+  
   @Test
   public void extractPeriod_InvalidPeriodStartDateAfterEndDate() {
-
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from today 10am to today 8am");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertNull(resultRange);
   }
+  
+  @Test
+  public void extractPeriod_NoValidInput() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().
+        trimResults().splitToList("from aaa to bbb");
+        String[] inputArray = input.toArray(new String[input.size()]);
+        p.params = inputArray;
+        
+        DateRange resultRange = p.extractPeriod();
+        
+        assertNull(resultRange);
+  }
+  
 }
