@@ -122,6 +122,9 @@ public class GokuController {
   }
 
   private void commitInput() {
+    if (inputField.getText().isEmpty()) {
+      return;
+    }
     try {
       historyController.addInput(inputField.getText());
       String input = inputField.getText().toLowerCase().trim();
