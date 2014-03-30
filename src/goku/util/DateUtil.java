@@ -214,15 +214,21 @@ public class DateUtil {
     if (date == null && time == null) {
       return null;
     }
+    DateTime result = null;
+
     if (date == null) {
       date = getNow();
+      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
+          time.getHour(), time.getMinute(), time.getSecond(),
+          time.getNanoseconds());
+    } else if (time == null) {
+      result = date;
+    } else {
+      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
+          time.getHour(), time.getMinute(), time.getSecond(),
+          time.getNanoseconds());
     }
-    if (time == null) {
-      time = DateTime.forTimeOnly(23, 59, 0, 0);
-    }
-    DateTime result = new DateTime(date.getYear(), date.getMonth(),
-        date.getDay(), time.getHour(), time.getMinute(), time.getSecond(),
-        time.getNanoseconds());
+
     return result.plusDays(offsetDays);
   }
 
