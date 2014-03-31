@@ -56,6 +56,8 @@ public class InputParser {
 
   public InputParser(GOKU goku) {
     this.goku = goku;
+    paramsByIndex = null;
+    paramsFromIndex = null;
   }
   
   /*
@@ -215,7 +217,7 @@ public class InputParser {
     DateRange dr = extractPeriod();
     addAction.dline = dl;
     addAction.period = dr;
-    addAction.title = Joiner.on(" ").join(params);
+    addAction.title = extractTitle();
     return addAction;
   }
 
@@ -308,11 +310,14 @@ public class InputParser {
         }
       }
 
+      System.out.println("by: "+paramsByIndex);
+      System.out.println("from: "+paramsFromIndex);
       DateTime dl = extractDate();
       DateRange dr = extractPeriod();
       editAction.dline = dl;
       editAction.period = dr;
-      String title = Joiner.on(" ").join(params);
+
+      String title = extractTitle();
       if (!title.isEmpty()) {
         editAction.title = title;
       }
@@ -347,7 +352,7 @@ public class InputParser {
       DateRange dr = extractPeriod();
       searchAction.dline = dl;
       searchAction.period = dr;
-      String title = Joiner.on(" ").join(params);
+      String title = extractTitle();
       if (!title.isEmpty()) {
         searchAction.title = title;
       }

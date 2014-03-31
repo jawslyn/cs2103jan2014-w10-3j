@@ -194,11 +194,12 @@ public class InputParserTest {
     a = p.parse("edit a abc");
     assertTrue(a instanceof NoAction);
 
+    resetParamIndex();
     a = p.parse("edit 1 remove");
     assertTrue(a instanceof EditAction);
     ea = (EditAction) a;
     assertEquals(1, ea.id);
-    assertEquals(ea.title, "remove");
+    assertEquals("remove", ea.title);
 
     a = p.parse("edit 1 remove rubbish");
     assertTrue(a instanceof EditAction);
@@ -281,8 +282,9 @@ public class InputParserTest {
     sa = (SearchAction) a;
     assertNull(sa.title);
     assertNotNull(sa.period);
-    assertEquals(sa.period.getStartDate(), DateUtil.getNowDate());
-    assertEquals((Integer) 5, sa.dline.getHour());
+    assertEquals(sa.period.getStartDate(), DateUtil.getNowDate().
+        getStartOfDay().truncate(DateTime.Unit.SECOND));
+    assertEquals((Integer) 17, sa.dline.getHour());
 
     a = p.parse("search from today by 5pm to sunday");
     assertTrue(a instanceof NoAction);
@@ -452,6 +454,8 @@ public class InputParserTest {
         plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
         truncate(DateTime.Unit.SECOND).truncate(DateTime.Unit.SECOND),
         resultRange.getEndDate());
+    
+    resetParamIndex();
   }
 
   @Test
@@ -502,6 +506,8 @@ public class InputParserTest {
     assertEquals(DateUtil.getNowDate().plusDays(1).
         plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
         truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+    
+    resetParamIndex();
   }
 
   @Test
@@ -652,5 +658,10 @@ public class InputParserTest {
     String resultTitle = p.extractTitle();
     
     assertEquals("title is...", resultTitle);
+  }
+  
+  private void resetParamIndex() {
+    p.paramsByIndex = null;
+    p.paramsFromIndex = null;
   }
 }
