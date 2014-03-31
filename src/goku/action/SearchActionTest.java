@@ -171,12 +171,39 @@ public class SearchActionTest {
    * D - within the period, and has a deadline
    */
   @Test
-  public void searchByPeriodAndDeadline_returnsTasksWithDeadlineWithinPeriod()
+  public void searchByPeriodAndDeadline_returnsTasksWithDeadlineWithinPeriodWithoutTime()
       throws Exception {
     Task a = makeTaskWithDeadlineDaysLater("task a", 1);
     Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
     Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
     Task d = makeTaskWithDeadlineDaysLater("task d", 7);
+    Task e = makeTaskWithPeriodDaysRelative("task e", 8, 10);
+    Task f = makeTaskWithDeadlineDaysLater("task f", 11);
+
+    addAllTasks(a, b, c, d, e, f);
+
+    Task periodTask = makeTaskWithPeriodDaysRelative("periodTask", 3, 9);
+    Task dueTask = makeTaskWithDeadlineDaysLater("dueTask", 8);
+
+    SearchAction search = new SearchAction(goku);
+    search.dline = dueTask.getDeadline();
+    search.period = periodTask.getDateRange();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(1, result.getTasks().size());
+  }
+  
+  /*
+   * Similar to previous test, except deadline query now indicates time
+   */
+  @Test
+  public void searchByPeriodAndDeadline_returnsTasksWithDeadlineWithinPeriodWithDeadlineTime()
+      throws Exception {
+    Task a = makeTaskWithDeadlineDaysLater("task a", 1);
+    Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
+    Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
+    Task d = makeTaskWithDeadlineDaysLaterWithTime("task d", 8, 23, 50, 0);
     Task e = makeTaskWithPeriodDaysRelative("task e", 8, 10);
     Task f = makeTaskWithDeadlineDaysLater("task f", 11);
 
