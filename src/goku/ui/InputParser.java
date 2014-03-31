@@ -310,8 +310,6 @@ public class InputParser {
         }
       }
 
-      System.out.println("by: "+paramsByIndex);
-      System.out.println("from: "+paramsFromIndex);
       DateTime dl = extractDate();
       DateRange dr = extractPeriod();
       editAction.dline = dl;

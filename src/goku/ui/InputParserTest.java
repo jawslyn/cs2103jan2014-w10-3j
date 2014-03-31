@@ -286,9 +286,6 @@ public class InputParserTest {
         getStartOfDay().truncate(DateTime.Unit.SECOND));
     assertEquals((Integer) 17, sa.dline.getHour());
 
-    a = p.parse("search from today by 5pm to sunday");
-    assertTrue(a instanceof NoAction);
-    
     a = p.parse("search abc by tomorrow");
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
@@ -558,16 +555,18 @@ public class InputParserTest {
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
     
+    DateTime resultDate = p.extractDate();
     DateRange resultRange = p.extractPeriod();
-    //TODO didn't check deadline
-    
+
+    assertEquals(DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND), 
+        resultDate);
     assertEquals(DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND), 
         resultRange.getStartDate());
     assertEquals(DateUtil.getNow().getEndOfDay().plusDays(1).truncate(DateTime.Unit.SECOND), 
         resultRange.getEndDate());
   }
   
-  @Ignore
+  @Test
   public void extractDeadlineAndPeriod_DeadlineThenPeriod() {
     List<String> input = Splitter.on(' ').omitEmptyStrings().
         trimResults().splitToList("by today from today to tmr");
@@ -583,18 +582,6 @@ public class InputParserTest {
         resultRange.getStartDate());
     assertEquals(DateUtil.getNow().getEndOfDay().plusDays(1).truncate(DateTime.Unit.SECOND), 
         resultRange.getEndDate());
-  }
-  
-  @Ignore
-  public void extractDeadlineAndPeriod_JumbledOrder() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from today by tmr to tmr");
-    String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
-        
-    DateRange resultRange = p.extractPeriod();
-    assertNull(resultRange.getEndDate());
-    assertNull(resultRange);
   }
   
   @Test
