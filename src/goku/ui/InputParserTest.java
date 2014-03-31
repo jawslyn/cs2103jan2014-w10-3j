@@ -255,24 +255,42 @@ public class InputParserTest {
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertEquals("abc", sa.title);
-
+    
+    a = p.parse("search by tomorrow");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertNull(sa.title);
+    assertNotNull(sa.dline);
+    
     a = p.parse("search from today to tomorrow");
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertNull(sa.title);
     assertNotNull(sa.period);
 
-    a = p.parse("search by tomorrow");
+    a = p.parse("search from today to sunday by tmr 5pm");
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertNull(sa.title);
-    assertNotNull(sa.dline);
+    assertNotNull(sa.period);
+    assertNotNull(sa.dline.getHour());
+    
+    a = p.parse("search by tmr 5pm from today to sunday");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertNull(sa.title);
+    assertNotNull(sa.period);
+    assertNotNull(sa.dline.getHour());
 
+    a = p.parse("search from today by 5pm to sunday");
+    assertTrue(a instanceof NoAction);
+    
     a = p.parse("search abc by tomorrow");
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertNotNull(sa.title);
     assertNotNull(sa.dline);
+    
   }
 
   @Test(expected = MakeActionException.class)
