@@ -279,7 +279,8 @@ public class InputParserTest {
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertNull(sa.title);
-    assertNotNull(sa.period);
+    assertEquals((Integer) 1, sa.dline.getDay());
+    //assertNotNull(sa.period);
     assertNotNull(sa.dline.getHour());
 
     a = p.parse("search from today by 5pm to sunday");

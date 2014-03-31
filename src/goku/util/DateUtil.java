@@ -258,19 +258,34 @@ public class DateUtil {
    * 
    * @return null when parsing fails, i.e. no date or time can be interpreted
    * from the inputs.
+   * 
+   * Caution: For each component, day, date, time, once found, the rest of the input
+   * will NOT be tested for possibility of that component. Test priority in order of
+   * offset, day > date, then time.
    */
   public static DateTime parse(final String[] inputs) {
     DateTime date = null, time = null;
+    boolean offsetFound = false, dateFound = false, timeFound = false;
+    
     int daysOffsets = 0;
     for (String input : inputs) {
       if (isOffsetWord(input)) {
         daysOffsets = parseOffset(input);
+        offsetFound = true;
       } else if (looksLikeDay(input)) {
         date = parseDay(input);
+        dateFound = true;
       } else if (looksLikeDate(input)) {
         date = parseDate(input);
+        dateFound = true;
       } else if (looksLikeTime(input)) {
         time = parseTime(input);
+        timeFound = true;
+      }
+      
+      // stop searching if all components found
+      if(offsetFound==true && dateFound==true && timeFound==true) {
+        break;
       }
     }
     return mergeDateAndTime(date, time, daysOffsets);
