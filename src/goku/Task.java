@@ -3,6 +3,7 @@ package goku;
 import goku.storage.Storeable;
 import goku.util.DateOutput;
 import goku.util.DateUtil;
+import goku.util.DiffMatchPath;
 import hirondelle.date4j.DateTime;
 
 import com.google.gson.Gson;
@@ -46,7 +47,9 @@ public class Task implements Storeable {
     }
     String aTitle = getTitle().toLowerCase();
     String otherTitle = title.toLowerCase();
-    return aTitle.contains(otherTitle);
+    int match = (new DiffMatchPath()).match_main(aTitle, otherTitle, 0);
+    return match != -1;
+    // return aTitle.contains(otherTitle);
   }
 
   public void updateWith(Task other) {
