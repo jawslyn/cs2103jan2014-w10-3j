@@ -107,7 +107,7 @@ public class SearchActionTest {
    * E - start date is within period
    */
   @Test
-  public void searchByPeriod_returnsTasksWithinPeriod() throws Exception {
+  public void searchByPeriod_returnsTasksWithinPeriodWithoutTime() throws Exception {
     Task a = makeTaskWithDeadlineDaysLater("task a", 1);
     Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
     Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
@@ -241,8 +241,22 @@ public class SearchActionTest {
       int endDaysLater) {
     Task task = new Task();
     task.setTitle(title);
-    DateTime start = DateUtil.getNow().plusDays(startDaysLater);
-    DateTime end = DateUtil.getNow().plusDays(endDaysLater);
+    DateTime start = DateUtil.getNowDate().plusDays(startDaysLater);
+    DateTime end = DateUtil.getNowDate().plusDays(endDaysLater);
+    DateRange period = new DateRange(start, end);
+    task.setPeriod(period);
+    return task;
+  }
+  
+  private Task makeTaskWithPeriodDaysRelativeWithTime(String title, int startDaysLater, 
+      int startHour, int startMin, int startSec, int endDaysLater, int endHour, 
+      int endMin, int endSec) {
+    Task task = new Task();
+    task.setTitle(title);
+    DateTime start = DateUtil.getNowDate().plus(0, 0, startDaysLater, startHour, startMin,
+        startSec, 0, DateTime.DayOverflow.Spillover);
+    DateTime end = DateUtil.getNowDate().plus(0, 0, endDaysLater, endHour, endMin, endSec, 
+        0, DateTime.DayOverflow.Spillover);
     DateRange period = new DateRange(start, end);
     task.setPeriod(period);
     return task;
