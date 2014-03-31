@@ -68,7 +68,7 @@ public class EditAction extends Action {
 
   private void doRemoveImportant() {
     Task t = list.getTaskById(id);
-    t.setStatus(false);
+    t.setImpt(false);
   }
 
   private void doRemoveDeadline() {

@@ -214,6 +214,20 @@ public class InputParserTest {
     assertEquals(ea.title, null);
     assertTrue(ea.removeDeadline);
 
+    a = p.parse("edit 1 remove period");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, null);
+    assertTrue(ea.removePeriod);
+
+    a = p.parse("edit 1 remove important");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, null);
+    assertTrue(ea.removeImportant);
+
     a = p.parse("do 1 abc");
     assertTrue(a instanceof EditAction);
     ea = (EditAction) a;
@@ -257,13 +271,13 @@ public class InputParserTest {
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertEquals("abc", sa.title);
-    
+
     a = p.parse("search by tomorrow");
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertNull(sa.title);
     assertNotNull(sa.dline);
-    
+
     a = p.parse("search from today to tomorrow");
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
@@ -276,14 +290,14 @@ public class InputParserTest {
     assertNull(sa.title);
     assertNotNull(sa.period);
     assertNotNull(sa.dline.getHour());
-    
+
     a = p.parse("search by tmr 5pm from today to sunday");
     assertTrue(a instanceof SearchAction);
     sa = (SearchAction) a;
     assertNull(sa.title);
     assertNotNull(sa.period);
-    assertEquals(sa.period.getStartDate(), DateUtil.getNowDate().
-        getStartOfDay().truncate(DateTime.Unit.SECOND));
+    assertEquals(sa.period.getStartDate(), DateUtil.getNowDate()
+        .getStartOfDay().truncate(DateTime.Unit.SECOND));
     assertEquals((Integer) 17, sa.dline.getHour());
 
     a = p.parse("search abc by tomorrow");
@@ -291,7 +305,7 @@ public class InputParserTest {
     sa = (SearchAction) a;
     assertNotNull(sa.title);
     assertNotNull(sa.dline);
-    
+
   }
 
   @Test(expected = MakeActionException.class)
@@ -422,231 +436,249 @@ public class InputParserTest {
    */
   @Test
   public void extractPeriod_SpecificDatesOnly() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from today to tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
-    assertEquals(DateUtil.getNowDate().getStartOfDay().truncate(DateTime.Unit.SECOND),
+
+    assertEquals(
+        DateUtil.getNowDate().getStartOfDay().truncate(DateTime.Unit.SECOND),
         resultRange.getStartDate());
-    assertEquals(DateUtil.getNowDate().plusDays(1).getEndOfDay().truncate(DateTime.Unit.SECOND),
-        resultRange.getEndDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1).getEndOfDay()
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificDatesSpecificTimes() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from today 10am to tmr 2pm");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today 10am to tmr 2pm");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
-    assertEquals(DateUtil.getNowDate().getStartOfDay().
-        plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
-    assertEquals(DateUtil.getNowDate().plusDays(1).getStartOfDay().
-        plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND).truncate(DateTime.Unit.SECOND),
+
+    assertEquals(
+        DateUtil.getNowDate().getStartOfDay()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1).getStartOfDay()
+            .plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND).truncate(DateTime.Unit.SECOND),
         resultRange.getEndDate());
-    
+
     resetParamIndex();
   }
 
   @Test
   public void extractPeriod_SpecificTimesOnly() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from 10am to 2pm");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from 10am to 2pm");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
-    assertEquals(DateUtil.getNowDate().
-        plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
-    assertEquals(DateUtil.getNowDate().
-        plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificDatesStartTimeOnly() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from today 10am to tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today 10am to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
-    assertEquals(DateUtil.getNowDate().
-        plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
-    assertEquals(DateUtil.getNowDate().plusDays(1).
-        plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1)
+            .plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
   @Test
   public void extractPeriod_SpecificDatesEndTimeOnly() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from today to tmr 2pm");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today to tmr 2pm");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
-    assertEquals(DateUtil.getNowDate().getStartOfDay().
-        truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
-    assertEquals(DateUtil.getNowDate().plusDays(1).
-        plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
-    
+
+    assertEquals(
+        DateUtil.getNowDate().getStartOfDay().truncate(DateTime.Unit.SECOND),
+        resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1)
+            .plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+
     resetParamIndex();
   }
 
   @Test
   public void extractPeriod_SpecificStartTimeSpecificEndDate() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from 10am to tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from 10am to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
-    assertEquals(DateUtil.getNowDate().
-        plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
-    assertEquals(DateUtil.getNowDate().plusDays(1).
-        plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover).
-        truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1)
+            .plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
-  
+
   @Test
   public void extractPeriod_InvalidPeriodStartDateAfterEndDate() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from today 10am to today 8am");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today 10am to today 8am");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
+
     assertNull(resultRange);
   }
-  
+
   @Test
   public void extractPeriod_NoValidInput() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from aaa to bbb");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from aaa to bbb");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateRange resultRange = p.extractPeriod();
-    
+
     assertNull(resultRange);
   }
-  
+
   @Ignore
   public void extractDeadlineAndPeriod_PeriodThenDeadline() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("from today to tmr by tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today to tmr by tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateTime resultDate = p.extractDate();
     DateRange resultRange = p.extractPeriod();
 
-    assertEquals(DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND), 
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND),
         resultDate);
-    assertEquals(DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND), 
+    assertEquals(
+        DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND),
         resultRange.getStartDate());
-    assertEquals(DateUtil.getNow().getEndOfDay().plusDays(1).truncate(DateTime.Unit.SECOND), 
-        resultRange.getEndDate());
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().plusDays(1)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
-  
+
   @Test
   public void extractDeadlineAndPeriod_DeadlineThenPeriod() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("by today from today to tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by today from today to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     DateTime resultDate = p.extractDate();
     DateRange resultRange = p.extractPeriod();
 
-    assertEquals(DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND), 
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND),
         resultDate);
-    assertEquals(DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND), 
+    assertEquals(
+        DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND),
         resultRange.getStartDate());
-    assertEquals(DateUtil.getNow().getEndOfDay().plusDays(1).truncate(DateTime.Unit.SECOND), 
-        resultRange.getEndDate());
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().plusDays(1)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
-  
+
   @Test
   public void extractTitle_FromAndByNotInInput() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("title is...");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is...");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
-    
+
     String resultTitle = p.extractTitle();
     assertEquals("title is...", resultTitle);
   }
-  
+
   @Test
   public void extractTitle_FromOnly() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("title is... from to tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... from to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
     p.paramsFromIndex = 2;
-    
+
     String resultTitle = p.extractTitle();
     assertEquals("title is...", resultTitle);
   }
-  
+
   @Test
   public void extractTitle_ByOnly() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("title is... by tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... by tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
     p.paramsByIndex = 2;
-    
+
     String resultTitle = p.extractTitle();
     assertEquals("title is...", resultTitle);
   }
-  
+
   @Test
   public void extractTitle_FromBeforeBy() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("title is... from today by tmr to tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... from today by tmr to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
     p.paramsByIndex = 4;
     p.paramsFromIndex = 2;
-    
+
     String resultTitle = p.extractTitle();
-    
+
     assertEquals("title is...", resultTitle);
   }
-  
+
   @Test
   public void extractTitle_ByBeforeFrom() {
-    List<String> input = Splitter.on(' ').omitEmptyStrings().
-        trimResults().splitToList("title is... by tmr from today to tmr");
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... by tmr from today to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
     p.paramsByIndex = 2;
     p.paramsFromIndex = 4;
-    
+
     String resultTitle = p.extractTitle();
-    
+
     assertEquals("title is...", resultTitle);
   }
-  
+
   private void resetParamIndex() {
     p.paramsByIndex = null;
     p.paramsFromIndex = null;
