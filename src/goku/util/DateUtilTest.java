@@ -212,7 +212,7 @@ public class DateUtilTest {
 
     date = DateTime.forDateOnly(2014, 3, 4);
     time = DateTime.forTimeOnly(12, 13, 14, 0);
-    expected = new DateTime(2014, 3, 4, 12, 13, 14, 0);
+    expected = new DateTime(2014, 3, 4, 12, 13, 14, 0).truncate(DateTime.Unit.SECOND);
     result = DateUtil.mergeDateAndTime(date, time, 0);
     assertEquals(expected, result);
   }

@@ -269,16 +269,16 @@ public class DateUtil {
     
     int daysOffsets = 0;
     for (String input : inputs) {
-      if (isOffsetWord(input)) {
+      if (isOffsetWord(input) && offsetFound==false) {
         daysOffsets = parseOffset(input);
         offsetFound = true;
-      } else if (looksLikeDay(input)) {
+      } else if (looksLikeDay(input) && dateFound==false) {
         date = parseDay(input);
         dateFound = true;
-      } else if (looksLikeDate(input)) {
+      } else if (looksLikeDate(input) && dateFound==false) {
         date = parseDate(input);
         dateFound = true;
-      } else if (looksLikeTime(input)) {
+      } else if (looksLikeTime(input) && timeFound==false) {
         time = parseTime(input);
         timeFound = true;
       }

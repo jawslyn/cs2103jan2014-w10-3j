@@ -52,6 +52,7 @@ public class InputParser {
 
   private GOKU goku;
   String[] params;
+  Integer paramsByIndex, paramsFromIndex;
 
   public InputParser(GOKU goku) {
     this.goku = goku;
@@ -69,15 +70,15 @@ public class InputParser {
     int indexOfBy = Arrays.asList(params).indexOf("by");
     if (indexOfBy < 0) {
       return null;
+    } else {
+      paramsByIndex = indexOfBy;
     }
     // get the rest of the params after "by"
     String[] candidates = Arrays.copyOfRange(params, indexOfBy + 1,
         params.length);
     DateTime parsed = DateUtil.parse(candidates);
-    if (parsed != null) {
-      params = Arrays.copyOfRange(params, 0, indexOfBy);
-    } else {
-      return null;
+    if (parsed == null) {
+      return parsed;
     }
 
     // add time 23:59 to deadline if no time was specified
@@ -120,6 +121,7 @@ public class InputParser {
     int indexOfFrom = Arrays.asList(params).indexOf("from");
     int indexOfTo = Arrays.asList(params).indexOf("to");
     if (indexOfFrom >= 0 && indexOfTo >= 0) {
+      paramsFromIndex = indexOfFrom;
       if (indexOfTo + 1 < params.length) {
         /*
          * Parse start date
@@ -146,11 +148,36 @@ public class InputParser {
 
         if (start != null && end != null && DateUtil.isEarlierThan(start, end)) {
           dr = new DateRange(start, end);
-          params = Arrays.copyOfRange(params, 0, indexOfFrom);
         }
       }
     }
     return dr;
+  }
+  
+  /*
+   * Similar to extractDate and extractPeriod, extractTitle finds the relevant title
+   * content in params and returns the title string.
+   * 
+   * Variables paramsByIndex and paramsFromIndex indicates the possible cutoff point
+   * in the input string between title and date time inputs. extractTitle cuts off from
+   * the earliest inde indicated by the two variables.
+   */
+  String extractTitle() {
+    int indexToSplit;
+    
+    if(paramsByIndex!=null && paramsFromIndex!=null) {
+      assert paramsByIndex > 0;
+      assert paramsFromIndex > 0;
+      indexToSplit = Math.min(paramsByIndex, paramsFromIndex);
+    } else if(paramsByIndex != null) {
+      indexToSplit = paramsByIndex;
+    } else if(paramsFromIndex != null){
+      indexToSplit = paramsFromIndex;
+    } else {
+      return Joiner.on(" ").join(params);
+    }
+    
+    return Joiner.on(" ").join(Arrays.copyOfRange(params, 0, indexToSplit));
   }
   
   private DateTime initTimeToStartOfDay(DateTime date) {
