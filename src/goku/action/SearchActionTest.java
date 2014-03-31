@@ -126,6 +126,33 @@ public class SearchActionTest {
     assertTrue(result.isSuccess());
     assertEquals(4, result.getTasks().size());
   }
+  
+  /*
+   * 
+   * Similar test to previous, but involves search period with time
+   */
+  @Test
+  public void searchByPeriod_returnsTasksWithinPeriodWithTime() throws Exception {
+    Task a = makeTaskWithDeadlineDaysLater("task a", 1);
+    Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
+    Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
+    Task d = makeTaskWithDeadlineDaysLater("task d", 7);
+    Task e = makeTaskWithDeadlineDaysLaterWithTime("task e", 9, 15, 30, 0);
+    Task f = makeTaskWithPeriodDaysRelative("task f", 8, 10);
+    Task g = makeTaskWithDeadlineDaysLaterWithTime("task g", 11, 10, 0, 0);
+
+    addAllTasks(a, b, c, d, e, f, g);
+
+    Task periodTask = makeTaskWithPeriodDaysRelativeWithTime("periodTask", 3, 10, 0, 0,
+        9, 15, 30, 0);
+
+    SearchAction search = new SearchAction(goku);
+    search.period = periodTask.getDateRange();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(5, result.getTasks().size());
+  }
 
   /*
    * ---  Time line -------------------------------->
