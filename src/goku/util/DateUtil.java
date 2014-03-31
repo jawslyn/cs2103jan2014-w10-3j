@@ -55,7 +55,7 @@ public class DateUtil {
   public static DateTime getNow() {
     return DateTime.now(TimeZone.getDefault());
   }
-  
+
   /*
    * Returns the current date (day) only
    */
@@ -64,24 +64,24 @@ public class DateUtil {
   }
 
   public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
-    if (aDate==null || otherDate==null) {
+    if (aDate == null || otherDate == null) {
       return false;
     }
-    
-    //no time indicated => compare only by date
-    if(aDate.getHour()==null || otherDate.getHour()==null) {
+
+    // no time indicated => compare only by date
+    if (aDate.getHour() == null || otherDate.getHour() == null) {
       return isEarlierThanOrOnByDate(aDate, otherDate);
     }
     return aDate.lteq(otherDate);
   }
 
   public static boolean isEarlierThan(DateTime aDate, DateTime otherDate) {
-    if (aDate==null || otherDate==null) {
+    if (aDate == null || otherDate == null) {
       return false;
     }
-    
-    //no time indicated => compare only by date
-    if(aDate.getHour()==null || otherDate.getHour()==null) {
+
+    // no time indicated => compare only by date
+    if (aDate.getHour() == null || otherDate.getHour() == null) {
       return isEarlierThanByDate(aDate, otherDate);
     }
     return aDate.lt(otherDate);
@@ -266,25 +266,25 @@ public class DateUtil {
   public static DateTime parse(final String[] inputs) {
     DateTime date = null, time = null;
     boolean offsetFound = false, dateFound = false, timeFound = false;
-    
+
     int daysOffsets = 0;
     for (String input : inputs) {
-      if (isOffsetWord(input) && offsetFound==false) {
+      if (isOffsetWord(input) && offsetFound == false) {
         daysOffsets = parseOffset(input);
         offsetFound = true;
-      } else if (looksLikeDay(input) && dateFound==false) {
+      } else if (looksLikeDay(input) && dateFound == false) {
         date = parseDay(input);
         dateFound = true;
-      } else if (looksLikeDate(input) && dateFound==false) {
+      } else if (looksLikeDate(input) && dateFound == false) {
         date = parseDate(input);
         dateFound = true;
-      } else if (looksLikeTime(input) && timeFound==false) {
+      } else if (looksLikeTime(input) && timeFound == false) {
         time = parseTime(input);
         timeFound = true;
       }
-      
+
       // stop searching if all components found
-      if(offsetFound==true && dateFound==true && timeFound==true) {
+      if (offsetFound == true && dateFound == true && timeFound == true) {
         break;
       }
     }

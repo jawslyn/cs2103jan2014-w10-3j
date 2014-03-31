@@ -110,7 +110,7 @@ public class SearchActionTest {
 
     Result result = search.doIt();
     assertTrue(result.isSuccess());
-    assertEquals(2, result.getTasks().size());
+    assertEquals(1, result.getTasks().size());
   }
 
   /*
