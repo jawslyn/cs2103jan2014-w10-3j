@@ -268,25 +268,29 @@ public class DateUtil {
     boolean offsetFound = false, dateFound = false, timeFound = false;
 
     int daysOffsets = 0;
-    for (String input : inputs) {
-      if (isOffsetWord(input) && offsetFound == false) {
-        daysOffsets = parseOffset(input);
-        offsetFound = true;
-      } else if (looksLikeDay(input) && dateFound == false) {
-        date = parseDay(input);
-        dateFound = true;
-      } else if (looksLikeDate(input) && dateFound == false) {
-        date = parseDate(input);
-        dateFound = true;
-      } else if (looksLikeTime(input) && timeFound == false) {
-        time = parseTime(input);
-        timeFound = true;
-      }
+    try {
+      for (String input : inputs) {
+        if (isOffsetWord(input) && offsetFound == false) {
+          daysOffsets = parseOffset(input);
+          offsetFound = true;
+        } else if (looksLikeDay(input) && dateFound == false) {
+          date = parseDay(input);
+          dateFound = true;
+        } else if (looksLikeDate(input) && dateFound == false) {
+          date = parseDate(input);
+          dateFound = true;
+        } else if (looksLikeTime(input) && timeFound == false) {
+          time = parseTime(input);
+          timeFound = true;
+        }
 
-      // stop searching if all components found
-      if (offsetFound == true && dateFound == true && timeFound == true) {
-        break;
+        // stop searching if all components found
+        if (offsetFound == true && dateFound == true && timeFound == true) {
+          break;
+        }
       }
+    } catch (Exception e) {
+      return null;
     }
     return mergeDateAndTime(date, time, daysOffsets);
   }

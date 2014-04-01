@@ -78,14 +78,14 @@ public class Task implements Storeable {
 
     if (deadline != null) {
       sb.append(" | by ");
-      sb.append(DateOutput.format(deadline));
+      sb.append(DateOutput.formatDateTimeDayMonthHourMin(deadline));
     }
 
     if (period != null) {
       sb.append(" | from ");
-      sb.append(DateOutput.format(period.getStartDate()));
+      sb.append(DateOutput.formatDateTimeDayMonthHourMin(period.getStartDate()));
       sb.append(" to ");
-      sb.append(DateOutput.format(period.getEndDate()));
+      sb.append(DateOutput.formatDateTimeDayMonthHourMin(period.getEndDate()));
     }
 
     return sb.toString();

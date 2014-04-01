@@ -2,43 +2,65 @@ package goku.util;
 
 import hirondelle.date4j.DateTime;
 
-import java.util.Date;
+import java.util.Locale;
 
+/*
+ * Formats dates into a more readable string
+ * Mainly wrappers around DateTime.format.
+ */
 public class DateOutput {
 
   /*
-   * @see format
+   * converts DateTime -> "1.15pm"
    */
-  public static String format(Date date) {
-    return format(DateUtil.date4j(date));
+  public static String formatTimeOnly12h(DateTime dateTime) {
+    return dateTime.format("h12.mma", Locale.getDefault()).toLowerCase();
   }
 
   /*
-   * Formats a date into a human-friendly string.
-   * 1 - date is the same day as current day: "X hours later"
-   * 2 - date is less than 7 days away: "X days later"
-   * 3 - all other dates "dd/MM"
+   * converts DateTime -> "08:50h"
    */
-  public static String format(DateTime date) {
+  public static String formatTimeOnly24h(DateTime dateTime) {
+    return dateTime.format("hh:mm|h|").toLowerCase();
+  }
+
+  /*
+   * converts DateTime -> "3h later"
+   */
+  public static String formatTimeOnlyHoursLater(DateTime date) {
+    long hoursDifference = getDifferenceInHours(DateUtil.getNow(), date);
+    return hoursDifference + "h later";
+  }
+
+  /*
+   * converts DateTime -> "4/10"
+   */
+  public static String formatDateOnlyDayMonth(DateTime dateTime) {
+    return dateTime.format("D/M").toLowerCase();
+  }
+
+  /*
+   * converts DateTime -> "today" or "4d later"
+   */
+  public static String formatDateOnlyDaysLater(DateTime date) {
     DateTime now = DateUtil.getNow();
     int daysDifference = now.numDaysFrom(date);
+    // if negative?
     if (daysDifference == 0) {
-      int hoursDifference = getDifferenceInHours(now, date);
-      return hoursDifference + "h later";
-    } else if (daysDifference == 1) {
-      return date.getHour() + ":" + date.getMinute();
-    } else if (daysDifference < 7) {
-      if (daysDifference < 0) {
-        return "expired";
-      } else {
-        return daysDifference + "d later";
-      }
+      return "today";
     } else {
-      return date.getDay() + "/" + date.getMonth();
+      return daysDifference + "d later";
     }
   }
 
-  private static int getDifferenceInHours(DateTime now, DateTime date) {
-    return date.getHour() - now.getHour();
+  /*
+   * converts DateTime -> "4/10 1.15pm"
+   */
+  public static String formatDateTimeDayMonthHourMin(DateTime date) {
+    return formatDateOnlyDayMonth(date) + " " + formatTimeOnly12h(date);
+  }
+
+  private static long getDifferenceInHours(DateTime now, DateTime date) {
+    return (now.numSecondsFrom(date) / 60 / 60);
   }
 }

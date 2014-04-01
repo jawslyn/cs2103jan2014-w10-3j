@@ -179,8 +179,9 @@ public class FeedbackController {
   private Text makeDateRange(Task t) {
     DateRange period = t.getDateRange();
     Text range = makeNormalText("from "
-        + DateOutput.format(period.getStartDate()) + "\nto "
-        + DateOutput.format(period.getEndDate()));
+        + DateOutput.formatDateTimeDayMonthHourMin(period.getStartDate())
+        + "\nto "
+        + DateOutput.formatDateTimeDayMonthHourMin(period.getEndDate()));
     range.getStyleClass().addAll("task-date-range");
     return range;
   }
@@ -190,7 +191,8 @@ public class FeedbackController {
    * @param t task to be shown
    */
   private Text makeDeadline(Task t) {
-    Text deadline = makeNormalText("by " + DateOutput.format(t.getDeadline()));
+    Text deadline = makeNormalText("by "
+        + DateOutput.formatTimeOnly12h(t.getDeadline()));
     deadline.getStyleClass().addAll("task-deadline");
     return deadline;
   }
