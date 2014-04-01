@@ -95,12 +95,12 @@ public class SearchActionTest {
   @Test
   public void searchByDeadline_returnsTaskWithDeadlineBeforeWithTime()
       throws Exception {
-    // Task a = makeTaskWithDeadlineDaysLaterWithTime("task a", 1, 10, 0, 0);
+    Task a = makeTaskWithDeadlineDaysLaterWithTime("task a", 1, 10, 0, 0);
     Task b = makeTaskWithDeadlineDaysLaterWithTime("task b", 2, 14, 0, 0);
     Task c = makeTaskWithDeadlineDaysLater("task c", 3);
     Task d = makeTaskWithPeriodDaysRelative("task d", 1, 3);
 
-    addAllTasks(b, c, d);
+    addAllTasks(a, b, c, d);
 
     Task dueTask = makeTaskWithDeadlineDaysLaterWithTime("due task", 2, 14, 0,
         0);
@@ -110,7 +110,7 @@ public class SearchActionTest {
 
     Result result = search.doIt();
     assertTrue(result.isSuccess());
-    assertEquals(1, result.getTasks().size());
+    assertEquals(2, result.getTasks().size());
   }
 
   /*
