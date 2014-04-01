@@ -1,8 +1,6 @@
 package goku.action;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
@@ -15,6 +13,7 @@ import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SearchActionTest {
@@ -252,27 +251,29 @@ public class SearchActionTest {
    */
   @Test
   public void checkIfFree_dateQueryWithinPeriodOfTask() throws Exception {
-    Task task = makeTaskWithPeriodDaysRelative("task a", 0, 5);
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 0, 0, 0, 0, 5, 23, 59, 59);
     addAllTasks(task);
 
     SearchAction search = new SearchAction(goku);
     search.dateQuery = DateUtil.getNow().plusDays(1);
+    assertNotNull(search.dateQuery.getHour());
 
     Result result = search.doIt();
     assertFalse(result.isSuccess());
   }
-
+  
   /*
    * Query date on boundary of period of a task
    * Returns false
    */
   @Test
   public void checkIfFree_dateQueryOnBoundaryOfPeriodOfTask() throws Exception {
-    Task task = makeTaskWithPeriodDaysRelative("task a", 0, 5);
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 0, 0, 0, 0, 5, 23, 59, 59);
     addAllTasks(task);
 
     SearchAction search = new SearchAction(goku);
     search.dateQuery = task.getDateRange().getEndDate();
+    assertNotNull(search.dateQuery.getHour());
 
     Result result = search.doIt();
     assertFalse(result.isSuccess());
@@ -284,11 +285,12 @@ public class SearchActionTest {
    */
   @Test
   public void checkIfFree_dateQueryOutsidePeriodOfTask() throws Exception {
-    Task task = makeTaskWithPeriodDaysRelative("task a", 1, 5);
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 1, 0, 0, 0, 5, 23, 59, 59);
     addAllTasks(task);
 
     SearchAction search = new SearchAction(goku);
     search.dateQuery = DateUtil.getNow();
+    assertNotNull(search.dateQuery.getHour());
 
     Result result = search.doIt();
     assertTrue(result.isSuccess());
@@ -305,9 +307,25 @@ public class SearchActionTest {
 
     SearchAction search = new SearchAction(goku);
     search.dateQuery = DateUtil.getNow();
+    assertNotNull(search.dateQuery.getHour());
 
     Result result = search.doIt();
     assertTrue(result.isSuccess());
+  }
+  
+  /*
+   * TODO not yet implemented
+   */
+  @Ignore
+  public void checkIfFree_dateQueryFindTimeSlots() throws Exception {
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 0, 0, 0, 0, 5, 23, 59, 59);
+    addAllTasks(task);
+
+    SearchAction search = new SearchAction(goku);
+    search.dateQuery = DateUtil.getNow().plusDays(1);
+
+    Result result = search.doIt();
+    assertFalse(result.isSuccess());
   }
 
   private Task makeTaskWithTitle(String title) {
