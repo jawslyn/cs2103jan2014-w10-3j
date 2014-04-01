@@ -290,6 +290,9 @@ public class DateUtil {
         }
       }
     } catch (Exception e) {
+      // this catches an exception thrown by DateTime's parse methods.
+      // when there is a parsing error, e.g. time given is 123.45pm,
+      // an exception is thrown and we treat it as no time was given
       return null;
     }
     return mergeDateAndTime(date, time, daysOffsets);

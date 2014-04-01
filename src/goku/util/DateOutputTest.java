@@ -12,8 +12,7 @@ public class DateOutputTest {
   public static final String DAYS_LATER = "d later";
   public static final String NEXT_WEEK = "next week";
 
-  DateTime base; // Has the same year, month, day as the date now, but set is
-                 // set to 6pm
+  DateTime base;
 
   @Before
   public void setup() {
