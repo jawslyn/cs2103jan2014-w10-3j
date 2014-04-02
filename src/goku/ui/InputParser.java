@@ -49,6 +49,7 @@ public class InputParser {
   private String[] exitKeywords = Commands.exitKeywords;
   private String[] undoKeywords = Commands.undoKeywords;
   private String[] redoKeywords = Commands.redoKeywords;
+  private String[] helpKeywords = Commands.helpKeywords;
 
   private GOKU goku;
   String[] params;
@@ -59,7 +60,7 @@ public class InputParser {
     paramsByIndex = null;
     paramsFromIndex = null;
   }
-  
+
   /*
    * extractDate() Specifics
    * 1) Contains date and time => returns DateTime with date and time
@@ -130,21 +131,21 @@ public class InputParser {
          */
         String[] startCandidates = Arrays.copyOfRange(params, indexOfFrom + 1,
             indexOfTo);
-        
+
         DateTime start = DateUtil.parse(startCandidates);
-        
-        if (start!=null && start.getHour()==null) {
+
+        if (start != null && start.getHour() == null) {
           start = initTimeToStartOfDay(start);
         }
-        
+
         /*
          * Parsed end date
          */
         String[] endCandidates = Arrays.copyOfRange(params, indexOfTo + 1,
             params.length);
         DateTime end = DateUtil.parse(endCandidates);
-        
-        if (end!=null && end.getHour() == null) {
+
+        if (end != null && end.getHour() == null) {
           end = initTimeToEndOfDay(end);
         }
 
@@ -155,7 +156,7 @@ public class InputParser {
     }
     return dr;
   }
-  
+
   /*
    * Similar to extractDate and extractPeriod, extractTitle finds the relevant title
    * content in params and returns the title string.
@@ -166,33 +167,33 @@ public class InputParser {
    */
   String extractTitle() {
     int indexToSplit;
-    
-    if(paramsByIndex!=null && paramsFromIndex!=null) {
+
+    if (paramsByIndex != null && paramsFromIndex != null) {
       assert paramsByIndex > 0;
       assert paramsFromIndex > 0;
       indexToSplit = Math.min(paramsByIndex, paramsFromIndex);
-    } else if(paramsByIndex != null) {
+    } else if (paramsByIndex != null) {
       indexToSplit = paramsByIndex;
-    } else if(paramsFromIndex != null){
+    } else if (paramsFromIndex != null) {
       indexToSplit = paramsFromIndex;
     } else {
       return Joiner.on(" ").join(params);
     }
-    
+
     return Joiner.on(" ").join(Arrays.copyOfRange(params, 0, indexToSplit));
   }
-  
+
   private DateTime initTimeToStartOfDay(DateTime date) {
     String parsedString = date.format("YYYY-MM-DD");
     parsedString = parsedString.concat(" 00:00:00");
-    
+
     return new DateTime(parsedString);
   }
-  
+
   private DateTime initTimeToEndOfDay(DateTime date) {
     String parsedString = date.format("YYYY-MM-DD");
     parsedString = parsedString.concat(" 23:59:59");
-    
+
     return new DateTime(parsedString);
   }
 
@@ -403,6 +404,8 @@ public class InputParser {
       action = new UndoAction(goku);
     } else if (Arrays.asList(redoKeywords).contains(command)) {
       action = new RedoAction(goku);
+    } else if (Arrays.asList(helpKeywords).contains(command)) {
+      action = new HelpAction(goku);
     } else {
       action = new UnknownAction(goku, command);
     }

@@ -14,11 +14,12 @@ public class Commands {
   public static String[] exitKeywords = { "quit", "exit", "q" };
   public static String[] undoKeywords = { "undo", "revert", "rollback" };
   public static String[] redoKeywords = { "redo" };
+  public static String[] helpKeywords = { "help", "h" };
 
   public static List<String> getAllKeywords() {
     return Arrays.asList(mergeArrays(addKeywords, deleteKeywords, editKeywords,
         completeKeywords, displayKeywords, searchKeywords, exitKeywords,
-        undoKeywords, redoKeywords));
+        undoKeywords, redoKeywords, helpKeywords));
 
   }
 

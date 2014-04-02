@@ -356,6 +356,14 @@ public class InputParserTest {
   }
 
   @Test
+  public void parse_HelpAction() throws Exception {
+    a = p.parse("help");
+    assertTrue(a instanceof HelpAction);
+    a = p.parse("h");
+    assertTrue(a instanceof HelpAction);
+  }
+
+  @Test
   public void parse_ExitAction() throws Exception {
     a = p.parse("exit");
     assertTrue(a instanceof ExitAction);
