@@ -14,10 +14,6 @@ import java.util.TimeZone;
 public class TaskListDisplayer {
   PrintStream ps;
 
-  DateTime now = DateUtil.getNow();
-
-  DateTime tmr = now.plusDays(1);
-
   public TaskListDisplayer(PrintStream ps) {
     this.ps = ps;
   }
@@ -111,14 +107,14 @@ public class TaskListDisplayer {
     if (dateRange == null) {
       return false;
     }
-    return isToday(dateRange.getEndDate());
+    return dateRange.containsDate(DateUtil.getNow());
   }
 
   private boolean isToday(DateTime date) {
     if (date == null) {
       return false;
     }
-    return now.isSameDayAs(date);
+    return DateUtil.getNow().isSameDayAs(date);
   }
 
   private boolean isToday(Task task) {
@@ -129,14 +125,14 @@ public class TaskListDisplayer {
     if (dateRange == null) {
       return false;
     }
-    return tmr.isSameDayAs(dateRange.getStartDate());
+    return DateUtil.getNow().plusDays(1).isSameDayAs(dateRange.getStartDate());
   }
 
   private boolean isTomorrow(DateTime date) {
     if (date == null) {
       return false;
     }
-    return tmr.isSameDayAs(date);
+    return DateUtil.getNow().plusDays(1).isSameDayAs(date);
 
   }
 
