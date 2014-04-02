@@ -28,6 +28,10 @@ public class AutoCompleteEngine {
     }
   }
 
+  /*
+   * Adds a word to the corpus, allowing this word to be autocompleted
+   * subsequently
+   */
   public void addCompletion(String completion) {
     wordAuto.addToCorpus(completion);
   }

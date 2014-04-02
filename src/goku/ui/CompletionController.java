@@ -1,11 +1,11 @@
 package goku.ui;
 
 import goku.Task;
-import goku.TaskList;
 import goku.autocomplete.AutoCompleteEngine;
 
 import java.util.List;
 
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -172,14 +172,30 @@ public class CompletionController {
     suggestionList.getChildren().add(new Text(suggestion));
   }
 
-  public void updateWithTaskList(TaskList taskList) {
-    for (Task task : taskList) {
-      List<String> titleList = Splitter.on(' ').omitEmptyStrings()
-          .trimResults().splitToList(task.getTitle());
-      String[] titleTokens = titleList.toArray(new String[titleList.size()]);
-      for (String tokens : titleTokens) {
-        auto.addCompletion(tokens);
+  public ListChangeListener<? super Task> getCompletionListener() {
+    return new ListChangeListener<Task>() {
+      @Override
+      public void onChanged(ListChangeListener.Change<? extends Task> change) {
+        while (change.next()) {
+          if (change.wasAdded()) {
+            addTasksToCompletion(change.getAddedSubList());
+          }
+        }
       }
-    }
+
+      private void addTasksToCompletion(List<? extends Task> tasks) {
+        for (Task task : tasks) {
+          addTaskTitleToCompletion(task.getTitle());
+        }
+      }
+
+      private void addTaskTitleToCompletion(String title) {
+        List<String> titleList = Splitter.on(' ').omitEmptyStrings()
+            .trimResults().splitToList(title);
+        for (String tokens : titleList) {
+          auto.addCompletion(tokens);
+        }
+      }
+    };
   }
 }

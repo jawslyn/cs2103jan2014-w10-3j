@@ -83,6 +83,11 @@ public class GokuController {
     parser = new InputParser(goku);
     storage = StorageFactory.getDefaultStorage();
 
+    // this listeners for tasks added to the list and extracts the title
+    // so that they can be autocompleted next time
+    goku.getObservable().addListener(
+        completionController.getCompletionListener());
+
     try {
       goku.addToTaskList(storage.loadStorage());
       doAction(new GreetAction(goku));
@@ -98,8 +103,6 @@ public class GokuController {
       feedbackController.displayErrorMessage(e.getMessage());
       goku.addToTaskList(e.getLoadedTasks());
     }
-
-    completionController.updateWithTaskList(goku.getTaskList());
   }
 
   /*
