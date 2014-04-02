@@ -23,13 +23,17 @@ public class TaskListDisplayer {
     if (list == null) {
       return ht;
     }
+
     ArrayList<Task> overdue = new ArrayList<Task>();
     ArrayList<Task> today = new ArrayList<Task>();
     ArrayList<Task> tomorrow = new ArrayList<Task>();
     ArrayList<Task> remaining = new ArrayList<Task>();
+    ArrayList<Task> completed = new ArrayList<Task>();
 
     for (Task task : list) {
-      if (isOver(task)) {
+      if (task.isDone() != null && task.isDone()) {
+        completed.add(task);
+      } else if (isOver(task)) {
         overdue.add(task);
       } else if (isToday(task)) {
         today.add(task);
@@ -39,6 +43,8 @@ public class TaskListDisplayer {
         remaining.add(task);
       }
     }
+
+    ht.put("completed", completed);
     ht.put("overdue", overdue);
     ht.put("today", today);
     ht.put("tomorrow", tomorrow);

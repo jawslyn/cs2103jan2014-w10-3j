@@ -30,7 +30,7 @@ import javafx.scene.layout.VBox;
 public class GokuController {
 
   private class GreetAction extends Action {
-    private static final String MSG = "Welcome to GOKU! Here's whats upcoming...";
+    private static final String MSG = "Welcome to GOKU! Here are your tasks for today!";
 
     public GreetAction(GOKU goku) {
       super(goku);
