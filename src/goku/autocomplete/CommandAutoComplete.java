@@ -2,8 +2,9 @@ package goku.autocomplete;
 
 import goku.Commands;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /*
  * CommandAutoComplete completes prefixes that is likely to be a command.
@@ -12,14 +13,14 @@ import java.util.List;
  */
 public class CommandAutoComplete extends WordAutoComplete {
 
-  private final static List<String> DEFAULT_CORPUS = makeCommandCorpus();
+  private final static Set<String> DEFAULT_CORPUS = makeCommandCorpus();
 
   public CommandAutoComplete() {
     super(DEFAULT_CORPUS);
   }
 
-  private static List<String> makeCommandCorpus() {
-    List<String> defaultCorpus = new ArrayList<String>();
+  private static SortedSet<String> makeCommandCorpus() {
+    SortedSet<String> defaultCorpus = new TreeSet<String>();
     defaultCorpus.addAll(Commands.getAllKeywords());
     return defaultCorpus;
   }
