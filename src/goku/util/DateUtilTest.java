@@ -1,6 +1,7 @@
 package goku.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import hirondelle.date4j.DateTime;
 
@@ -165,6 +166,9 @@ public class DateUtilTest {
     expected = DateTime.forTimeOnly(1, 45, 0, 0);
     assertEquals(expected.getHour(), date.getHour());
     assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("91.45am");
+    assertNull(date);
   }
 
   /*
@@ -212,7 +216,8 @@ public class DateUtilTest {
 
     date = DateTime.forDateOnly(2014, 3, 4);
     time = DateTime.forTimeOnly(12, 13, 14, 0);
-    expected = new DateTime(2014, 3, 4, 12, 13, 14, 0).truncate(DateTime.Unit.SECOND);
+    expected = new DateTime(2014, 3, 4, 12, 13, 14, 0)
+        .truncate(DateTime.Unit.SECOND);
     result = DateUtil.mergeDateAndTime(date, time, 0);
     assertEquals(expected, result);
   }
