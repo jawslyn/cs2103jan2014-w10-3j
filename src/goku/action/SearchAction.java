@@ -89,10 +89,27 @@ public class SearchAction extends Action {
     }
   }
 
+  /*
+   * Case 1: dateQuery contains specific date and time
+   * Checks whether dateQuery contains any tasks whose period coincides
+   * If there is => not free, else => free
+   * 
+   * Case 2: dateQuery only contains date
+   * Shows users the list of free(?) timeslots of the specified day
+   */
   public Result checkFreeTime() {
-
     assert (dateQuery != null);
 
+    // Case 1: Specific date and time
+    if (dateQuery.getHour() != null) {
+      return checkIfFree();
+    } else {  // Case 2: Only date given
+      //TODO not implemented yet
+      return null;
+    }
+  }
+
+  private Result checkIfFree() {
     if (list.isFree(dateQuery) == true) {
       return new Result(true, IS_FREE, null, null);
     } else {
