@@ -61,6 +61,11 @@ public class InputParser {
     paramsFromIndex = null;
   }
 
+  public void reset() {
+    paramsByIndex = null;
+    paramsFromIndex = null;
+  }
+
   /*
    * extractDeadline() Specifics
    * 1) Contains date and time => returns DateTime with date and time
@@ -119,7 +124,7 @@ public class InputParser {
    * 4) Any uninitialised end time will be 23:59:59 (without nanoseconds)
    * 5) If end date before start date, return null
    */
-  DateRange extractPeriod() throws MakeActionException{
+  DateRange extractPeriod() throws MakeActionException {
     DateRange dr = null;
     int indexOfFrom = Arrays.asList(params).indexOf("from");
     int indexOfTo = Arrays.asList(params).indexOf("to");
@@ -271,8 +276,8 @@ public class InputParser {
       da.viewComplete = true;
     } else if (nonArrayParams.contains("overdue")) {
       da.viewOverdue = true;
-    } else if (!nonArrayParams.isEmpty()){
-        throw new MakeActionException(DisplayAction.ERR_INVALID_DISPLAY);
+    } else if (!nonArrayParams.isEmpty()) {
+      throw new MakeActionException(DisplayAction.ERR_INVALID_DISPLAY);
     }
 
     return da;
@@ -366,6 +371,7 @@ public class InputParser {
    * @return NoAction if there is no input, UnknownAction if the command is not known
    */
   public Action parse(String input) throws MakeActionException {
+    reset();
     Action action = null;
 
     if (input == null || input.isEmpty()) {
