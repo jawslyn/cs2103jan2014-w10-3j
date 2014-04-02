@@ -21,13 +21,6 @@ public class TaskList implements Iterable<Task> {
     _list = FXCollections.observableArrayList();
   }
 
-  private int makeId() {
-    if (unusedId.size() > 0) {
-      return unusedId.remove(0);
-    }
-    return runningId++;
-  }
-
   public int addTask(Task task) {
     task.setId(makeId());
     boolean success = _list.add(task);
@@ -58,6 +51,17 @@ public class TaskList implements Iterable<Task> {
     return cloned;
   }
 
+  private List<Task> deleteTask(List<Task> matches) {
+    if (matches.size() == 1) {
+      Task deleted = deleteTaskById(matches.get(0).getId());
+      List<Task> results = new ArrayList<>();
+      results.add(deleted);
+      return results;
+    } else {
+      return matches;
+    }
+  }
+
   public Task deleteTaskById(int id) {
     int index = getIndexOfTaskById(id);
     return index < 0 ? null : deleteTaskByIndex(index);
@@ -68,6 +72,10 @@ public class TaskList implements Iterable<Task> {
     unusedId.add(t.getId());
     Collections.sort(unusedId);
     return _list.remove(index);
+  }
+
+  public List<Task> deleteTaskByTitle(String title) {
+    return deleteTask(findTaskByTitle(title));
   }
 
   public List<Task> findTaskByDeadline(DateTime deadline) {
@@ -91,10 +99,6 @@ public class TaskList implements Iterable<Task> {
     return matches;
   }
 
-  public List<Task> deleteTaskByTitle(String title) {
-    return deleteTask(findTaskByTitle(title));
-  }
-
   public List<Task> findTaskByTitle(String title) {
     List<Task> matches = new ArrayList<>();
     for (Task task : _list) {
@@ -103,17 +107,6 @@ public class TaskList implements Iterable<Task> {
       }
     }
     return matches;
-  }
-
-  private List<Task> deleteTask(List<Task> matches) {
-    if (matches.size() == 1) {
-      Task deleted = deleteTaskById(matches.get(0).getId());
-      List<Task> results = new ArrayList<>();
-      results.add(deleted);
-      return results;
-    } else {
-      return matches;
-    }
   }
 
   public List<Task> getAllCompleted() {
@@ -149,6 +142,24 @@ public class TaskList implements Iterable<Task> {
 
   public ObservableList<Task> getObservable() {
     return _list;
+  }
+
+  public List<Task> getOverdue() {
+    List<Task> incomplete = new ArrayList<Task>();
+    DateTime now = DateUtil.getNow();
+    for (Task task : _list) {
+      if ((((task.getStatus()) == null || !task.getStatus()))) {
+        incomplete.add(task);
+      }
+    }
+
+    List<Task> overdue = new ArrayList<>();
+    for (Task task : incomplete) {
+      if (DateUtil.isEarlierOrOn(task.getDeadline(), now)) {
+        overdue.add(task);
+      }
+    }
+    return overdue;
   }
 
   /*
@@ -191,20 +202,16 @@ public class TaskList implements Iterable<Task> {
     return result;
   }
 
-  public List<Task> getOverdue() {
-    DateTime now = DateUtil.getNow();
-    List<Task> overdue = new ArrayList<>();
-    for (Task task : _list) {
-      if (DateUtil.isEarlierOrOn(task.getDeadline(), now)) {
-        overdue.add(task);
-      }
-    }
-    return overdue;
-  }
-
   @Override
   public Iterator<Task> iterator() {
     return _list.listIterator();
+  }
+
+  private int makeId() {
+    if (unusedId.size() > 0) {
+      return unusedId.remove(0);
+    }
+    return runningId++;
   }
 
   public int size() {
