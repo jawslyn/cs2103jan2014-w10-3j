@@ -297,7 +297,7 @@ public class FeedbackController {
   public HBox makeTitle(Task task) {
     HBox hbox = new HBox();
     Text title = makeNormalText(task.getTitle());
-    title.setWrappingWidth(output.getWidth() - 100);
+    title.setWrappingWidth(width - 300);
     hbox.getChildren().add(title);
     HBox.setHgrow(title, Priority.NEVER);
     return hbox;
