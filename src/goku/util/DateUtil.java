@@ -297,7 +297,7 @@ public class DateUtil {
       // this catches an exception thrown by DateTime's parse methods.
       // when there is a parsing error, e.g. time given is 123.45pm,
       // an exception is thrown and we treat it as no time was given
-      return null;
+      // TODO return null;
     }
     return mergeDateAndTime(date, time, daysOffsets);
   }
@@ -420,12 +420,7 @@ public class DateUtil {
     return -1;
   }
 
-  /*
-   * readable to string method for datetime
-   * TODO format!!
-   */
-  public String dateTimeToString(DateTime date) {
-
-    return null;
+  public static String toString(DateTime date) {
+    return DateOutput.formatDateTimeDayMonthHourMin(date);
   }
 }

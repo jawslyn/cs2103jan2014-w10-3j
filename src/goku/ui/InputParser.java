@@ -262,7 +262,7 @@ public class InputParser {
     return da;
   }
 
-  private DisplayAction makeDisplayAction() {
+  private DisplayAction makeDisplayAction() throws MakeActionException {
 
     DisplayAction da = new DisplayAction(goku);
 
@@ -271,6 +271,8 @@ public class InputParser {
       da.viewComplete = true;
     } else if (nonArrayParams.contains("overdue")) {
       da.viewOverdue = true;
+    } else if (!nonArrayParams.isEmpty()){
+        throw new MakeActionException(DisplayAction.ERR_INVALID_DISPLAY);
     }
 
     return da;

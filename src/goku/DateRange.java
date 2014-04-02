@@ -1,6 +1,7 @@
 package goku;
 
 import goku.action.MakeActionException;
+import goku.util.DateOutput;
 import goku.util.DateUtil;
 import hirondelle.date4j.DateTime;
 
@@ -40,6 +41,7 @@ public class DateRange {
   
   @Override
   public String toString() {
-    return startDate.toString()+" to "+endDate.toString();
+    return DateOutput.formatDateTimeDayMonthHourMin(startDate)+" to "+
+        DateOutput.formatDateTimeDayMonthHourMin(endDate);
   }
 }

@@ -569,6 +569,7 @@ public class InputParserTest {
     String[] inputArray = input.toArray(new String[input.size()]);
     p.params = inputArray;
 
+    @SuppressWarnings("unused")
     DateRange resultRange = p.extractPeriod();
   }
 

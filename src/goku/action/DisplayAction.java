@@ -15,6 +15,7 @@ public class DisplayAction extends Action {
   private static final String MSG_NO_COMPLETED = "You have not completed any tasks!\nTry \"done [ID]\" to mark a task as completed!";
   private static final String MSG_NO_INCOMPLETE = "There is currently no upcoming tasks!\nTry \"add [TITLE] by [TIME] [DAY]\" or\n\"add [TITLE] from [TIME] [DAY] to [TIME] [DAY]\" to add a task now!\n";
   private static final String MSG_NO_OVERDUE = "No overdue tasks!";
+  public static final String ERR_INVALID_DISPLAY = "Invalid display option!";
   DateTime byDeadline;
   public boolean viewComplete;
   public boolean viewOverdue;

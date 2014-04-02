@@ -14,7 +14,12 @@ public class DateOutput {
    * converts DateTime -> "1.15pm"
    */
   public static String formatTimeOnly12h(DateTime dateTime) {
-    return dateTime.format("h12.mma", Locale.getDefault()).toLowerCase();
+    String m = "";
+    if (dateTime.getHour() == null) {
+      return dateTime.format("h12.mm");
+    } else {
+      return dateTime.format("h12.mma", Locale.getDefault()).toLowerCase();
+    }
   }
 
   /*

@@ -26,23 +26,29 @@ public class DisplayActionTest {
     Task completedTask = new Task();
     completedTask.setTitle("complete task");
     completedTask.setStatus(true);
-
+    
     Task overdueTask = new Task();
     overdueTask.setTitle("overdue task");
-    overdueTask.setDeadline(DateUtil.getNow().minusDays(3));
+    overdueTask.setDeadline(DateUtil.getNow().minusDays(3));   
 
+    Task previousTask= new Task();
+    previousTask.setTitle("previous task");
+    previousTask.setStatus(true);
+    previousTask.setDeadline(DateUtil.getNow().minusDays(3));
+    
     Task task = new Task();
     task.setTitle("task");
 
     list.addTask(completedTask);
     list.addTask(overdueTask);
+    list.addTask(previousTask);
     list.addTask(task);
 
     DisplayAction da = new DisplayAction(goku);
     da.viewComplete = true;
     da.viewOverdue = false;
     Result onlyComplete = da.doIt();
-    assertEquals(1, onlyComplete.getTasks().size());
+    assertEquals(2, onlyComplete.getTasks().size());
 
     da.viewComplete = false;
     da.viewOverdue = true;
@@ -53,6 +59,6 @@ public class DisplayActionTest {
     da.viewOverdue = false;
     Result onlyIncomplete = da.doIt();
     assertEquals(1, onlyIncomplete.getTasks().size());
-  }
 
+  }
 }
