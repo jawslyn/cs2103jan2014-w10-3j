@@ -83,7 +83,6 @@ public class DateUtilTest {
     // DateTime base = new DateTime(2014, 3, 27, 0, 0, 0, 0); // this is a
     // thursday
     // DateTime result, expected;
-    //
     // expected = base.plusDays(8);
     //
     // result = DateUtil.parse("next friday".split(" "));
@@ -97,6 +96,7 @@ public class DateUtilTest {
     //
     // expected = base.plusDays(11);
     // result = DateUtil.parse("Next monday".split(" "));
+    // assertTrue(expected.isSameDayAs(result));
     // assertTrue(expected.isSameDayAs(result));
   }
 
@@ -123,6 +123,12 @@ public class DateUtilTest {
 
   @Test
   public void parseDate_invalidDates_returnsNullDateTime() throws Exception {
+
+    actual = DateUtil.parseDate("34-3-12");
+    assertNull(actual);
+
+    actual = DateUtil.parseDate("4-23-12");
+    assertNull(actual);
   }
 
   /*
@@ -172,6 +178,9 @@ public class DateUtilTest {
     expected = DateTime.forTimeOnly(1, 45, 0, 0);
     assertEquals(expected.getHour(), date.getHour());
     assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("91.45am");
+    assertNull(date);
   }
 
   @Test

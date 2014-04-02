@@ -28,6 +28,7 @@ public class FeedbackController {
   private static final Paint IMPT_COLOUR = Color.RED;
   private static final Paint SUCCESS_COLOUR = Color.rgb(13, 255, 166);
   private static final Paint NORMAL_COLOUR = Color.rgb(86, 255, 0);
+  public static double width = 800 - 90;
 
   private VBox output;
 
@@ -105,6 +106,7 @@ public class FeedbackController {
    * Displays a list of task. Shows header, and then list the tasks under that
    * header. This is very coupled to TaskListDisplayer, as the header that is
    * displayed depends on it.
+    text.setWrappingWidth(width);
    */
   public void displayTasks(List<Task> tasks) {
     if (tasks == null) {
@@ -125,6 +127,8 @@ public class FeedbackController {
         }
       }
     }
+    id.setWrappingWidth(0.08 * width);
+    title.setWrappingWidth(0.6 * width);
   }
 
   /*
@@ -214,19 +218,18 @@ public class FeedbackController {
    */
   public HBox makeDisplayBoxForTask(Task t) {
     HBox hbox = new HBox();
-    hbox.getStyleClass().add("task");
-    hbox.setSpacing(5);
-    hbox.getChildren().addAll(makeId(t), makeImpt(t), makeTitle(t),
-        makeSeparator(), makeDate(t));
-    return hbox;
-  }
+    hbox.setMinWidth(width);
+    hbox.setMaxWidth(width);
+    hbox.setPrefWidth(width);
+    Text text = makeNormalText(message);
+    text.setWrappingWidth(0.85 * width);
+    hbox.getChildren().add(text);
 
   public Text makeErrorText(String message) {
     Text text = new Text(message);
     text.setFill(ERROR_COLOUR);
     return text;
   }
-
   /*
    * Builds a Text that shows the ID of the task. The id will be in square
    * brackets: [1]

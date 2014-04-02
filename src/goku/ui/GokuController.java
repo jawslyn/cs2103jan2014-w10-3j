@@ -59,6 +59,9 @@ public class GokuController {
   private ScrollPane scrollPane;
 
   @FXML
+  private AnchorPane scrollAnchorPane;
+
+  @FXML
   private TextField inputField;
 
   @FXML

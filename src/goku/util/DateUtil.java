@@ -306,29 +306,21 @@ public class DateUtil {
    * Parses a string into a DateTime where only the date matters. We can handled
    * cases: 1) Day and Month specified, 2) Day and Month and Year specified
    */
+  // dd/mm or dd/mm/yy
+
   public static DateTime parseDate(String string) {
-    String date[] = new String[0];
-    if (string.contains("-")) {
-      date = string.split("-");
-    } else if (string.contains("/")) {
-      date = string.split("/");
+    if (string.matches("(([02]?[0-9])|(3[01]))[/-]([1-9]?|1[0-2])[/-]?\\d*")) {
+      String date[] = string.split("[-/]");
+      Integer day, month, year;
+      day = Integer.parseInt(date[0]);
+      month = Integer.parseInt(date[1]);
+      year = date.length > 2 ? Integer.parseInt(date[2]) + 2000 : getNow()
+          .getYear();
+
+      return DateTime.forDateOnly(year, month, day);
+    } else {
+      return null;
     }
-    if (date.length == 2) {
-      Integer yearNow = getNow().getYear();
-      return DateTime.forDateOnly(yearNow, Integer.parseInt(date[1]),
-          Integer.parseInt(date[0]));
-    } else if (date.length == 3) {
-      // this is needed because most users will type the year 2014 as 14
-      // and if we do not prepend with 20, the actual date formed will be year
-      // 14 instead of 2014
-      String possibleYear = date[2];
-      if (possibleYear.length() == 2) {
-        possibleYear = "20" + possibleYear;
-      }
-      return DateTime.forDateOnly(Integer.parseInt(possibleYear),
-          Integer.parseInt(date[1]), Integer.parseInt(date[0]));
-    }
-    return null;
   }
 
   /*
@@ -392,11 +384,18 @@ public class DateUtil {
       }
       if (results.length > 1) {
         min = Integer.parseInt(results[1]);
+      }
+      if (results.length > 1) {
+        min = Integer.parseInt(results[1]);
       } else {
+        min = 0;
         min = 0;
       }
       return DateTime.forTimeOnly(hour, min, 0, 0);
+      return DateTime.forTimeOnly(hour, min, 0, 0);
     } else {
+      return null;
+    }
       return null;
     }
   }
