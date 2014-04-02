@@ -123,6 +123,7 @@ public class DateUtilTest {
 
   @Test
   public void parseDate_invalidDates_returnsNullDateTime() throws Exception {
+    DateTime actual;
 
     actual = DateUtil.parseDate("34-3-12");
     assertNull(actual);

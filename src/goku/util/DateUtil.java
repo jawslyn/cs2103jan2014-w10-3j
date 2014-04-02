@@ -392,10 +392,7 @@ public class DateUtil {
         min = 0;
       }
       return DateTime.forTimeOnly(hour, min, 0, 0);
-      return DateTime.forTimeOnly(hour, min, 0, 0);
     } else {
-      return null;
-    }
       return null;
     }
   }

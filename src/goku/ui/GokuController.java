@@ -159,7 +159,7 @@ public class GokuController {
     } catch (FileNotFoundException e) {
       LOGGER.warning("File cannot be found, no tasks loaded.");
       feedbackController
-          .displayLine("Seems like you're new!\nA file called \"store.goku\" has been created to save your tasks!");
+          .displayLine("Seems like you're new!\nA file called \"store.goku\" has been created to save your tasks!\nType \"help\" to get a quick guide.");
     } catch (IOException e) {
       LOGGER.warning("Error loading file, no tasks loaded.");
     } catch (LoadTasksException e) {
