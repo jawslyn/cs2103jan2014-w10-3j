@@ -37,7 +37,6 @@
 #scrollPane .scroll-bar:vertical .track {
 	-fx-background-color: rgba(50, 50, 50, 1);
 	-fx-background-radius: 0;
-	-fx-padding
 }
 
 #scrollPane .scroll-bar:vertical .thumb {
@@ -84,7 +83,7 @@
 	-fx-background-color: rgba(0, 0, 0, 0);
 	-fx-padding: 15 20 5 20;
 }
-W
+
 .separator {
 	/*
 	-fx-border-width: 0 0 1 0;
