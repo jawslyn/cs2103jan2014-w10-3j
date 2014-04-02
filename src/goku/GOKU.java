@@ -41,4 +41,9 @@ public class GOKU {
     _list = list;
   }
 
+  public void addToTaskList(TaskList list) {
+    for (Task task : list) {
+      _list.addTask(task);
+    }
+  }
 }

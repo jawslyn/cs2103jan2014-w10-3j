@@ -28,6 +28,10 @@ public class AutoCompleteEngine {
     }
   }
 
+  public void addCompletion(String completion) {
+    wordAuto.addToCorpus(completion);
+  }
+
   public int getCommandContext() {
     return -1;
   }
@@ -35,5 +39,4 @@ public class AutoCompleteEngine {
   public int getNormalContext() {
     return 0;
   }
-
 }

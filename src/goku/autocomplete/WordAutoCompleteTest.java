@@ -67,7 +67,14 @@ public class WordAutoCompleteTest {
     assertArraysHaveSameElements(expected, actual);
     actual = listToArray(auto.complete(PREFIX_WITHOUT_COMPLETION_2));
     assertArraysHaveSameElements(expected, actual);
+  }
 
+  @Test
+  public void complete_addNewCompletion_returnsNewCompletion() throws Exception {
+    auto.addToCorpus("xhello");
+    String[] expected = { "xhello" }, actual;
+    actual = listToArray(auto.complete("x"));
+    assertArraysHaveSameElements(expected, actual);
   }
 
   String[] listToArray(List<String> list) {

@@ -84,7 +84,7 @@ public class GokuController {
     storage = StorageFactory.getDefaultStorage();
 
     try {
-      goku.setTaskList(storage.loadStorage());
+      goku.addToTaskList(storage.loadStorage());
       doAction(new GreetAction(goku));
     } catch (FileNotFoundException e) {
       LOGGER.warning("File cannot be found, no tasks loaded.");
@@ -96,8 +96,10 @@ public class GokuController {
       LOGGER
           .warning("Error parsing JSON, loaded tasks to the best of my ability.");
       feedbackController.displayErrorMessage(e.getMessage());
-      goku.setTaskList(e.getLoadedTasks());
+      goku.addToTaskList(e.getLoadedTasks());
     }
+
+    completionController.updateWithTaskList(goku.getTaskList());
   }
 
   /*

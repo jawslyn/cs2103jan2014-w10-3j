@@ -1,5 +1,7 @@
 package goku.ui;
 
+import goku.Task;
+import goku.TaskList;
 import goku.autocomplete.AutoCompleteEngine;
 
 import java.util.List;
@@ -10,6 +12,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+
+import com.google.common.base.Splitter;
 
 public class CompletionController {
   private AutoCompleteEngine auto;
@@ -168,4 +172,14 @@ public class CompletionController {
     suggestionList.getChildren().add(new Text(suggestion));
   }
 
+  public void updateWithTaskList(TaskList taskList) {
+    for (Task task : taskList) {
+      List<String> titleList = Splitter.on(' ').omitEmptyStrings()
+          .trimResults().splitToList(task.getTitle());
+      String[] titleTokens = titleList.toArray(new String[titleList.size()]);
+      for (String tokens : titleTokens) {
+        auto.addCompletion(tokens);
+      }
+    }
+  }
 }
