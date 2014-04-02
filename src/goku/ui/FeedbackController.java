@@ -28,6 +28,7 @@ public class FeedbackController {
   private static final Paint IMPT_COLOUR = Color.RED;
   private static final Paint SUCCESS_COLOUR = Color.rgb(13, 255, 166);
   private static final Paint NORMAL_COLOUR = Color.rgb(86, 255, 0);
+  public static double width = 800 - 90;
 
   private VBox output;
 
@@ -68,6 +69,7 @@ public class FeedbackController {
     clearArea();
     HBox hbox = new HBox();
     Text text = makeErrorText("Error: " + message);
+    text.setWrappingWidth(width);
     hbox.getChildren().add(text);
     displayLine(hbox);
   }
@@ -119,6 +121,7 @@ public class FeedbackController {
   public Text makeId(Task task) {
     Text id = makeNormalText("[" + String.valueOf(task.getId()) + "]");
     id.getStyleClass().addAll("task-id");
+    id.setWrappingWidth(0.08 * width);
     return id;
   }
 
@@ -139,7 +142,7 @@ public class FeedbackController {
   public HBox makeTitle(Task task) {
     HBox hbox = new HBox();
     Text title = makeNormalText(task.getTitle());
-    title.setWrappingWidth(output.getWidth() - 300);
+    title.setWrappingWidth(0.6 * width);
     hbox.getChildren().add(title);
     HBox.setHgrow(title, Priority.NEVER);
     return hbox;
@@ -217,9 +220,13 @@ public class FeedbackController {
    */
   public void displayLine(String message) {
     HBox hbox = new HBox();
-    hbox.getChildren().add(makeNormalText(message));
+    hbox.setMinWidth(width);
+    hbox.setMaxWidth(width);
+    hbox.setPrefWidth(width);
+    Text text = makeNormalText(message);
+    text.setWrappingWidth(0.85 * width);
+    hbox.getChildren().add(text);
     output.getChildren().add(hbox);
-
   }
 
   /*
