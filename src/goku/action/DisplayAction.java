@@ -10,6 +10,7 @@ import java.util.List;
 public class DisplayAction extends Action {
 
   private static final String MSG_SUCCESS = "Here are your tasks!";
+  private static final String MSG_SUCCESS_COMPLETED = "Here are your completed tasks!";
   private static final String MSG_SUCCESS_OVERDUE = "Here are your overdue tasks!";
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
   private static final String MSG_NO_COMPLETED = "You have not completed any tasks!\nTry \"done [ID]\" to mark a task as completed!";
@@ -29,7 +30,8 @@ public class DisplayAction extends Action {
     if (list.getAllCompleted().isEmpty()) {
       return new Result(false, null, MSG_NO_COMPLETED, null);
     } else {
-      return new Result(true, MSG_SUCCESS, null, list.getAllCompleted());
+      return new Result(true, MSG_SUCCESS_COMPLETED, null,
+          list.getAllCompleted());
     }
   }
 

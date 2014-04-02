@@ -72,13 +72,13 @@ public class Task implements Storeable {
   public String toString() {
     StringBuffer sb = new StringBuffer();
 
-    sb.append(impt ? "(!) " : "");    
+    sb.append(impt == null ? "" : (impt ? "(!) " : ""));
     sb.append("[" + id + "] ");
-    
+
     if (title != null) {
       sb.append(title);
     }
-    
+
     if (deadline != null) {
       sb.append(" | by ");
       sb.append(DateOutput.formatDateTimeDayMonthHourMin(deadline));

@@ -14,10 +14,6 @@ import java.util.TimeZone;
 public class TaskListDisplayer {
   PrintStream ps;
 
-  DateTime now = DateUtil.getNow();
-
-  DateTime tmr = now.plusDays(1);
-
   public TaskListDisplayer(PrintStream ps) {
     this.ps = ps;
   }
@@ -27,13 +23,17 @@ public class TaskListDisplayer {
     if (list == null) {
       return ht;
     }
+
     ArrayList<Task> overdue = new ArrayList<Task>();
     ArrayList<Task> today = new ArrayList<Task>();
     ArrayList<Task> tomorrow = new ArrayList<Task>();
     ArrayList<Task> remaining = new ArrayList<Task>();
+    ArrayList<Task> completed = new ArrayList<Task>();
 
     for (Task task : list) {
-      if (isOver(task)) {
+      if (task.isDone() != null && task.isDone()) {
+        completed.add(task);
+      } else if (isOver(task)) {
         overdue.add(task);
       } else if (isToday(task)) {
         today.add(task);
@@ -43,6 +43,8 @@ public class TaskListDisplayer {
         remaining.add(task);
       }
     }
+
+    ht.put("completed", completed);
     ht.put("overdue", overdue);
     ht.put("today", today);
     ht.put("tomorrow", tomorrow);
@@ -111,14 +113,14 @@ public class TaskListDisplayer {
     if (dateRange == null) {
       return false;
     }
-    return isToday(dateRange.getEndDate());
+    return dateRange.containsDate(DateUtil.getNow());
   }
 
   private boolean isToday(DateTime date) {
     if (date == null) {
       return false;
     }
-    return now.isSameDayAs(date);
+    return DateUtil.getNow().isSameDayAs(date);
   }
 
   private boolean isToday(Task task) {
@@ -129,14 +131,14 @@ public class TaskListDisplayer {
     if (dateRange == null) {
       return false;
     }
-    return tmr.isSameDayAs(dateRange.getStartDate());
+    return DateUtil.getNow().plusDays(1).isSameDayAs(dateRange.getStartDate());
   }
 
   private boolean isTomorrow(DateTime date) {
     if (date == null) {
       return false;
     }
-    return tmr.isSameDayAs(date);
+    return DateUtil.getNow().plusDays(1).isSameDayAs(date);
 
   }
 
