@@ -85,21 +85,27 @@ public class FeedbackController {
     HBox hbox = new HBox();
     HBox hboxOverdue = new HBox();
     hbox.setSpacing(10);
-    Text status, message, overdueMsg = makeNormalText("       You have overdue tasks, \"view overdue\" to see them.");
+    Text status, message, overdueMsg = makeNormalText("You have overdue tasks, \"view overdue\" to see them.");
 
     hboxOverdue.getChildren().add(overdueMsg);
 
     if (result.isSuccess()) {
       status = makeSuccessText("Yay!");
-      message = makeNormalText(result.getSuccessMsg());
+      message = makeResultMsg(result.getSuccessMsg());
     } else {
       status = makeErrorText("Error!");
-      message = makeNormalText(result.getErrorMsg());
+      message = makeResultMsg(result.getErrorMsg());
     }
     hbox.getChildren().addAll(status, message);
     displayLine(hbox);
     displayLine("");
     displayTasks(result.getTasks());
+  }
+
+  private Text makeResultMsg(String msg) {
+    Text text = new Text(msg);
+    text.setFill(NORMAL_COLOUR);
+    return text;
   }
 
   /*
@@ -237,6 +243,7 @@ public class FeedbackController {
   public Text makeId(Task task) {
     Text id = makeNormalText("[" + String.valueOf(task.getId()) + "]");
     id.getStyleClass().addAll("task-id");
+    id.setWrappingWidth(0.08 * width);
     return id;
   }
 
@@ -248,6 +255,7 @@ public class FeedbackController {
    */
   public Text makeImpt(Task task) {
     Text impt = makeImptText(task.getImpt() ? "(!)" : "   ");
+    impt.setWrappingWidth(0.05 * width);
     return impt;
   }
 
@@ -289,7 +297,7 @@ public class FeedbackController {
   public HBox makeTitle(Task task) {
     HBox hbox = new HBox();
     Text title = makeNormalText(task.getTitle());
-    title.setWrappingWidth(output.getWidth() - 300);
+    title.setWrappingWidth(output.getWidth() - 100);
     hbox.getChildren().add(title);
     HBox.setHgrow(title, Priority.NEVER);
     return hbox;
