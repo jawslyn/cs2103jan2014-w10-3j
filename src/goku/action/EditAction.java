@@ -16,6 +16,8 @@ public class EditAction extends Action {
 
   public static final String ERR_INSUFFICIENT_ARGS_FOR_COMPLETION = "Can't complete, need ID! Try \"do 1\"";
 
+  public static final String ERR_NO_ID_GIVEN = ERR_INSUFFICIENT_ARGS;
+
   private final String MSG_SUCCESS = "edited task %d";
 
   public int id;
@@ -50,6 +52,7 @@ public class EditAction extends Action {
 
   @Override
   public Result doIt() {
+    addToUndoList();
     if (removeDeadline) {
       doRemoveDeadline();
     } else if (removeImportant) {
@@ -57,7 +60,6 @@ public class EditAction extends Action {
     } else if (removePeriod) {
       doRemovePeriod();
     }
-    addToUndoList();
     return updateTask();
   }
 

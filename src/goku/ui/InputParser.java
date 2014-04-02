@@ -321,7 +321,7 @@ public class InputParser {
         editAction.title = title;
       }
     } catch (NumberFormatException e) {
-      return null;
+      throw new MakeActionException(EditAction.ERR_NO_ID_GIVEN);
     }
     return editAction;
   }

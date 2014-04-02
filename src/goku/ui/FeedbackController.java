@@ -128,8 +128,8 @@ public class FeedbackController {
    * @param task task to be shown
    */
   public Text makeImpt(Task task) {
-      Text impt = makeImptText(task.getImpt() ? "(!)" : "   ");
-      return impt;
+    Text impt = makeImptText(task.getImpt() ? "(!)" : "   ");
+    return impt;
   }
 
   /*
