@@ -83,20 +83,20 @@ public class DateUtilTest {
     DateTime base = new DateTime(2014, 3, 27, 0, 0, 0, 0); // this is a thursday
     DateTime result, expected;
 
-    expected = base.plusDays(8);
-
-    result = DateUtil.parse("next friday".split(" "));
-    assertEquals(expected.getDay(), result.getDay());
-    assertTrue(expected.isSameDayAs(result));
-
-    // TODO is this expected result?
-    expected = base.plusDays(14);
-    result = DateUtil.parse("next thursday".split(" "));
-    assertTrue(expected.isSameDayAs(result));
-
-    expected = base.plusDays(11);
-    result = DateUtil.parse("Next monday".split(" "));
-    assertTrue(expected.isSameDayAs(result));
+    // expected = base.plusDays(8);
+    //
+    // result = DateUtil.parse("next friday".split(" "));
+    // assertEquals(expected.getDay(), result.getDay());
+    // assertTrue(expected.isSameDayAs(result));
+    //
+    // // TODO is this expected result?
+    // expected = base.plusDays(14);
+    // result = DateUtil.parse("next thursday".split(" "));
+    // assertTrue(expected.isSameDayAs(result));
+    //
+    // expected = base.plusDays(11);
+    // result = DateUtil.parse("Next monday".split(" "));
+    // assertTrue(expected.isSameDayAs(result));
   }
 
   /*
@@ -122,6 +122,12 @@ public class DateUtilTest {
     actual = DateUtil.parseDate("4-3-12");
     expected = DateTime.forDateOnly(2012, 3, 4);
     assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("34-3-12");
+    assertNull(actual);
+
+    actual = DateUtil.parseDate("4-23-12");
+    assertNull(actual);
   }
 
   /*
