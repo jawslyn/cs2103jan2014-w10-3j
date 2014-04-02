@@ -107,9 +107,11 @@ public class SearchAction extends Action {
     task.setDeadline(dline);
     List<Task> foundTasks = list.findTaskByDeadline(dline);
     if (foundTasks.size() != 0) {
-      return new Result(true, String.format(MSG_SUCCESS, DateUtil.toString(dline)), null, foundTasks);
+      return new Result(true, String.format(MSG_SUCCESS,
+          DateUtil.toString(dline)), null, foundTasks);
     } else {
-      return new Result(false, null, editMsgIfHaveOverdue(String.format(MSG_FAIL, DateUtil.toString(dline))), null);
+      return new Result(false, null, editMsgIfHaveOverdue(String.format(
+          MSG_FAIL, DateUtil.toString(dline))), null);
     }
   }
 
@@ -132,7 +134,8 @@ public class SearchAction extends Action {
       }
     }
 
-    return new Result(true, String.format(MSG_SUCCESS, period.toString()), null, tasksDueInPeriod.asList());
+    return new Result(true, String.format(MSG_SUCCESS, period.toString()),
+        null, tasksDueInPeriod.asList());
   }
 
   /*
@@ -149,11 +152,12 @@ public class SearchAction extends Action {
     Task task = new Task();
 
     assert (period != null);
-    
+
     task.setPeriod(period);
     List<Task> foundTasks = list.findTaskByPeriod(period);
     if (foundTasks.size() != 0) {
-      return new Result(true, String.format(MSG_SUCCESS, period), null, foundTasks);
+      return new Result(true, String.format(MSG_SUCCESS, period), null,
+          foundTasks);
     } else {
       return new Result(false, null, editMsgIfHaveOverdue(MSG_FAIL), null);
     }
