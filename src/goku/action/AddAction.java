@@ -47,6 +47,9 @@ public class AddAction extends Action {
     for (Task t : list.getArrayList()) {
       currList.addTaskWithoutSettingId(t);
     }
+
+    currList.setRunningId(list.getRunningId());
+    currList.setUnusedId(list.getUnusedId());
     goku.getUndoList().offer(currList);
   }
 
