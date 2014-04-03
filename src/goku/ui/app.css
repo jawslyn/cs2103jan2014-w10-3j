@@ -1,0 +1,113 @@
+.page {
+	-fx-background-color: rgba(30, 30, 30, 1);
+	-fx-font-family: 'Inconsolata';
+	-fx-text-fill: rgba(86, 255, 0, 1);
+	-fx-font-size: 22;
+}
+
+.input-field {
+	-fx-font-size: 26;
+	-fx-padding: 5 20 5 20;
+	-fx-background-color: rgba(40, 40, 40, 1);
+	-fx-text-fill: rgba(86, 255, 0, 1);
+}
+
+.input-field:focused {
+	
+}
+
+
+#suggestionBox {
+	-fx-background-color: white;
+	-fx-effect: dropshadow(three-pass-box, rgba(40,40,40,0.5), 11, 0.3, 5, 5);
+	-fx-padding: 3 20 3 20;
+}
+
+#suggestionList {
+	-fx-text-origin: baseline;
+}
+
+#scrollPane {
+	-fx-background-color: rgba(0, 0, 0, 0);
+}
+
+#scrollPane .scroll-bar .track {
+	-fx-background-color: rgba(50, 50, 50, 1);
+	-fx-background-radius: 0;
+}
+
+#scrollPane .scroll-bar .thumb {
+	-fx-background-color: rgba(35, 35, 35, 1);
+	-fx-background-radius: 0;
+}
+
+#scrollPane .scroll-bar .increment-button {
+	-fx-background-color: rgba(30, 30, 30, 1);
+	-fx-border-color: rgba(60, 60, 60, 1);
+	-fx-border-width: 2;
+}
+
+#scrollPane .scroll-bar .increment-button .increment-arrow{
+	-fx-background-color: rgba(86, 255, 0, 1);
+}
+
+#scrollPane .scroll-bar .decrement-button {
+	-fx-background-color: rgba(30, 30, 30, 1);
+	-fx-border-color: rgba(60, 60, 60, 1);
+	-fx-border-width: 2;
+}
+
+#scrollPane .scroll-bar .decrement-button .decrement-arrow{
+	-fx-background-color: rgba(86, 255, 0, 1);
+}
+
+#scrollPane .scroll-bar:hover .track,
+#scrollPane .scroll-bar:pressed .track{
+	-fx-opacity: 0.9;	
+}
+
+#scrollPane .scroll-bar .thumb:hover;
+#scrollPane .scroll-bar .thumb:pressed {
+	-fx-opacity: 0.8;	
+}
+
+#scrollPane .scroll-bar .decrement-button:hover;
+#scrollPane .scroll-bar .increment-button:pressed {
+	-fx-background-color: rgba(60, 60, 60, 1);
+}
+
+#outputField {
+	-fx-background-color: rgba(0, 0, 0, 0);
+}
+
+.separator {
+	/*
+	-fx-border-width: 0 0 1 0;
+	-fx-border-color: rgba(86, 255, 0, 1);
+	-fx-border-style: dotted;
+	*/
+}
+
+.task {
+	-fx-font-size: 20;
+}
+
+.task-id {
+	
+}
+
+.task-title {
+}
+
+.check-box {
+}
+
+.task-title:focused {
+}
+
+.task-deadline {
+}
+
+.task-period {
+	
+}
