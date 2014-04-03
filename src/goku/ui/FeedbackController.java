@@ -66,7 +66,7 @@ public class FeedbackController {
     idColumn.setPercentWidth(12);
     ColumnConstraints titleColumn = new ColumnConstraints();
     ColumnConstraints dateColumn = new ColumnConstraints();
-    dateColumn.setPercentWidth(23);
+    dateColumn.setPercentWidth(30);
 
     grid.getColumnConstraints().addAll(idColumn, titleColumn, dateColumn);
     return grid;
@@ -184,29 +184,36 @@ public class FeedbackController {
 
   private void displayTaskListHeader(String header) {
     HBox hbox = new HBox();
-    Label label = new Label(header);
+    Label label = new Label("-" + header.toUpperCase() + "-");
     label.setTextAlignment(TextAlignment.CENTER);
-    label.setTextFill(NORMAL_COLOUR);
+    label.setTextFill(HEADER_COLOUR);
     hbox.getChildren().add(label);
     hbox.setAlignment(Pos.BOTTOM_CENTER);
-    // GridPane output = makeNewPage();
     output.add(hbox, 0, lines++, numColumns, 1);
-    // vbox.getChildren().add(output);
   }
 
   private void displayTaskOnLine(Task task) {
-    // GridPane output = makeNewPage();
     Label id = new Label("[" + task.getId().toString() + "]");
-    id.setTextFill(NORMAL_COLOUR);
+    id.setTextFill(ID_COLOUR);
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
     Label date = new Label(makeDate(task).getText());
     date.setTextFill(NORMAL_COLOUR);
     date.setWrapText(true);
+    Label dateIcon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    dateIcon.setTextFill(NORMAL_COLOUR);
+    HBox dateHbox = new HBox();
+    // dateHbox.setSpacing(10);
+    // dateHbox.setAlignment(Pos.CENTER);
+    if (date.getText().isEmpty()) {
+      dateHbox.getChildren().add(date);
+    } else {
+      dateHbox.getChildren().addAll(dateIcon, date);
+    }
     output.add(id, 0, lines);
     output.add(title, 1, lines);
-    output.add(date, 2, lines);
+    output.add(dateHbox, 2, lines);
     lines++;
   }
 
