@@ -48,6 +48,10 @@ public class TaskList implements Iterable<Task> {
     for (Task task : _list) {
       cloned.addTaskWithoutSettingId(task);
     }
+
+    cloned.runningId = runningId;
+    cloned.unusedId = unusedId;
+
     return cloned;
   }
 
