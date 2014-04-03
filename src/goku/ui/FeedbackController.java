@@ -83,11 +83,8 @@ public class FeedbackController {
     clearArea();
 
     HBox hbox = new HBox();
-    HBox hboxOverdue = new HBox();
     hbox.setSpacing(10);
-    Text status, message, overdueMsg = makeNormalText("You have overdue tasks, \"view overdue\" to see them.");
-
-    hboxOverdue.getChildren().add(overdueMsg);
+    Text status, message;
 
     if (result.isSuccess()) {
       status = makeSuccessText("Yay!");
@@ -102,12 +99,6 @@ public class FeedbackController {
     displayTasks(result.getTasks());
   }
 
-  private Text makeResultMsg(String msg) {
-    Text text = new Text(msg);
-    text.setFill(NORMAL_COLOUR);
-    return text;
-  }
-
   /*
    * Displays a list of task. Shows header, and then list the tasks under that
    * header. This is very coupled to TaskListDisplayer, as the header that is
@@ -119,7 +110,8 @@ public class FeedbackController {
     }
     TaskListDisplayer tld = new TaskListDisplayer(System.out);
     Hashtable<String, List<Task>> ht = tld.build(tasks);
-    String[] headers = { "overdue", "today", "tomorrow", "remaining" };
+    String[] headers = { "overdue", "today", "tomorrow", "remaining",
+        "completed" };
     for (String header : Arrays.asList(headers)) {
       if (ht.get(header).size() != 0) {
         displayLine(makeDateHeader(header));
@@ -267,6 +259,12 @@ public class FeedbackController {
 
   public Text makeNormalText(String message) {
     Text text = new Text(message);
+    text.setFill(NORMAL_COLOUR);
+    return text;
+  }
+
+  private Text makeResultMsg(String msg) {
+    Text text = new Text(msg);
     text.setFill(NORMAL_COLOUR);
     return text;
   }

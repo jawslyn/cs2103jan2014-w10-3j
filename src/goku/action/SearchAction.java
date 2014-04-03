@@ -128,14 +128,18 @@ public class SearchAction extends Action {
     Result byPeriod = searchByPeriod();
     TaskList tasksDueInPeriod = new TaskList();
 
-    for (Task task : byPeriod.getTasks()) {
-      if (task.getDeadline() != null) {
-        tasksDueInPeriod.addTaskWithoutSettingId(task);
+    if (byPeriod.getTasks() != null) {
+      for (Task task : byPeriod.getTasks()) {
+        if (task.getDeadline()!=null && DateUtil.isEarlierOrOn(task.getDeadline(), dline)) {
+          tasksDueInPeriod.addTaskWithoutSettingId(task);
+        }
       }
-    }
 
-    return new Result(true, String.format(MSG_SUCCESS, period.toString()),
-        null, tasksDueInPeriod.asList());
+      return new Result(true, String.format(MSG_SUCCESS, period.toString()),
+          null, tasksDueInPeriod.asList());
+    } else {
+      return new Result(false, null, editMsgIfHaveOverdue(MSG_FAIL), null);
+    }
   }
 
   /*

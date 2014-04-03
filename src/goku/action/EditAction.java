@@ -7,6 +7,10 @@ import goku.Task;
 import goku.TaskList;
 import hirondelle.date4j.DateTime;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /*
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
@@ -41,11 +45,29 @@ public class EditAction extends Action {
       currList.addTaskWithoutSettingId(t);
     }
 
+    List<Integer> idList = new ArrayList<Integer>();
+    for (Integer id : list.getUnusedId()) {
+      idList.add(id);
+    }
+
+    Collections.sort(idList);
+    currList.setRunningId(list.getRunningId());
+    currList.setUnusedId(idList);
+
     TaskList newCurrList = new TaskList();
     for (Task t : currList) {
       Task newT = new Task(t);
       newCurrList.addTaskWithoutSettingId(newT);
     }
+
+    List<Integer> newIdList = new ArrayList<Integer>();
+    for (Integer id : list.getUnusedId()) {
+      newIdList.add(id);
+    }
+
+    Collections.sort(newIdList);
+    newCurrList.setRunningId(list.getRunningId());
+    newCurrList.setUnusedId(newIdList);
 
     goku.getUndoList().offer(newCurrList);
   }
