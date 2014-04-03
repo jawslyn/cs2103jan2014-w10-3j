@@ -173,9 +173,11 @@ public class FeedbackController {
   private Text makeDateRange(Task t) {
     DateRange period = t.getDateRange();
     Text range = makeNormalText("from "
-        + DateOutput.formatDateTimeDayMonthHourMin(period.getStartDate())
+        + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+            .getStartDate())
         + "\nto "
-        + DateOutput.formatDateTimeDayMonthHourMin(period.getEndDate()));
+        + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+            .getEndDate()));
     range.getStyleClass().addAll("task-date-range");
     return range;
   }
@@ -187,14 +189,14 @@ public class FeedbackController {
    */
   private Text makeDeadline(Task t) {
     Text deadline = makeNormalText("by "
-        + DateOutput.formatTimeOnly12h(t.getDeadline()));
+        + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
     deadline.getStyleClass().addAll("task-deadline");
     return deadline;
   }
 
   private Text makeDeadlineForRemaining(Task t) {
     Text deadline = makeNormalText("by "
-        + DateOutput.formatDateTimeDayMonthHourMin(t.getDeadline()));
+        + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
     deadline.getStyleClass().addAll("task-deadline");
     return deadline;
   }

@@ -23,6 +23,18 @@ public class DateOutput {
   }
 
   /*
+   * converts DateTime -> "1.15pm"
+   */
+  public static String formatTimeOnly12hIgnoreZeroMinutes(DateTime dateTime) {
+    String time = formatTimeOnly12h(dateTime);
+    if (time.substring(time.indexOf(".")).contains("00")) {
+      return time.substring(0, time.indexOf("."))
+          + time.substring(time.indexOf(".") + 3);
+    }
+    return time;
+  }
+
+  /*
    * converts DateTime -> "08:50h"
    */
   public static String formatTimeOnly24h(DateTime dateTime) {
@@ -65,7 +77,17 @@ public class DateOutput {
     return formatDateOnlyDayMonth(date) + " " + formatTimeOnly12h(date);
   }
 
+  /*
+   * converts DateTime -> "4/10 3pm"
+   */
+  public static String formatDateTimeDayMonthHourMinIgnoreZeroMinutes(
+      DateTime date) {
+    return formatDateOnlyDayMonth(date) + " "
+        + formatTimeOnly12hIgnoreZeroMinutes(date);
+  }
+
   private static long getDifferenceInHours(DateTime now, DateTime date) {
     return (now.numSecondsFrom(date) / 60 / 60);
   }
+
 }
