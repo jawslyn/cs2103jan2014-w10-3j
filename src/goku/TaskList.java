@@ -162,6 +162,10 @@ public class TaskList implements Iterable<Task> {
     return overdue;
   }
 
+  public Integer getRunningId() {
+    return runningId;
+  }
+
   /*
    * @param id
    * 
@@ -178,6 +182,10 @@ public class TaskList implements Iterable<Task> {
 
   protected Task getTaskByIndex(int index) {
     return _list.get(index);
+  }
+
+  public List<Integer> getUnusedId() {
+    return unusedId;
   }
 
   public boolean isFree(DateTime dateTime) {
@@ -212,6 +220,14 @@ public class TaskList implements Iterable<Task> {
       return unusedId.remove(0);
     }
     return runningId++;
+  }
+
+  public void setRunningId(Integer id) {
+    runningId = id;
+  }
+
+  public void setUnusedId(List<Integer> idList) {
+    unusedId = idList;
   }
 
   public int size() {
