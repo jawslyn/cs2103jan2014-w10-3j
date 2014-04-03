@@ -9,14 +9,15 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
@@ -37,64 +38,44 @@ public class FeedbackController {
   private static final Paint NORMAL_COLOUR = Color.rgb(86, 255, 0);
   private static final Paint HEADER_COLOUR = Color.rgb(8, 137, 166);
   private static final Paint ID_COLOUR = Color.web("1A882B");
-  private static final int numColumns = 12;
+  private static final int numColumns = 3;
   // Color.rgb(26, 89, 24);
   public static double width = 800 - 20;
+  private static int lines = 0;
 
   private ScrollPane scrollPane;
 
-  private VBox vbox;
+  private GridPane output;
 
   public FeedbackController(ScrollPane scrollPane) {
     this.scrollPane = scrollPane;
     // this.output = makeNewPage();
     // vbox = new VBox();
-    scrollPane.setContent(vbox);
+    output = makeNewPage();
+    scrollPane.setContent(output);
   }
 
   public GridPane makeNewPage() {
     GridPane grid = new GridPane();
-    grid.setPrefWidth(scrollPane.getPrefWidth() - 20);
-    grid.setMinWidth(scrollPane.getPrefWidth() - 20);
-    grid.setMaxWidth(scrollPane.getPrefWidth() - 20);
-    double percentWidth = scrollPane.getPrefWidth() / 12;
-    double hgap = 15;
-    ColumnConstraints column1 = new ColumnConstraints();
-    column1.setPercentWidth(percentWidth);
-    ColumnConstraints column2 = new ColumnConstraints();
-    column2.setPercentWidth(percentWidth);
-    ColumnConstraints column3 = new ColumnConstraints();
-    column3.setPercentWidth(percentWidth);
-    ColumnConstraints column4 = new ColumnConstraints();
-    column4.setPercentWidth(percentWidth);
-    ColumnConstraints column5 = new ColumnConstraints();
-    column5.setPercentWidth(percentWidth);
-    ColumnConstraints column6 = new ColumnConstraints();
-    column6.setPercentWidth(percentWidth);
-    ColumnConstraints column7 = new ColumnConstraints();
-    column7.setPercentWidth(percentWidth);
-    ColumnConstraints column8 = new ColumnConstraints();
-    column8.setPercentWidth(percentWidth);
-    ColumnConstraints column9 = new ColumnConstraints();
-    column9.setPercentWidth(percentWidth);
-    ColumnConstraints column10 = new ColumnConstraints();
-    column10.setPercentWidth(percentWidth);
-    ColumnConstraints column11 = new ColumnConstraints();
-    column11.setPercentWidth(percentWidth);
-    ColumnConstraints column12 = new ColumnConstraints();
-    column12.setPercentWidth(percentWidth);
-    grid.getColumnConstraints().addAll(column1, column2, column3, column4,
-        column5, column6, column7, column8, column9, column10, column11,
-        column12);
-    grid.setHgap(hgap);
+    AnchorPane.setLeftAnchor(grid, 40.0);
+    AnchorPane.setRightAnchor(grid, 40.0);
+    grid.setPrefWidth(800 - 40);
+    grid.setPadding(new Insets(0, 10, 0, 40));
+
+    ColumnConstraints idColumn = new ColumnConstraints();
+    idColumn.setPercentWidth(12);
+    ColumnConstraints titleColumn = new ColumnConstraints();
+    ColumnConstraints dateColumn = new ColumnConstraints();
+    dateColumn.setPercentWidth(23);
+
+    grid.getColumnConstraints().addAll(idColumn, titleColumn, dateColumn);
     return grid;
   }
 
   public void clearArea() {
-    vbox.getChildren().clear();
-    // this.output = makeNewPage();
-    // scrollPane.setContent(output);
-    // lines = 0; output.getChildren().clear();
+    this.output = makeNewPage();
+    scrollPane.setContent(output);
+    lines = 0;
   }
 
   /*
@@ -113,9 +94,10 @@ public class FeedbackController {
   }
 
   private void displayLine(Label label) {
-    GridPane output = makeNewPage();
-    output.add(label, 0, 0, numColumns, 1);
-    vbox.getChildren().add(output);
+    // GridPane output = makeNewPage();
+    output.add(label, 0, lines++, numColumns + 1, 1);
+    // output.add(label, 0, lines, numColumns, 1);
+    // vbox.getChildren().add(output);
   }
 
   /*
@@ -124,12 +106,15 @@ public class FeedbackController {
    * @param message the string to be printed
    */
   public void displayLine(String message) {
-    Label l = new Label(message);
-    l.setTextFill(NORMAL_COLOUR);
-    l.getStyleClass().add("normal-text");
-    GridPane output = makeNewPage();
-    output.add(l, 0, 0, numColumns, 1);
-    vbox.getChildren().add(output);
+    if (message.length() <= 60) {
+      Label l = new Label(message);
+      l.setTextFill(NORMAL_COLOUR);
+      output.add(l, 0, lines, numColumns + 1, 1);
+      lines++;
+    } else {
+      displayLine(message.substring(0, 60));
+      displayLine(message.substring(61));
+    }
   }
 
   /*
@@ -204,26 +189,25 @@ public class FeedbackController {
     label.setTextFill(NORMAL_COLOUR);
     hbox.getChildren().add(label);
     hbox.setAlignment(Pos.BOTTOM_CENTER);
-    hbox.setStyle("-fx-background-color:blue");
-    GridPane output = makeNewPage();
-    output.add(hbox, 0, 0, numColumns, 1);
-    vbox.getChildren().add(output);
+    // GridPane output = makeNewPage();
+    output.add(hbox, 0, lines++, numColumns, 1);
+    // vbox.getChildren().add(output);
   }
 
   private void displayTaskOnLine(Task task) {
-    GridPane output = makeNewPage();
+    // GridPane output = makeNewPage();
     Label id = new Label("[" + task.getId().toString() + "]");
     id.setTextFill(NORMAL_COLOUR);
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
-    // Label date = new Label(makeDate(task).getText());
-    // date.setTextFill(NORMAL_COLOUR);
-    // date.setWrapText(true);
-    output.add(id, 0, 0, 2, 1);
-    output.add(title, 2, 0, 7, 1);
-    // output.add(date, 9, 0, 3, 1);
-    vbox.getChildren().add(output);
+    Label date = new Label(makeDate(task).getText());
+    date.setTextFill(NORMAL_COLOUR);
+    date.setWrapText(true);
+    output.add(id, 0, lines);
+    output.add(title, 1, lines);
+    output.add(date, 2, lines);
+    lines++;
   }
 
   /*
@@ -414,10 +398,5 @@ public class FeedbackController {
   public void sayGoodbye() {
     clearArea();
     displayLine("Goodbye!");
-  }
-
-  public void setOutputBox(VBox outputBox) {
-    this.vbox = outputBox;
-    scrollPane.setContent(vbox);
   }
 }

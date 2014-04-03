@@ -11,46 +11,9 @@
 
 <AnchorPane id="AnchorPane" fx:id="page" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="" styleClass="page" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="goku.ui.GokuController">
   <children>
-    <ScrollPane fx:id="scrollPane" prefHeight="-1.0" prefWidth="800.0" style="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+    <ScrollPane fx:id="scrollPane" prefHeight="-1.0" prefWidth="800.0" style="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
       <content>
-        <AnchorPane prefHeight="-1.0" prefWidth="800.0">
-          <children>
-            <VBox id="Output" fx:id="outputBox" prefHeight="-1.0" prefWidth="-1.0" style="" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="20.0">
-              <children>
-                <Label text="Label" />
-                <GridPane prefHeight="85.0" prefWidth="735.0">
-                  <children>
-                    <Label text="asdjfalsjfkasjdfaskasdjfalsjfkasjdfaskasdjfalsjfkasjdfaskasdjfalsjfkasjdfaskasdjfalsjfkasjdfaskasdjfalsjfkasjdfaskasdjfalsjfkasjdfaskasdjfalsjfkasjdfaskasdjfalsjfkasjdfask" textFill="#8fff00" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                  </children>
-                  <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                </GridPane>
-                <GridPane>
-                  <children>
-                    <Label text="Label" textFill="#43ff33" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                  </children>
-                  <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                </GridPane>
-                <TextArea prefWidth="200.0" wrapText="true" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="30.0" stroke="BLACK" strokeType="INSIDE" width="200.0" />
-              </children>
-              <padding>
-                <Insets left="20.0" />
-              </padding>
-            </VBox>
-          </children>
-        </AnchorPane>
+        <AnchorPane prefHeight="-1.0" prefWidth="800.0" style="" />
       </content>
     </ScrollPane>
     <HBox fx:id="titleBar" alignment="CENTER_RIGHT" onMouseDragged="#onTitleBarDrag" onMousePressed="#onTitleBarMousePress" prefHeight="30.0" prefWidth="800.0" style="" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -71,7 +34,6 @@
         <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
       </padding>
     </HBox>
-    <StackPane fx:id="suggestionBox" layoutX="20.0" layoutY="90.0" prefHeight="-1.0" prefWidth="-1.0" style="" visible="false">
     <StackPane fx:id="suggestionBox" layoutX="20.0" layoutY="85.0" prefHeight="-1.0" prefWidth="-1.0" style="" visible="false">
       <children>
         <VBox fx:id="suggestionList" prefHeight="-1.0" prefWidth="-1.0" />

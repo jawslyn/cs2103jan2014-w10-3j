@@ -76,9 +76,6 @@ public class GokuController {
   private AnchorPane scrollAnchorPane;
 
   @FXML
-  private VBox outputBox;
-
-  @FXML
   private TextField inputField;
 
   @FXML
@@ -164,7 +161,7 @@ public class GokuController {
     completionController = new CompletionController(inputField, suggestionBox,
         suggestionList);
     feedbackController = new FeedbackController(scrollPane);
-    feedbackController.setOutputBox(outputBox);
+    // feedbackController.setOutputBox(outputBox);
     historyController = new HistoryController(inputField);
     parser = new InputParser(goku);
     storage = StorageFactory.getDefaultStorage();
