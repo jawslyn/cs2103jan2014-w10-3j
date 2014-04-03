@@ -21,6 +21,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import de.jensd.fx.fontawesome.AwesomeDude;
+import de.jensd.fx.fontawesome.AwesomeIcon;
 
 /*
  * FeedbackController takes care of outputting feedback to user.
@@ -33,8 +35,11 @@ public class FeedbackController {
   private static final Paint IMPT_COLOUR = Color.RED;
   private static final Paint SUCCESS_COLOUR = Color.rgb(13, 255, 166);
   private static final Paint NORMAL_COLOUR = Color.rgb(86, 255, 0);
-  public static double width = 800 - 90;
+  private static final Paint HEADER_COLOUR = Color.rgb(8, 137, 166);
+  private static final Paint ID_COLOUR = Color.web("1A882B");
   private static final int numColumns = 12;
+  // Color.rgb(26, 89, 24);
+  public static double width = 800 - 20;
 
   private ScrollPane scrollPane;
 
@@ -254,8 +259,8 @@ public class FeedbackController {
   private HBox makeDateHeader(String header) {
     HBox hbox = new HBox();
     hbox.setAlignment(Pos.BASELINE_CENTER);
-    Text t = makeNormalText(header.toUpperCase());
-    t.setUnderline(true);
+    Text t = makeNormalText("-" + header.toUpperCase() + "-");
+    t.setFill(HEADER_COLOUR);
     hbox.getChildren().add(t);
     return hbox;
   }
@@ -268,9 +273,11 @@ public class FeedbackController {
   private Text makeDateRange(Task t) {
     DateRange period = t.getDateRange();
     Text range = makeNormalText(""
-        + DateOutput.formatDateTimeDayMonthHourMin(period.getStartDate())
-        // + "\nto "
-        + DateOutput.formatDateTimeDayMonthHourMin(period.getEndDate()));
+        + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+            .getStartDate())
+        + "\nto "
+        + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+            .getEndDate()));
     range.getStyleClass().addAll("task-date-range");
     return range;
   }
@@ -281,15 +288,15 @@ public class FeedbackController {
    * @param t task to be shown
    */
   private Text makeDeadline(Task t) {
-    Text deadline = makeNormalText("by "
-        + DateOutput.formatTimeOnly12h(t.getDeadline()));
+    Text deadline = makeNormalText(""
+        + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
     deadline.getStyleClass().addAll("task-deadline");
     return deadline;
   }
 
   private Text makeDeadlineForRemaining(Task t) {
     Text deadline = makeNormalText("by "
-        + DateOutput.formatDateTimeDayMonthHourMin(t.getDeadline()));
+        + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
     deadline.getStyleClass().addAll("task-deadline");
     return deadline;
   }
@@ -311,8 +318,15 @@ public class FeedbackController {
     hbox.getStyleClass().add("task");
     hbox.setSpacing(5);
     hbox.getChildren().addAll(makeId(t), makeImpt(t), makeTitle(t),
-        makeSeparator(), makeDate(t));
+        makeSeparator(), makeDateIcon(), makeDate(t));
     return hbox;
+  }
+
+  private Label makeDateIcon() {
+    Label l = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    l.setTextFill(NORMAL_COLOUR);
+    return l;
+    // return null;
   }
 
   public Text makeErrorText(String message) {
@@ -329,6 +343,7 @@ public class FeedbackController {
    */
   public Text makeId(Task task) {
     Text id = makeNormalText("[" + String.valueOf(task.getId()) + "]");
+    id.setFill(ID_COLOUR);
     id.getStyleClass().addAll("task-id");
     id.setWrappingWidth(0.08 * width);
     return id;

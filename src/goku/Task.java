@@ -37,7 +37,7 @@ public class Task implements Storeable {
     period = task.period;
     tags = task.tags;
     notes = task.notes;
-    complete = false;
+    complete = task.complete;
     impt = task.impt;
   }
 

@@ -41,18 +41,7 @@ public class EditAction extends Action {
 
   public void addToUndoList() {
     TaskList currList = new TaskList();
-    for (Task t : goku.getTaskList().getArrayList()) {
-      currList.addTaskWithoutSettingId(t);
-    }
-
-    List<Integer> idList = new ArrayList<Integer>();
-    for (Integer id : list.getUnusedId()) {
-      idList.add(id);
-    }
-
-    Collections.sort(idList);
-    currList.setRunningId(list.getRunningId());
-    currList.setUnusedId(idList);
+    currList = list.clone();
 
     TaskList newCurrList = new TaskList();
     for (Task t : currList) {

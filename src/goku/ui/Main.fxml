@@ -72,6 +72,7 @@
       </padding>
     </HBox>
     <StackPane fx:id="suggestionBox" layoutX="20.0" layoutY="90.0" prefHeight="-1.0" prefWidth="-1.0" style="" visible="false">
+    <StackPane fx:id="suggestionBox" layoutX="20.0" layoutY="85.0" prefHeight="-1.0" prefWidth="-1.0" style="" visible="false">
       <children>
         <VBox fx:id="suggestionList" prefHeight="-1.0" prefWidth="-1.0" />
       </children>

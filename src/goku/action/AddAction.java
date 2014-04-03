@@ -44,12 +44,8 @@ public class AddAction extends Action {
 
   public void addToUndoList() {
     TaskList currList = new TaskList();
-    for (Task t : list.getArrayList()) {
-      currList.addTaskWithoutSettingId(t);
-    }
+    currList = list.clone();
 
-    currList.setRunningId(list.getRunningId());
-    currList.setUnusedId(list.getUnusedId());
     goku.getUndoList().offer(currList);
   }
 

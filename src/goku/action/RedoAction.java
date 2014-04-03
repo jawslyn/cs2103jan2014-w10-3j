@@ -2,12 +2,7 @@ package goku.action;
 
 import goku.GOKU;
 import goku.Result;
-import goku.Task;
 import goku.TaskList;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class RedoAction extends Action {
   private static final String MSG_SUCCESS = "Command undone!";
@@ -42,18 +37,8 @@ public class RedoAction extends Action {
 
   public void addToUndoList() {
     TaskList currList = new TaskList();
-    for (Task t : list.getArrayList()) {
-      currList.addTaskWithoutSettingId(t);
-    }
+    currList = list.clone();
 
-    List<Integer> idList = new ArrayList<Integer>();
-    for (Integer id : list.getUnusedId()) {
-      idList.add(id);
-    }
-
-    Collections.sort(idList);
-    currList.setRunningId(list.getRunningId());
-    currList.setUnusedId(idList);
     goku.getUndoList().offer(currList);
   }
 
