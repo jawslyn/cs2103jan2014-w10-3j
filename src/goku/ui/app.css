@@ -16,6 +16,24 @@
 	
 }
 
+.minimize-button {
+	-fx-background-color: rgba(0, 0, 0, 0);
+	-fx-text-fill: rgb(86,255,0);
+}
+
+.minimize-button:hover {
+	-fx-background-color: rgba(50, 50, 50, 1);
+}
+
+.close-button {
+	-fx-text-fill: rgb(255,10,0);
+    -fx-background-color: rgba(40, 40, 40, 1);
+}
+
+.close-button:hover {
+	-fx-background-color: rgb(255, 10, 0);
+	-fx-text-fill: rgba(30, 30, 30, 1);
+}
 
 #suggestionBox {
 	-fx-background-color: white;

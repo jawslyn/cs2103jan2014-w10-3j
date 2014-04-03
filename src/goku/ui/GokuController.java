@@ -19,13 +19,17 @@ import java.util.logging.Logger;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class GokuController {
 
@@ -56,6 +60,15 @@ public class GokuController {
   private AnchorPane page;
 
   @FXML
+  private HBox titleBar;
+
+  @FXML
+  private Label minimizeButton;
+
+  @FXML
+  private Label closeButton;
+
+  @FXML
   private ScrollPane scrollPane;
 
   @FXML
@@ -72,6 +85,9 @@ public class GokuController {
 
   @FXML
   private VBox outputField;
+
+  private static double mousePressX;
+  private static double mousePressY;
 
   private GOKU goku;
 
@@ -203,6 +219,26 @@ public class GokuController {
       e.printStackTrace();
       System.out.println("Error saving tasks.");
     }
+  }
+
+  public void onTitleBarMousePress(MouseEvent event) {
+    mousePressX = event.getSceneX();
+    mousePressY = event.getSceneY();
+  }
+
+  public void onTitleBarDrag(MouseEvent event) {
+    Stage stage = FXGUI.getStage();
+    stage.setX(event.getScreenX() - mousePressX);
+    stage.setY(event.getScreenY() - mousePressY);
+  }
+
+  public void exitButtonPress(MouseEvent event) {
+    Platform.exit();
+  }
+
+  public void minimizeButtonPress(MouseEvent event) {
+    Stage stage = FXGUI.getStage();
+    stage.setIconified(true);
   }
 
 }
