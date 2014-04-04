@@ -6,55 +6,36 @@ import java.util.List;
 public class InputHistory {
   List<String> history;
   public int current; // index of current history pointed to
-  boolean pointing;
 
   public InputHistory() {
     history = new ArrayList<>();
-    current = -1;
-    pointing = false;
+    history.add("");
+    history.add("");
+    current = 1;
   }
 
   public int size() {
-    return history.size();
+    return history.size() - 2;
   }
 
   public void write(String string) {
-    history.add(string);
+    history.add(history.size() - 1, string);
     current = history.size() - 1;
-    pointing = false;
   }
 
   public String getPrevious() {
-    String prev = "";
-    if (pointing) {
-      if (current > 0) {
-        current--;
-        prev = history.get(current);
-      } else {
-        pointing = false;
-      }
+    if (current == 0) {
+      return "";
     } else {
-      if (current != 0) {
-        prev = history.get(current);
-        pointing = true;
-      }
+      return history.get(--current);
     }
-    return prev;
   }
 
   public String getNext() {
-    String next = "";
-    if (pointing) {
-      if (current < size() - 1) {
-        current++;
-        next = history.get(current);
-      } else {
-        pointing = false;
-      }
+    if (current == history.size() - 1) {
+      return "";
     } else {
-      next = history.get(current);
-      pointing = true;
+      return history.get(++current);
     }
-    return next;
   }
 }

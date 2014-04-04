@@ -16,6 +16,12 @@ public class InputHistoryTest {
   }
 
   @Test
+  public void history_empty() throws Exception {
+    assertEquals("", history.getPrevious());
+    assertEquals("", history.getNext());
+  }
+
+  @Test
   public void history_getLastestFew() throws Exception {
     history.write("1");
     history.write("2");
