@@ -108,6 +108,35 @@ public class DateUtilTest {
   public void parseDate_success() throws Exception {
     DateTime now = DateUtil.getNow(), actual, expected;
 
+    actual = DateUtil.parseDate("1/1");
+    expected = DateTime.forDateOnly(now.getYear(), 1, 1);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("01/1");
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("01/01");
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("1/01");
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("10/01");
+    expected = DateTime.forDateOnly(now.getYear(), 1, 10);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("19/4");
+    expected = DateTime.forDateOnly(now.getYear(), 4, 19);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("21/4");
+    expected = DateTime.forDateOnly(now.getYear(), 4, 21);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("31/8");
+    expected = DateTime.forDateOnly(now.getYear(), 8, 31);
+    assertTrue(expected.isSameDayAs(actual));
+
     actual = DateUtil.parseDate("4/3");
     expected = DateTime.forDateOnly(now.getYear(), 3, 4);
     assertTrue(expected.isSameDayAs(actual));
@@ -116,8 +145,28 @@ public class DateUtilTest {
     expected = DateTime.forDateOnly(2012, 3, 4);
     assertTrue(expected.isSameDayAs(actual));
 
+    actual = DateUtil.parseDate("04/03/12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
     actual = DateUtil.parseDate("4-3");
     expected = DateTime.forDateOnly(now.getYear(), 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4-3-12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("04-03-12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("31-8");
+    expected = DateTime.forDateOnly(now.getYear(), 8, 31);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("31-8-123");
+    expected = DateTime.forDateOnly(2123, 8, 31);
     assertTrue(expected.isSameDayAs(actual));
   }
 
@@ -128,7 +177,13 @@ public class DateUtilTest {
     actual = DateUtil.parseDate("34-3-12");
     assertNull(actual);
 
+    actual = DateUtil.parseDate("004-3-12");
+    assertNull(actual);
+
     actual = DateUtil.parseDate("4-23-12");
+    assertNull(actual);
+
+    actual = DateUtil.parseDate("4-023-12");
     assertNull(actual);
   }
 

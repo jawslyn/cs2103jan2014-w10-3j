@@ -309,7 +309,8 @@ public class DateUtil {
   // dd/mm or dd/mm/yy
 
   public static DateTime parseDate(String string) {
-    if (string.matches("(([02]?[0-9])|(3[01]))[/-]([1-9]?|1[0-2])[/-]?\\d*")) {
+    if (string
+        .matches("(([0-2]?[0-9])|(3[01]))[/-](0?[1-9]?|[12][0-2])[/-]?\\d*")) {
       String date[] = string.split("[-/]");
       Integer day, month, year;
       day = Integer.parseInt(date[0]);
