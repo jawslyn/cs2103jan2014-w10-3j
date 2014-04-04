@@ -15,10 +15,17 @@ import javafx.scene.text.Text;
 
 import com.google.common.base.Splitter;
 
+/*
+ * Handles the completion of user input
+ */
 public class CompletionController {
+  /* Engine to handle auto completion */
   private AutoCompleteEngine auto;
+  /* TextField where the user enters input */
   private TextField inputField;
+  /* Pane where the list of suggestion is displayed */
   private StackPane suggestionBox;
+  /* VBox to insert suggestions into */
   private VBox suggestionList;
 
   public CompletionController(TextField inputField, StackPane suggestionBox,
@@ -78,6 +85,10 @@ public class CompletionController {
         || event.getCode() == KeyCode.BACK_SPACE;
   }
 
+  /*
+   * Inserts the most likely suggestion into the field
+   * where the user is entering input
+   */
   private void insertSuggestedText(Text suggestedText) {
     if (suggestedText == null) {
       return;
@@ -87,6 +98,9 @@ public class CompletionController {
     hideSuggestions();
   }
 
+  /*
+   * Gets the best suggestion from the list of suggestions
+   */
   private Text getBestSuggestion() {
     if (suggestionList.getChildren().size() == 0) {
       return null;
@@ -172,6 +186,10 @@ public class CompletionController {
     suggestionList.getChildren().add(new Text(suggestion));
   }
 
+  /*
+   * Listens to the list of tasks in GOKU for additions of Tasks.
+   * It then adds the title to the corpus for auto completion.
+   */
   public ListChangeListener<? super Task> getCompletionListener() {
     return new ListChangeListener<Task>() {
       @Override

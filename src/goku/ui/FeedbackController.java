@@ -21,6 +21,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.TextAlignment;
+
+import com.google.common.base.Splitter;
+
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
 
@@ -63,7 +66,8 @@ public class FeedbackController {
     AnchorPane.setLeftAnchor(grid, 40.0);
     AnchorPane.setRightAnchor(grid, 40.0);
     grid.setPrefWidth(800 - 40);
-    grid.setPadding(new Insets(0, 10, 0, 40));
+    grid.setPadding(new Insets(0, 10, 50, 40));
+    grid.setVgap(5);
 
     ColumnConstraints idColumn = new ColumnConstraints();
     idColumn.setPercentWidth(12);
@@ -76,19 +80,19 @@ public class FeedbackController {
     return grid;
   }
 
-  /*
-   * Displays a simple error message to the user
-   * 
-   * @param message error message to be displayed
-   */
-  public void displayErrorMessage(String message) {
-    clearArea();
-    displayLine("Error! ", ERROR_COLOUR);
-    displayLine(message, ERROR_COLOUR);
+  public void displayLines(List<String> messages) {
+    for (String message : messages) {
+      displayLine(message);
+    }
   }
 
   public void displayLine(String message) {
-    displayLine(message, NORMAL_COLOUR);
+    if (message.contains("\n")) {
+      displayLines(Splitter.on('\n').trimResults().omitEmptyStrings()
+          .splitToList(message));
+    } else {
+      displayLine(message, NORMAL_COLOUR);
+    }
   }
 
   /*
@@ -108,31 +112,15 @@ public class FeedbackController {
     }
   }
 
-  public void displayTask(Task task) {
-    Label id = new Label("[" + task.getId().toString() + "]");
-    id.setTextFill(ID_COLOUR);
-    Label title = new Label(task.getTitle());
-    title.setTextFill(NORMAL_COLOUR);
-    title.setWrapText(true);
-    Label dateIcon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
-    dateIcon.setTextFill(NORMAL_COLOUR);
-    VBox dateVBox = makeDateVbox(task);
-    output.add(id, 0, lines);
-    output.add(title, 1, lines);
-    output.add(dateVBox, 2, lines);
-    lines++;
-  }
-
-  public VBox makeDateVbox(Task task) {
-    VBox vbox = new VBox();
-    if (task.getDeadline() != null) {
-      HBox dl = makeDeadline(task);
-      vbox.getChildren().add(dl);
-    } else if (task.getDateRange() != null) {
-      HBox[] pr = makeDateRange(task);
-      vbox.getChildren().addAll(pr[0], pr[1]);
-    }
-    return vbox;
+  /*
+   * Displays a simple error message to the user
+   * 
+   * @param message error message to be displayed
+   */
+  public void displayErrorMessage(String message) {
+    clearArea();
+    displayLine("Error! ", ERROR_COLOUR);
+    displayLine(message, ERROR_COLOUR);
   }
 
   /*
@@ -157,7 +145,7 @@ public class FeedbackController {
    * header. This is very coupled to TaskListDisplayer, as the header that is
    * displayed depends on it.
    */
-  public void displayTasks(List<Task> tasks) {
+  private void displayTasks(List<Task> tasks) {
     if (tasks == null) {
       return;
     }
@@ -177,6 +165,33 @@ public class FeedbackController {
         }
       }
     }
+  }
+
+  private void displayTask(Task task) {
+    Label id = new Label("[" + task.getId().toString() + "]");
+    id.setTextFill(ID_COLOUR);
+    Label title = new Label(task.getTitle());
+    title.setTextFill(NORMAL_COLOUR);
+    title.setWrapText(true);
+    Label dateIcon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    dateIcon.setTextFill(NORMAL_COLOUR);
+    VBox dateVBox = makeDateVbox(task);
+    output.add(id, 0, lines);
+    output.add(title, 1, lines);
+    output.add(dateVBox, 2, lines);
+    lines++;
+  }
+
+  private VBox makeDateVbox(Task task) {
+    VBox vbox = new VBox();
+    if (task.getDeadline() != null) {
+      HBox dl = makeDeadline(task);
+      vbox.getChildren().add(dl);
+    } else if (task.getDateRange() != null) {
+      HBox[] pr = makeDateRange(task);
+      vbox.getChildren().addAll(pr[0], pr[1]);
+    }
+    return vbox;
   }
 
   private void displayTaskListHeader(String header) {
