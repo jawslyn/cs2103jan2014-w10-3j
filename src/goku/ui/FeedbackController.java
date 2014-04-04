@@ -17,10 +17,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
@@ -35,11 +34,12 @@ public class FeedbackController {
   private static final Paint ERROR_COLOUR = Color.rgb(255, 10, 0);
   private static final Paint IMPT_COLOUR = Color.RED;
   private static final Paint SUCCESS_COLOUR = Color.rgb(13, 255, 166);
-  private static final Paint NORMAL_COLOUR = Color.rgb(86, 255, 0);
-  private static final Paint HEADER_COLOUR = Color.rgb(8, 137, 166);
-  private static final Paint ID_COLOUR = Color.web("1A882B");
+  private static final Paint NORMAL_COLOUR = Color.web("F9F8F1");
+  private static final Paint HEADER_COLOUR = Color.web("EE3474");
+  private static final Paint DATE_COLOUR = Color.web("F8981C");
+  private static final Paint ID_COLOUR = Color.web("73CEE4");
+
   private static final int numColumns = 3;
-  // Color.rgb(26, 89, 24);
   public static double width = 800 - 20;
   private static int lines = 0;
 
@@ -49,10 +49,13 @@ public class FeedbackController {
 
   public FeedbackController(ScrollPane scrollPane) {
     this.scrollPane = scrollPane;
-    // this.output = makeNewPage();
-    // vbox = new VBox();
-    output = makeNewPage();
+    clearArea();
+  }
+
+  public void clearArea() {
+    this.output = makeNewPage();
     scrollPane.setContent(output);
+    lines = 0;
   }
 
   public GridPane makeNewPage() {
@@ -65,17 +68,12 @@ public class FeedbackController {
     ColumnConstraints idColumn = new ColumnConstraints();
     idColumn.setPercentWidth(12);
     ColumnConstraints titleColumn = new ColumnConstraints();
+    titleColumn.setPercentWidth(100 - 12 - 23);
     ColumnConstraints dateColumn = new ColumnConstraints();
-    dateColumn.setPercentWidth(30);
+    dateColumn.setPercentWidth(23);
 
     grid.getColumnConstraints().addAll(idColumn, titleColumn, dateColumn);
     return grid;
-  }
-
-  public void clearArea() {
-    this.output = makeNewPage();
-    scrollPane.setContent(output);
-    lines = 0;
   }
 
   /*
@@ -85,19 +83,12 @@ public class FeedbackController {
    */
   public void displayErrorMessage(String message) {
     clearArea();
-    Label errorLabel = new Label("Error! ");
-    errorLabel.setTextFill(ERROR_COLOUR);
-    Label errorMessage = new Label(message);
-    errorMessage.setTextFill(ERROR_COLOUR);
-    displayLine(errorLabel);
-    displayLine(errorMessage);
+    displayLine("Error! ", ERROR_COLOUR);
+    displayLine(message, ERROR_COLOUR);
   }
 
-  private void displayLine(Label label) {
-    // GridPane output = makeNewPage();
-    output.add(label, 0, lines++, numColumns + 1, 1);
-    // output.add(label, 0, lines, numColumns, 1);
-    // vbox.getChildren().add(output);
+  public void displayLine(String message) {
+    displayLine(message, NORMAL_COLOUR);
   }
 
   /*
@@ -105,16 +96,43 @@ public class FeedbackController {
    * 
    * @param message the string to be printed
    */
-  public void displayLine(String message) {
+  public void displayLine(String message, Paint color) {
     if (message.length() <= 60) {
       Label l = new Label(message);
-      l.setTextFill(NORMAL_COLOUR);
+      l.setTextFill(color);
       output.add(l, 0, lines, numColumns + 1, 1);
       lines++;
     } else {
       displayLine(message.substring(0, 60));
       displayLine(message.substring(61));
     }
+  }
+
+  public void displayTask(Task task) {
+    Label id = new Label("[" + task.getId().toString() + "]");
+    id.setTextFill(ID_COLOUR);
+    Label title = new Label(task.getTitle());
+    title.setTextFill(NORMAL_COLOUR);
+    title.setWrapText(true);
+    Label dateIcon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    dateIcon.setTextFill(NORMAL_COLOUR);
+    VBox dateVBox = makeDateVbox(task);
+    output.add(id, 0, lines);
+    output.add(title, 1, lines);
+    output.add(dateVBox, 2, lines);
+    lines++;
+  }
+
+  public VBox makeDateVbox(Task task) {
+    VBox vbox = new VBox();
+    if (task.getDeadline() != null) {
+      HBox dl = makeDeadline(task);
+      vbox.getChildren().add(dl);
+    } else if (task.getDateRange() != null) {
+      HBox[] pr = makeDateRange(task);
+      vbox.getChildren().addAll(pr[0], pr[1]);
+    }
+    return vbox;
   }
 
   /*
@@ -124,29 +142,13 @@ public class FeedbackController {
   public void displayResult(Result result) {
     clearArea();
 
-    HBox hbox = new HBox();
-    hbox.setSpacing(10);
-    Label status, message;
-    String text = "";
-    // hboxOverdue.getChildren().add(overdueMsg);
-    // displayLine("You have overdue tasks, \"view overdue\" to see them.");
-
     if (result.isSuccess()) {
-      text += "Yay! ";
-      text += result.getSuccessMsg();
-      // status = new Label("Yay!");
-      // status = makeSuccessText("Yay!");
-      // message = makeResultMsg(result.getSuccessMsg());
+      displayLine("Yay!", SUCCESS_COLOUR);
+      displayLine(result.getSuccessMsg());
     } else {
-      text += "Error! ";
-      text += result.getErrorMsg();
-      // status = new Label("Error!");
-      // status = makeErrorText("Error!");
-      // message = makeResultMsg(result.getErrorMsg());
+      displayLine("Error!", ERROR_COLOUR);
+      displayLine(result.getErrorMsg());
     }
-    // hbox.getChildren().addAll(status, message);
-    displayLine(text);
-    // displayLine("");
     displayTasks(result.getTasks());
   }
 
@@ -159,9 +161,6 @@ public class FeedbackController {
     if (tasks == null) {
       return;
     }
-    // for (Task t : tasks) {
-    // displayLine(t.getTitle());
-    // }
     TaskListDisplayer tld = new TaskListDisplayer(System.out);
     Hashtable<String, List<Task>> ht = tld.build(tasks);
     String[] headers = { "overdue", "today", "tomorrow", "remaining",
@@ -171,11 +170,9 @@ public class FeedbackController {
         displayTaskListHeader(header);
         for (Task task : ht.get(header)) {
           if (header.equals("remaining") || header.equals("overdue")) {
-            displayTaskOnLine(task);
-            // displayLine(makeDisplayBoxForRemainingTask(task));
+            displayTask(task);
           } else {
-            displayTaskOnLine(task);
-            // displayLine(makeDisplayBoxForTask(task));
+            displayTask(task);
           }
         }
       }
@@ -192,85 +189,38 @@ public class FeedbackController {
     output.add(hbox, 0, lines++, numColumns, 1);
   }
 
-  private void displayTaskOnLine(Task task) {
-    Label id = new Label("[" + task.getId().toString() + "]");
-    id.setTextFill(ID_COLOUR);
-    Label title = new Label(task.getTitle());
-    title.setTextFill(NORMAL_COLOUR);
-    title.setWrapText(true);
-    Label date = new Label(makeDate(task).getText());
-    date.setTextFill(NORMAL_COLOUR);
-    date.setWrapText(true);
-    Label dateIcon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
-    dateIcon.setTextFill(NORMAL_COLOUR);
-    HBox dateHbox = new HBox();
-    // dateHbox.setSpacing(10);
-    // dateHbox.setAlignment(Pos.CENTER);
-    if (date.getText().isEmpty()) {
-      dateHbox.getChildren().add(date);
-    } else {
-      dateHbox.getChildren().addAll(dateIcon, date);
-    }
-    output.add(id, 0, lines);
-    output.add(title, 1, lines);
-    output.add(dateHbox, 2, lines);
-    lines++;
-  }
-
-  /*
-   * Builds a Text that represents either the deadline or the period of the
-   * task.
-   * 
-   * @param task t to be shown
-   */
-  private Text makeDate(Task t) {
-    if (t.getDeadline() != null) {
-      return makeDeadline(t);
-    } else if (t.getDateRange() != null) {
-      return makeDateRange(t);
-    } else {
-      return makeNormalText("");
-    }
-  }
-
-  private Text makeDateForRemaining(Task t) {
-    if (t.getDeadline() != null) {
-      return makeDeadlineForRemaining(t);
-    } else if (t.getDateRange() != null) {
-      return makeDateRange(t);
-    } else {
-      return makeNormalText("");
-    }
-  }
-
-  /*
-   * Builds a header used when displaying tasks. A header is used to categorize
-   * the task by the date, so that users can see the most urgent tasks first.
-   */
-  private HBox makeDateHeader(String header) {
-    HBox hbox = new HBox();
-    hbox.setAlignment(Pos.BASELINE_CENTER);
-    Text t = makeNormalText("-" + header.toUpperCase() + "-");
-    t.setFill(HEADER_COLOUR);
-    hbox.getChildren().add(t);
-    return hbox;
-  }
-
   /*
    * Builds a Text that represents the period of a task.
    * 
    * @param t task to be shown
    */
-  private Text makeDateRange(Task t) {
+  private HBox[] makeDateRange(Task t) {
+    HBox[] hbox = new HBox[2];
+    hbox[0] = new HBox();
+    hbox[1] = new HBox();
+    hbox[0].setAlignment(Pos.CENTER_LEFT);
+    hbox[1].setAlignment(Pos.CENTER_LEFT);
+    hbox[0].setSpacing(5);
+    hbox[1].setSpacing(5);
+
+    Label sicon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    Label eicon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    sicon.setTextFill(DATE_COLOUR);
+    eicon.setTextFill(DATE_COLOUR);
+
     DateRange period = t.getDateRange();
-    Text range = makeNormalText(""
-        + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
-            .getStartDate())
-        + "\nto "
-        + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+
+    Label s = new Label(
+        DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+            .getStartDate()));
+    s.setTextFill(DATE_COLOUR);
+    Label e = new Label(
+        DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
             .getEndDate()));
-    range.getStyleClass().addAll("task-date-range");
-    return range;
+    e.setTextFill(DATE_COLOUR);
+    hbox[0].getChildren().addAll(sicon, s);
+    hbox[1].getChildren().addAll(eicon, e);
+    return hbox;
   }
 
   /*
@@ -278,127 +228,16 @@ public class FeedbackController {
    * 
    * @param t task to be shown
    */
-  private Text makeDeadline(Task t) {
-    Text deadline = makeNormalText(""
+  private HBox makeDeadline(Task t) {
+    HBox hbox = new HBox();
+    Label deadline = new Label(""
         + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
-    deadline.getStyleClass().addAll("task-deadline");
-    return deadline;
-  }
-
-  private Text makeDeadlineForRemaining(Task t) {
-    Text deadline = makeNormalText("by "
-        + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
-    deadline.getStyleClass().addAll("task-deadline");
-    return deadline;
-  }
-
-  public HBox makeDisplayBoxForRemainingTask(Task t) {
-    HBox hbox = new HBox();
-    hbox.getStyleClass().add("task");
+    deadline.setTextFill(DATE_COLOUR);
+    Label icon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    icon.setTextFill(DATE_COLOUR);
+    hbox.getChildren().addAll(icon, deadline);
+    hbox.setAlignment(Pos.CENTER_LEFT);
     hbox.setSpacing(5);
-    hbox.getChildren().addAll(makeId(t), makeImpt(t), makeTitle(t),
-        makeSeparator(), makeDateForRemaining(t));
-    return hbox;
-  }
-
-  /*
-   * Builds HBox that displays a single task.
-   */
-  public HBox makeDisplayBoxForTask(Task t) {
-    HBox hbox = new HBox();
-    hbox.getStyleClass().add("task");
-    hbox.setSpacing(5);
-    hbox.getChildren().addAll(makeId(t), makeImpt(t), makeTitle(t),
-        makeSeparator(), makeDateIcon(), makeDate(t));
-    return hbox;
-  }
-
-  private Label makeDateIcon() {
-    Label l = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
-    l.setTextFill(NORMAL_COLOUR);
-    return l;
-    // return null;
-  }
-
-  public Text makeErrorText(String message) {
-    Text text = new Text(message);
-    text.setFill(ERROR_COLOUR);
-    return text;
-  }
-
-  /*
-   * Builds a Text that shows the ID of the task. The id will be in square
-   * brackets: [1]
-   * 
-   * @param task task to be shown
-   */
-  public Text makeId(Task task) {
-    Text id = makeNormalText("[" + String.valueOf(task.getId()) + "]");
-    id.setFill(ID_COLOUR);
-    id.getStyleClass().addAll("task-id");
-    id.setWrappingWidth(0.08 * width);
-    return id;
-  }
-
-  /*
-   * Builds a Text that indicates if a task is important or not. This is
-   * indicated by a (!), which is in bright red
-   * 
-   * @param task task to be shown
-   */
-  public Text makeImpt(Task task) {
-    Text impt = makeImptText(task.getImpt() ? "(!)" : "   ");
-    impt.setWrappingWidth(0.05 * width);
-    return impt;
-  }
-
-  public Text makeImptText(String message) {
-    Text text = new Text(message);
-    text.setFill(IMPT_COLOUR);
-    return text;
-  }
-
-  public Text makeNormalText(String message) {
-    Text text = new Text(message);
-    text.setFill(NORMAL_COLOUR);
-    return text;
-  }
-
-  private Text makeResultMsg(String msg) {
-    Text text = new Text(msg);
-    text.setFill(NORMAL_COLOUR);
-    return text;
-  }
-
-  /*
-   * Builds a separator that is then inserted between the task title and the due
-   * date or period. This helps the user to align the proper task title to the
-   * date. HBox is set to grow and fill up the extra space in the parent HBox.
-   */
-  private HBox makeSeparator() {
-    HBox separator = new HBox();
-    HBox.setHgrow(separator, Priority.ALWAYS); // IMPT don't change
-    separator.getStyleClass().add("separator");
-    return separator;
-  }
-
-  public Text makeSuccessText(String message) {
-    Text text = new Text(message);
-    text.setFill(SUCCESS_COLOUR);
-    return text;
-  }
-
-  /*
-   * Builds a Text that shows the title of a task.
-   * 
-   * @param task task to be shown
-   */
-  public HBox makeTitle(Task task) {
-    HBox hbox = new HBox();
-    Text title = makeNormalText(task.getTitle());
-    title.setWrappingWidth(width - 300);
-    hbox.getChildren().add(title);
-    HBox.setHgrow(title, Priority.NEVER);
     return hbox;
   }
 

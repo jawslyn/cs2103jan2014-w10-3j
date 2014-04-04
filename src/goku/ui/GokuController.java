@@ -173,8 +173,8 @@ public class GokuController {
 
     try {
       goku.addToTaskList(storage.loadStorage());
-      // doAction(new GreetAction(goku));
-      feedbackController.displayLine("HIHI");
+      doAction(new GreetAction(goku));
+      // feedbackController.displayLine("HIHI");
       // feedbackController
       // .displayLine("LKAJDFLalskdfjaskljdflkasjdfjasdfjaklsjfdlKj");
     } catch (FileNotFoundException e) {
