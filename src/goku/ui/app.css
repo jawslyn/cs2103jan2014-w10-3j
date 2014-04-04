@@ -14,7 +14,7 @@
 	-fx-font-size: 26;
 	-fx-padding: 5 20 5 20;
 	-fx-background-color: rgba(40, 40, 40, 1);
-	-fx-text-fill: rgba(86, 255, 0, 1);
+	-fx-text-fill: #E6DB59;
 }
 
 .input-field:focused {
