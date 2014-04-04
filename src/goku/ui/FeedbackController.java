@@ -120,7 +120,7 @@ public class FeedbackController {
   public void displayErrorMessage(String message) {
     clearArea();
     displayLine("Error! ", ERROR_COLOUR);
-    displayLine(message, ERROR_COLOUR);
+    displayLine(message, NORMAL_COLOUR);
   }
 
   /*
@@ -158,7 +158,7 @@ public class FeedbackController {
         displayTaskListHeader(header);
         for (Task task : ht.get(header)) {
           if (header.equals("remaining") || header.equals("overdue")) {
-            displayTask(task);
+            displayRemainingTask(task);
           } else {
             displayTask(task);
           }
@@ -167,28 +167,41 @@ public class FeedbackController {
     }
   }
 
-  private void displayTask(Task task) {
+  private void displayRemainingTask(Task task) {
     Label id = new Label("[" + task.getId().toString() + "]");
     id.setTextFill(ID_COLOUR);
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
-    Label dateIcon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
-    dateIcon.setTextFill(NORMAL_COLOUR);
-    VBox dateVBox = makeDateVbox(task);
+    VBox dateVBox = makeDateVbox(task, true);
+
     output.add(id, 0, lines);
     output.add(title, 1, lines);
     output.add(dateVBox, 2, lines);
     lines++;
   }
 
-  private VBox makeDateVbox(Task task) {
+  private void displayTask(Task task) {
+    Label id = new Label("[" + task.getId().toString() + "]");
+    id.setTextFill(ID_COLOUR);
+    Label title = new Label(task.getTitle());
+    title.setTextFill(NORMAL_COLOUR);
+    title.setWrapText(true);
+    VBox dateVBox = makeDateVbox(task, false);
+
+    output.add(id, 0, lines);
+    output.add(title, 1, lines);
+    output.add(dateVBox, 2, lines);
+    lines++;
+  }
+
+  private VBox makeDateVbox(Task task, boolean remaining) {
     VBox vbox = new VBox();
     if (task.getDeadline() != null) {
-      HBox dl = makeDeadline(task);
+      HBox dl = makeDeadline(task, remaining);
       vbox.getChildren().add(dl);
     } else if (task.getDateRange() != null) {
-      HBox[] pr = makeDateRange(task);
+      HBox[] pr = makeDateRange(task, remaining);
       vbox.getChildren().addAll(pr[0], pr[1]);
     }
     return vbox;
@@ -209,7 +222,7 @@ public class FeedbackController {
    * 
    * @param t task to be shown
    */
-  private HBox[] makeDateRange(Task t) {
+  private HBox[] makeDateRange(Task t, boolean remaining) {
     HBox[] hbox = new HBox[2];
     hbox[0] = new HBox();
     hbox[1] = new HBox();
@@ -218,20 +231,28 @@ public class FeedbackController {
     hbox[0].setSpacing(5);
     hbox[1].setSpacing(5);
 
-    Label sicon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
-    Label eicon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    Label sicon = AwesomeDude.createIconLabel(AwesomeIcon.CALENDAR_ALT);
+    Label eicon = AwesomeDude.createIconLabel(AwesomeIcon.LONG_ARROW_RIGHT);
     sicon.setTextFill(DATE_COLOUR);
     eicon.setTextFill(DATE_COLOUR);
 
     DateRange period = t.getDateRange();
+    Label s, e;
 
-    Label s = new Label(
-        DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
-            .getStartDate()));
+    if (remaining) {
+      s = new Label(
+          DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+              .getStartDate()));
+      e = new Label(
+          DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+              .getEndDate()));
+    } else {
+      s = new Label(DateOutput.formatTimeOnly12hIgnoreZeroMinutes(period
+          .getStartDate()));
+      e = new Label(DateOutput.formatTimeOnly12hIgnoreZeroMinutes(period
+          .getEndDate()));
+    }
     s.setTextFill(DATE_COLOUR);
-    Label e = new Label(
-        DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
-            .getEndDate()));
     e.setTextFill(DATE_COLOUR);
     hbox[0].getChildren().addAll(sicon, s);
     hbox[1].getChildren().addAll(eicon, e);
@@ -243,10 +264,17 @@ public class FeedbackController {
    * 
    * @param t task to be shown
    */
-  private HBox makeDeadline(Task t) {
+  private HBox makeDeadline(Task t, boolean remaining) {
     HBox hbox = new HBox();
-    Label deadline = new Label(""
-        + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
+    Label deadline;
+    if (remaining) {
+      deadline = new Label(""
+          + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(t
+              .getDeadline()));
+    } else {
+      deadline = new Label(""
+          + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
+    }
     deadline.setTextFill(DATE_COLOUR);
     Label icon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
     icon.setTextFill(DATE_COLOUR);
