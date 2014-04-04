@@ -8,56 +8,6 @@ import hirondelle.date4j.DateTime;
 import org.junit.Test;
 
 public class DateUtilTest {
-  @Test
-  public void looksLikeOffset() throws Exception {
-    assertTrue(DateUtil.isOffsetWord("next"));
-  }
-
-  /*
-   * Combination heuristics. All inputs below are well-formed
-   * and should pass.
-   */
-  @Test
-  public void looksLikeTime_success() throws Exception {
-    assertTrue(DateUtil.looksLikeTime("1:45"));
-    assertTrue(DateUtil.looksLikeTime("1.45"));
-    assertTrue(DateUtil.looksLikeTime("13:45"));
-    assertTrue(DateUtil.looksLikeTime("1pm"));
-    assertTrue(DateUtil.looksLikeTime("1:45am"));
-    assertTrue(DateUtil.looksLikeTime("1:45pm"));
-    assertTrue(DateUtil.looksLikeTime("1.45am"));
-  }
-
-  /*
-   * Combination heuristics. All inputs below are well-formed
-   * and should pass.
-   */
-  @Test
-  public void looksLikeDate_success() throws Exception {
-    assertTrue(DateUtil.looksLikeDay("sUn"));
-    assertTrue(DateUtil.looksLikeDay("Mon"));
-    assertTrue(DateUtil.looksLikeDay("tuE"));
-    assertTrue(DateUtil.looksLikeDay("wED"));
-    assertTrue(DateUtil.looksLikeDay("THur"));
-    assertTrue(DateUtil.looksLikeDay("fRi"));
-    assertTrue(DateUtil.looksLikeDay("Sat"));
-    assertTrue(DateUtil.looksLikeDay("SuNday"));
-    assertTrue(DateUtil.looksLikeDay("monday"));
-    assertTrue(DateUtil.looksLikeDay("tuesday"));
-    assertTrue(DateUtil.looksLikeDay("WedNesDay"));
-    assertTrue(DateUtil.looksLikeDay("Thursday"));
-    assertTrue(DateUtil.looksLikeDay("Friday"));
-    assertTrue(DateUtil.looksLikeDay("saturDAY"));
-    assertTrue(DateUtil.looksLikeDay("tOdAy"));
-    assertTrue(DateUtil.looksLikeDay("toMORRow"));
-    assertTrue(DateUtil.looksLikeDay("tMr"));
-    assertTrue(DateUtil.looksLikeDay("tmL"));
-    assertTrue(DateUtil.looksLikeDate("4/3"));
-    assertTrue(DateUtil.looksLikeDate("4/3/12"));
-    assertTrue(DateUtil.looksLikeDate("4-3"));
-    assertTrue(DateUtil.looksLikeDate("4-3-12"));
-  }
-
   /*
    * Combination heuristics. All inputs below are well-formed
    * and should pass.
@@ -68,36 +18,28 @@ public class DateUtilTest {
     DateTime result, expected;
 
     expected = now.plusDays(1);
-    result = DateUtil.parseDay("toMOrrow");
+    result = DateUtil.parseDay("toMOrrow", false);
     assertTrue(expected.isSameDayAs(result));
-    result = DateUtil.parseDay("tMl");
+    result = DateUtil.parseDay("tMl", false);
     assertTrue(expected.isSameDayAs(result));
-    result = DateUtil.parseDay("tMr");
+    result = DateUtil.parseDay("tMr", false);
     assertTrue(expected.isSameDayAs(result));
-    result = DateUtil.parseDay("todaY");
+    result = DateUtil.parseDay("todaY", false);
     assertTrue(now.isSameDayAs(result));
   }
 
   @Test
   public void parseWithWeekOffset_success() throws Exception {
-    // DateTime base = new DateTime(2014, 3, 27, 0, 0, 0, 0); // this is a
-    // thursday
-    // DateTime result, expected;
-    // expected = base.plusDays(8);
-    //
-    // result = DateUtil.parse("next friday".split(" "));
-    // assertEquals(expected.getDay(), result.getDay());
-    // assertTrue(expected.isSameDayAs(result));
-    //
-    // // TODO is this expected result?
-    // expected = base.plusDays(14);
-    // result = DateUtil.parse("next thursday".split(" "));
-    // assertTrue(expected.isSameDayAs(result));
-    //
-    // expected = base.plusDays(11);
-    // result = DateUtil.parse("Next monday".split(" "));
-    // assertTrue(expected.isSameDayAs(result));
-    // assertTrue(expected.isSameDayAs(result));
+    DateTime base = new DateTime(2014, 4, 3, 0, 0, 0, 0); // this is a thursday
+    DateTime result, expected;
+    expected = base.plusDays(9);
+
+    result = DateUtil.parse("next saturday".split(" "));
+    assertEquals(expected.getDay(), result.getDay());
+
+    expected = base.plusDays(6);
+    result = DateUtil.parse("next wednesday".split(" "));
+    assertEquals(expected.getDay(), result.getDay());
   }
 
   /*
@@ -245,6 +187,8 @@ public class DateUtilTest {
     actual = DateUtil.parseTime("90pm");
     assertNull(actual);
     actual = DateUtil.parseTime("21.45am");
+    assertNull(actual);
+    actual = DateUtil.parseTime("2.4am");
     assertNull(actual);
     actual = DateUtil.parseTime("21:45pm");
     assertNull(actual);

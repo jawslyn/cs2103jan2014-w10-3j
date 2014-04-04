@@ -13,44 +13,13 @@ public class DateUtil {
       "sunday" };
   private static String[] dateDelimiters = { "-", "/" };
   private static String[] timeDelimiters = { "pm", "am", ":", "." };
-  private static String[] weekOffsets = { "coming", "next" };
+  private static String[] weekOffsets = { "coming" };
 
   /*
    * Converts a {@link java.util.Date} into {@ DateTime}
    */
   public static DateTime date4j(Date date) {
     return DateTime.forInstant(date.getTime(), TimeZone.getDefault());
-  }
-
-  /*
-   * Given a starting date, finds the nearest weekday from this date that
-   * matches the target weekday
-   */
-  public static DateTime getNearestDateToWeekday(DateTime baseDate,
-      Integer targetWeekday) {
-    Integer baseWeekday = baseDate.getWeekDay();
-    Integer days = (targetWeekday - baseWeekday);
-    if (days <= 0) {
-      days += 7;
-    }
-
-    baseDate = baseDate.plusDays(days);
-    baseDate = baseDate.getEndOfDay().truncate(DateTime.Unit.SECOND);
-
-    return baseDate;
-  }
-
-  /*
-   * Gets the nearest weekday which matches the target weekday from current date
-   * 
-   * @see #getNearestDateToWeekday(DateTime baseDate, Integer targetWeekday)
-   */
-  public static DateTime getNearestDateToWeekday(Integer targetWeekday) {
-    return getNearestDateToWeekday(getNow(), targetWeekday);
-  }
-
-  private static DateTime getNearestDateToWeekday(String weekday) {
-    return getNearestDateToWeekday(weekdayToInteger(weekday));
   }
 
   /*
@@ -164,89 +133,6 @@ public class DateUtil {
     return aDateOnly.gteq(otherDateOnly);
   }
 
-  static boolean isOffsetWord(String candidate) {
-    candidate = candidate.trim().toLowerCase();
-    for (String offsetWord : weekOffsets) {
-      if (offsetWord.contains(candidate)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /*
-   * A string looks like a date if it has a "-" or "/". Examples are "3/4",
-   * "3/4/12", "3-4", "3-4-12"
-   */
-  public static boolean looksLikeDate(String candidate) {
-    for (String delimiter : dateDelimiters) {
-      if (candidate.contains(delimiter)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /*
-   * A candidate looks like a day when it matches: 1) today, tomorrow, tml, tmr
-   * 2) names of weekdays, spelled in full for short
-   */
-  public static boolean looksLikeDay(String candidate) {
-    candidate = candidate.trim().toLowerCase();
-    for (String dayKeyword : dayKeywords) {
-      if (dayKeyword.contains(candidate)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /*
-   * A candidate looks like a time when it has ".", ":", "am" or "pm". Examples
-   * are: "1.45", "1.45pm", "1:45", "1:45am"
-   */
-  public static boolean looksLikeTime(String candidate) {
-    // TODO use regex?
-    for (String delimiter : timeDelimiters) {
-      if (candidate.contains(delimiter)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /*
-   * Merge the date component of date with the time component of time.
-   * 
-   * 
-   * @param date a DateTime where only the date matters
-   * 
-   * @param date a DateTime where only the time matters
-   * 
-   * @return null when both params are null, or when only one is null, it tries
-   * to merge intelligently, using the current date or midnight time.
-   */
-  public static DateTime mergeDateAndTime(DateTime date, DateTime time,
-      Integer offsetDays) {
-    if (date == null && time == null) {
-      return null;
-    }
-    DateTime result = null;
-
-    if (date == null) {
-      date = getNow();
-      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
-          time.getHour(), time.getMinute(), time.getSecond(), null);
-    } else if (time == null) {
-      result = date;
-    } else {
-      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
-          time.getHour(), time.getMinute(), time.getSecond(), null);
-    }
-
-    return result.plusDays(offsetDays);
-  }
-
   public static DateTime parse(String string) {
     String[] s = string.split(" ");
     return parse(s);
@@ -270,17 +156,17 @@ public class DateUtil {
   public static DateTime parse(final String[] inputs) {
     DateTime date = null, time = null;
     boolean offsetFound = false, dateFound = false, timeFound = false;
+    boolean next = false;
 
     int daysOffsets = 0;
     try {
       for (String input : inputs) {
-        if (isOffsetWord(input) && offsetFound == false) {
-          daysOffsets = parseOffset(input);
-          offsetFound = true;
-        } else if (looksLikeDay(input) && dateFound == false) {
-          date = parseDay(input);
-          dateFound = true;
-        } else if (looksLikeDate(input) && !dateFound) {
+        if (!next) {
+          next = parseOffset(input);
+        } else if (!dateFound) {
+          date = parseDay(input, next);
+          dateFound = date == null ? false : true;
+        } else if (!dateFound) {
           date = parseDate(input);
           dateFound = date == null ? false : true;
         } else if (!timeFound) {
@@ -317,7 +203,6 @@ public class DateUtil {
       month = Integer.parseInt(date[1]);
       year = date.length > 2 ? Integer.parseInt(date[2]) + 2000 : getNow()
           .getYear();
-
       return DateTime.forDateOnly(year, month, day);
     } else {
       return null;
@@ -332,7 +217,7 @@ public class DateUtil {
    * if today is Tuesday, and string is Wednesday, the DateTime will be 7 days
    * after today.
    */
-  public static DateTime parseDay(String string) {
+  public static DateTime parseDay(String string, boolean next) {
     string = string.toLowerCase();
     DateTime today = getNowDate();
     switch (string) {
@@ -343,21 +228,72 @@ public class DateUtil {
       case "tmr" :
         return DateTime.today(TimeZone.getDefault()).plusDays(1);
       default :
-        return getNearestDateToWeekday(string);
+        return next ? getNearestNextWeekday(string)
+            : getNearestDateToWeekday(string);
     }
   }
 
-  private static int parseOffset(String string) {
+  private static DateTime getNearestNextWeekday(String weekday) {
+    int weekDayInt = weekdayToInteger(weekday);
+    if (weekDayInt < 0) {
+      return null;
+    }
+    int nowWeekDayInt = getNow().getWeekDay();
+    DateTime nearest = getNearestDateToWeekday(getNow(), weekDayInt);
+    DateTime nextWeekDay = nearest;
+    if (nowWeekDayInt <= weekDayInt) {
+      nextWeekDay = nearest.plusDays(7);
+    }
+    return nextWeekDay;
+  }
+
+  static boolean isOffsetWord(String candidate) {
+    candidate = candidate.trim().toLowerCase();
+    for (String offsetWord : weekOffsets) {
+      if (offsetWord.contains(candidate)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /*
+   * Given a starting date, finds the nearest weekday from this date that
+   * matches the target weekday
+   */
+  public static DateTime getNearestDateToWeekday(DateTime baseDate,
+      Integer targetWeekday) {
+    Integer baseWeekday = baseDate.getWeekDay();
+    Integer days = (targetWeekday - baseWeekday);
+    if (days <= 0) {
+      days += 7;
+    }
+    baseDate = baseDate.plusDays(days);
+    baseDate = baseDate.getEndOfDay().truncate(DateTime.Unit.SECOND);
+    return baseDate;
+  }
+
+  /*
+   * Gets the nearest date closest to a weekday.
+   * If the string is not recognized, a null object is returned
+   * @params weekday a recognized string that represents a weekday
+   */
+  private static DateTime getNearestDateToWeekday(String weekday) {
+    int weekDayInt = weekdayToInteger(weekday);
+    if (weekDayInt < 0) {
+      return null;
+    }
+    return getNearestDateToWeekday(getNow(), weekDayInt);
+  }
+
+  private static boolean parseOffset(String string) {
     string = string.toLowerCase();
     switch (string) {
-      case "coming" :
-        return 0;
       case "next" :
-        return 7;
+        return true;
       default :
-        return 0;
+        return false;
     }
-
   }
 
   /*
@@ -367,7 +303,7 @@ public class DateUtil {
    */
   public static DateTime parseTime(String string) {
     Integer hour = null;
-    Integer min = null;
+    Integer min = 0;
     if (string.matches("(([01]?[0-9]|2[0-3])[:.][0-5][0-9])")) {
       String[] results = string.split("[:.]");
       hour = Integer.parseInt(results[0]);
@@ -375,22 +311,13 @@ public class DateUtil {
       return DateTime.forTimeOnly(hour, min, 0, 0);
     } else if (string.matches("(([1-9]|1[0-2])([:.]?[0-5][0-9])?[ap]m)")) {
       String[] results = string.split("[:.\\D]");
-      if (string.contains("am")) {
-        hour = Integer.parseInt(results[0]);
-      } else {
-        hour = Integer.parseInt(results[0]);
-        if (hour != 12) {
-          hour += 12;
-        }
+      hour = Integer.parseInt(results[0]);
+      if (string.contains("pm")) {
+        // 12pm becomes 12, 1pm becomes 13
+        hour += (hour == 12 ? 0 : 12);
       }
-      if (results.length > 1) {
+      if (results.length > 1) { // has minute component
         min = Integer.parseInt(results[1]);
-      }
-      if (results.length > 1) {
-        min = Integer.parseInt(results[1]);
-      } else {
-        min = 0;
-        min = 0;
       }
       return DateTime.forTimeOnly(hour, min, 0, 0);
     } else {
@@ -415,6 +342,38 @@ public class DateUtil {
       }
     }
     return -1;
+  }
+
+  /*
+   * Merge the date component of date with the time component of time.
+   * 
+   * 
+   * @param date a DateTime where only the date matters
+   * 
+   * @param date a DateTime where only the time matters
+   * 
+   * @return null when both params are null, or when only one is null, it tries
+   * to merge intelligently, using the current date or midnight time.
+   */
+  public static DateTime mergeDateAndTime(DateTime date, DateTime time,
+      Integer offsetDays) {
+    if (date == null && time == null) {
+      return null;
+    }
+    DateTime result = null;
+
+    if (date == null) {
+      date = getNow();
+      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
+          time.getHour(), time.getMinute(), time.getSecond(), null);
+    } else if (time == null) {
+      result = date;
+    } else {
+      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
+          time.getHour(), time.getMinute(), time.getSecond(), null);
+    }
+
+    return result.plusDays(offsetDays);
   }
 
   public static String toString(DateTime date) {
