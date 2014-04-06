@@ -274,6 +274,8 @@ public class InputParser {
       da.viewComplete = true;
     } else if (nonArrayParams.equals("overdue")) {
       da.viewOverdue = true;
+    } else if (nonArrayParams.equals("over")) {
+      da.viewOverdue = true;
     } else if (nonArrayParams.equals("all")) {
       da.viewAll = true;
     } else if (!nonArrayParams.isEmpty()) {

@@ -11,8 +11,6 @@ public class DateUtil {
   private static String[] dayKeywords = { "tomorrow", "tml", "tmr", "today",
       "monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
       "sunday" };
-  private static String[] dateDelimiters = { "-", "/" };
-  private static String[] timeDelimiters = { "pm", "am", ":", "." };
   private static String[] weekOffsets = { "coming" };
 
   /*
@@ -163,13 +161,15 @@ public class DateUtil {
       for (String input : inputs) {
         if (!next) {
           next = parseOffset(input);
-        } else if (!dateFound) {
+        }
+        if (!dateFound) {
           date = parseDay(input, next);
+          if (date == null) {
+            date = parseDate(input);
+          }
           dateFound = date == null ? false : true;
-        } else if (!dateFound) {
-          date = parseDate(input);
-          dateFound = date == null ? false : true;
-        } else if (!timeFound) {
+        }
+        if (!timeFound) {
           time = parseTime(input);
           timeFound = time == null ? false : true;
         }

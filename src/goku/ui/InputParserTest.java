@@ -74,6 +74,13 @@ public class InputParserTest {
     DateTime later = aa.dline;
     assertTrue(later.gt(now));
 
+    now = DateUtil.getNow();
+    a = p.parse("add this is a task by today");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals(now.getDay(), aa.dline.getDay());
+    assertEquals(now.getMonth(), aa.dline.getMonth());
+
     a = p.parse("add this is a task from today to tomorrow    ");
     assertTrue(a instanceof AddAction);
     aa = (AddAction) a;
