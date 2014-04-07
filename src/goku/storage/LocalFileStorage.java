@@ -92,8 +92,8 @@ public class LocalFileStorage implements Storage {
   }
 
   @Override
-  public TaskList loadStorage() throws FileNotFoundException, IOException,
-      LoadTasksException {
+  public TaskList loadStorage() throws LoadTasksException,
+      FileNotFoundException, IOException {
     List<Integer> errorLines = new ArrayList<Integer>();
     int currentLine = 1;
     LOGGER.info("Loading from file: " + file.getName());
