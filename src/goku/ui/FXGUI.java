@@ -4,6 +4,8 @@ import goku.GOKU;
 import goku.Result;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,12 +16,19 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+/*
+ * FXGUI is the JavaFX Application sub-class that is started and shows a
+ * window to the user.
+ * FXGUI has a number of empty method implementations of UserInterface because
+ * of the big differences in the way a CLI and GUI in JavaFX does things.
+ */
 public class FXGUI extends Application implements UserInterface {
   private static GOKU goku;
   private static Stage stage;
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public FXGUI() {
-
   }
 
   public FXGUI(GOKU goku) {
@@ -32,26 +41,25 @@ public class FXGUI extends Application implements UserInterface {
 
   @Override
   public void start(Stage primaryStage) {
-    if (goku == null) {
-      System.out.println("NULL");
-    }
     try {
-      primaryStage.initStyle(StageStyle.UNDECORATED);
+      FXGUI.stage = primaryStage;
+      stage.initStyle(StageStyle.UNDECORATED);
+      stage.getIcons().add(
+          new Image(FXGUI.class.getResource("icon.png").toExternalForm()));
       Font.loadFont(
           FXGUI.class.getResource("Inconsolata.otf").toExternalForm(), 20);
       AnchorPane page = (AnchorPane) FXMLLoader.load(FXGUI.class
           .getResource("Main.fxml"));
-      FXGUI.stage = primaryStage;
-      primaryStage.getIcons().add(
-          new Image(FXGUI.class.getResource("icon.png").toExternalForm()));
-
       Scene scene = new Scene(page);
       scene.getStylesheets().add(
           getClass().getResource("app.css").toExternalForm());
-      primaryStage.setScene(scene);
-      primaryStage.setTitle("GOKU");
-      primaryStage.show();
+      stage.setScene(scene);
+      stage.setTitle("GOKU");
+      stage.show();
     } catch (IOException e) {
+      LOGGER
+          .log(Level.SEVERE, "Unable to start GOKU Graphical User Interface.");
+      System.err.println("GOKU has failed to start.");
       e.printStackTrace();
     }
   }
@@ -73,5 +81,4 @@ public class FXGUI extends Application implements UserInterface {
   public void run() {
     launch(FXGUI.class);
   }
-
 }
