@@ -173,8 +173,7 @@ public class FeedbackController {
   }
 
   private void displayCompleteTask(Task task) {
-    String fontsize = "26";
-    Label tick = AwesomeDude.createIconLabel(AwesomeIcon.CHECK, fontsize);
+    Label tick = AwesomeDude.createIconLabel(AwesomeIcon.CHECK);
     Label b1 = new Label("[");
     Label b2 = new Label("]");
 
@@ -183,6 +182,7 @@ public class FeedbackController {
     b2.setTextFill(ID_COLOUR);
     HBox tickHbox = new HBox();
     tickHbox.getChildren().addAll(b1, tick, b2);
+    tickHbox.setAlignment(Pos.CENTER);
 
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
