@@ -1,7 +1,9 @@
 package goku.ui;
 
+import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
+import goku.Task;
 import goku.action.Action;
 import goku.action.ExitAction;
 import goku.action.MakeActionException;
@@ -15,6 +17,7 @@ import goku.util.InvalidDateRangeException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -116,7 +119,8 @@ public class GokuController {
    * inputField. Ctrl + Z and Ctrl + Y is a shortcut for Undo and Redo,
    * respectively.
    */
-  public void keyPressOnInputField(KeyEvent event) throws InvalidDateRangeException {
+  public void keyPressOnInputField(KeyEvent event)
+      throws InvalidDateRangeException {
     if (event.isControlDown()) {
       handleControlKeypress(event);
     } else if (event.getCode() == KeyCode.ENTER) {
@@ -132,7 +136,8 @@ public class GokuController {
    * Called when user presses a Ctrl + ? combination,
    * where ? is any key.
    */
-  private void handleControlKeypress(KeyEvent event) throws InvalidDateRangeException {
+  private void handleControlKeypress(KeyEvent event)
+      throws InvalidDateRangeException {
     if (event.getCode() == KeyCode.Z) {
       inputField.setText("undo");
       commitInput();
@@ -249,11 +254,15 @@ public class GokuController {
     @Override
     public Result doIt() {
       SearchAction sa = new SearchAction(goku);
-      sa.dline = DateUtil.getNow().plusDays(1);
-      Result result = sa.doIt();
-      return new Result(true, MSG, null, result.getTasks());
+      try {
+        sa.period = new DateRange(DateUtil.getNow(), DateUtil.getNow()
+            .getEndOfDay());
+      } catch (InvalidDateRangeException e) {
+      }
+      Result result2 = sa.doIt();
+      List<Task> list2 = result2.getTasks();
+
+      return new Result(true, MSG, null, list2);
     }
-
   }
-
 }
