@@ -115,8 +115,8 @@ public class TaskListDisplayer {
     }
     DateTime now = DateUtil.getNow();
 
-    return DateUtil.isLaterOrOn(now, dateRange.getStartDate().getStartOfDay())
-        && DateUtil.isEarlierOrOn(now, dateRange.getEndDate().getEndOfDay());
+    return DateUtil.isLaterOrOn(dateRange.getStartDate(), now.getStartOfDay())
+        && DateUtil.isEarlierOrOn(dateRange.getEndDate(), now.getEndOfDay());
   }
 
   private boolean isToday(DateTime date) {
