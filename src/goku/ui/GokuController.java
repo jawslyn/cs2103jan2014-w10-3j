@@ -35,6 +35,24 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/*
+ * GokuController is the main coordinator of all user actions that happen
+ * on the GUI. It knows of other controllers and their duties.
+ * It also knows the mapping between Events and Controllers that handle them.
+ * Most of what GokuController is to look at an Event, and delegate it to
+ * the appropriate Controller to handle.
+ * For example, when the user presses the up arrow key, this event is sent to the
+ * HistoryController, which responsibility is to remember what the user has entered
+ * and to allow the user to scroll through the history.
+ * GokuController's most important responsibility is to handle the execution of user
+ * commands. This is done again by listening on a press of the Enter key.
+ * The following sequence of events then happen:
+ *   1. User presses Enter key
+ *   2. Calls on InputParser to parse the user's input into an Action
+ *   3a. Close application if the user wants to exit
+ *   3b. Executes the command by calling doAction(Action).
+ *   4. Feedback to the user the Result of the Action, via the FeedbackController
+ */
 public class GokuController {
 
   private static final String ERR_PARSE_FILE_FAIL = "Error parsing JSON, loaded tasks to the best of my ability.";
@@ -190,7 +208,8 @@ public class GokuController {
         feedbackController.sayGoodbye();
         Platform.exit();
       }
-      doAction(action);
+      Result result = doAction(action);
+      feedBack(result);
     } catch (MakeActionException e) {
       feedbackController.displayErrorMessage(e.getMessage());
     }
@@ -212,12 +231,12 @@ public class GokuController {
     inputField.clear();
   }
 
-  private void doAction(Action action) {
+  private Result doAction(Action action) {
     Result result = action.doIt();
-    feedBack(result);
     if (action.shouldSave()) {
       save();
     }
+    return result;
   }
 
   /*
