@@ -173,6 +173,7 @@ public class FeedbackController {
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
+    title.setMinWidth(50.0);
     VBox dateVBox = makeDateVbox(task, true);
 
     output.add(id, 0, lines);
@@ -187,6 +188,7 @@ public class FeedbackController {
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
+    title.setMinWidth(50.0);
     VBox dateVBox = makeDateVbox(task, false);
 
     output.add(id, 0, lines);
