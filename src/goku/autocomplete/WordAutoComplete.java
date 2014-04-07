@@ -57,7 +57,7 @@ public class WordAutoComplete {
         "next", "monday", "tuesday", "wednesday", "thursday", "friday",
         "saturday", "sunday", "week", "from", "by", "on", "do", "find", "play",
         "meet", "meeting", "homework", "project", "completed", "overdue",
-        "remove", "period", "deadline", "important" })));
+        "remove", "period", "deadline", "important", "tomorrow" })));
     return defaultCorpus;
   }
 
