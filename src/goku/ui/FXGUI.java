@@ -8,6 +8,7 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -41,6 +42,8 @@ public class FXGUI extends Application implements UserInterface {
       AnchorPane page = (AnchorPane) FXMLLoader.load(FXGUI.class
           .getResource("Main.fxml"));
       FXGUI.stage = primaryStage;
+      primaryStage.getIcons().add(
+          new Image(FXGUI.class.getResource("icon.png").toExternalForm()));
 
       Scene scene = new Scene(page);
       scene.getStylesheets().add(
