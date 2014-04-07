@@ -67,6 +67,11 @@ public class InputParserTest {
     aa = (AddAction) a;
     assertEquals("this is a title", aa.getTitle());
 
+    a = p.parse("add 12");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("12", aa.getTitle());
+
     DateTime now = DateUtil.getNow();
     a = p.parse("add this is a task by    tomorrow    ");
     assertTrue(a instanceof AddAction);
