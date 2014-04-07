@@ -35,7 +35,7 @@ import de.jensd.fx.fontawesome.AwesomeIcon;
  */
 public class FeedbackController {
   private static final Paint ERROR_COLOUR = Color.rgb(255, 10, 0);
-  private static final Paint IMPT_COLOUR = Color.RED;
+  private static final Paint IMPT_COLOUR = Color.rgb(235, 40, 30);
   private static final Paint DONE_COLOUR = Color.LIME;
   private static final Paint SUCCESS_COLOUR = Color.rgb(13, 255, 166);
   private static final Paint NORMAL_COLOUR = Color.web("F9F8F1");

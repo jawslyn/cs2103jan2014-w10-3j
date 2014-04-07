@@ -8,11 +8,18 @@ public class GokuMain {
   static UserInterface ui;
   static GOKU goku = new GOKU();
 
+  /*
+   * Runs either a Command Line or Graphical Interface polymorphically
+   */
   public static void main(String[] args) {
     ui = setUserInterface(args);
     ui.run();
   }
 
+  /*
+   * Determines which UserInterface to run based on the arguments to
+   * the program.
+   */
   private static UserInterface setUserInterface(String[] args) {
     if (shouldRunCli(args)) {
       return new CLUserInterface(goku);

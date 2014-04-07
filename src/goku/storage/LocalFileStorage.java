@@ -45,6 +45,16 @@ public class LocalFileStorage implements Storage {
     return file.getAbsolutePath();
   }
 
+  /*
+   * This has the exact same implementation as saveAll(TaskList tasklist)
+   * because this is mainly used for testing purposes.
+   * Since the internals of these 2 methods are the same,
+   * when this test passes, we can be sure that the other will pass as well.
+   * This allows us to mock the objects and remove any knowledge of how toStorageFormat
+   * actually looks like.
+   * (non-Javadoc)
+   * @see goku.storage.Storage#saveAll(java.lang.Iterable)
+   */
   @Override
   public void saveAll(Iterable<Storeable> list) throws IOException {
     if (list == null) {
@@ -82,8 +92,8 @@ public class LocalFileStorage implements Storage {
   }
 
   @Override
-  public TaskList loadStorage() throws FileNotFoundException, IOException,
-      LoadTasksException {
+  public TaskList loadStorage() throws LoadTasksException,
+      FileNotFoundException, IOException {
     List<Integer> errorLines = new ArrayList<Integer>();
     int currentLine = 1;
     LOGGER.info("Loading from file: " + file.getName());
