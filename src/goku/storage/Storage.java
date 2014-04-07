@@ -13,6 +13,9 @@ public interface Storage {
 
   public void saveAll(Iterable<Storeable> list) throws IOException;
 
+  /*
+   * Saves all tasks in the TaskList to the underlying storage.
+   */
   public void saveAll(TaskList tasklist) throws IOException;
 
   public void delete();
