@@ -9,6 +9,7 @@ import goku.action.DeleteAction;
 import goku.action.DisplayAction;
 import goku.action.EditAction;
 import goku.action.ExitAction;
+import goku.action.HelpAction;
 import goku.action.MakeActionException;
 import goku.action.NoAction;
 import goku.action.RedoAction;
@@ -25,16 +26,16 @@ import java.util.List;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
-/*
- * InputParser parses an input String into an {@link Action}.
- * The steps taken are:
- * 1. Split the input into tokens. Each token is guaranteed to be
- * non-empty and trimmed
- * 2. The first token is checked to see if it is a command.
- * This check is done by iterating through the arrays of keywords.
- * 3. The appropriate subclass of Action is made using the
- * makeXAction methods.
- * 4. In the event when any of the Actions are null, a NoAction is returned.
+/**
+ * InputParser parses an input String into an {@link Action}. The steps taken
+ * are: 1. Split the input into tokens. Each token is guaranteed to be non-empty
+ * and trimmed 2. The first token is checked to see if it is a command. This
+ * check is done by iterating through the arrays of keywords. 3. The appropriate
+ * subclass of Action is made using the makeXAction methods. 4. In the event
+ * when any of the Actions are null, a NoAction is returned.
+ * 
+ * @author Jonathan
+ * @author ZhiAn
  * 
  */
 public class InputParser {
@@ -433,7 +434,7 @@ public class InputParser {
     params = inputArray.length > 1 ? Arrays.copyOfRange(inputArray, 1,
         inputArray.length) : new String[0];
     lowerParams = new String[params.length];
-    for(int i=0; i< params.length; i++) {
+    for (int i = 0; i < params.length; i++) {
       lowerParams[i] = params[i].toLowerCase();
     }
 

@@ -8,11 +8,11 @@ import hirondelle.date4j.DateTime;
 
 import com.google.gson.Gson;
 
-/*
+/**
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
+ * 
  */
-
 public class Task implements Storeable, Comparable<Task> {
 
   private Integer id;
@@ -149,7 +149,7 @@ public class Task implements Storeable, Comparable<Task> {
   public boolean isDueOn(DateTime date) {
     return deadline != null && DateUtil.isEarlierOrOn(deadline, date);
   }
-  
+
   public boolean isOn(DateTime date) {
     return deadline != null && DateUtil.isSameDay(deadline, date);
   }
@@ -191,28 +191,28 @@ public class Task implements Storeable, Comparable<Task> {
   @Override
   public int compareTo(Task thatTask) {
     // Case 1:
-    if (this.impt==true && thatTask.impt==false) {
+    if (this.impt == true && thatTask.impt == false) {
       return -1;
-    } else if (this.impt==false && thatTask.impt==true){
+    } else if (this.impt == false && thatTask.impt == true) {
       return 1;
     }
-    
+
     // Case 2: compare by deadline or start date
-    if (this.deadline==null && this.period==null) {
-      if (thatTask.deadline!=null || thatTask.period!=null) {
+    if (this.deadline == null && this.period == null) {
+      if (thatTask.deadline != null || thatTask.period != null) {
         return 1;
       } else {
         return 0;
       }
-    } else if (this.deadline!=null || this.period!=null) {
-      if (thatTask.deadline==null && thatTask.period==null) {
+    } else if (this.deadline != null || this.period != null) {
+      if (thatTask.deadline == null && thatTask.period == null) {
         return -1;
       }
     }
-    
+
     DateTime thisDate = null;
     DateTime thatDate = null;
-    
+
     // get comparative date for this
     if (this.deadline != null) {
       assert this.period == null;
@@ -221,7 +221,7 @@ public class Task implements Storeable, Comparable<Task> {
       assert this.period != null;
       thisDate = this.period.getStartDate();
     }
-    
+
     // get comparative date for that
     if (thatTask.deadline != null) {
       assert thatTask.period == null;
@@ -230,11 +230,11 @@ public class Task implements Storeable, Comparable<Task> {
       assert thatTask.period != null;
       thatDate = thatTask.period.getStartDate();
     }
-    
+
     // compare dates
-    if (thisDate==null && thatDate==null) {
+    if (thisDate == null && thatDate == null) {
       return 0;
-    } else if (thisDate!=null && thatDate!=null) {
+    } else if (thisDate != null && thatDate != null) {
       return thisDate.compareTo(thatDate);
     } else if (thisDate != null) {
       return -1;

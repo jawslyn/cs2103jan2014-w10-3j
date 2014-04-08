@@ -7,13 +7,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-/*
- * Completes a prefix that has been entered by the user.
- * For completing command keywords, @see CommandAutoComplete
- * WordAutoComplete makes a default corpus and completion suggestions are
- * based of this default corpus.
- * User has the ability to add more words to this corpus for
- * WordAutoComplete to be able to suggest completions from them as well
+/**
+ * Completes a prefix that has been entered by the user. For completing command
+ * keywords, @see CommandAutoComplete WordAutoComplete makes a default corpus
+ * and completion suggestions are based of this default corpus. User has the
+ * ability to add more words to this corpus for WordAutoComplete to be able to
+ * suggest completions from them as well
+ * 
+ * @author ZhiAn
  */
 public class WordAutoComplete {
   private final static SortedSet<String> DEFAULT_CORPUS = makeDefaultCorpus();

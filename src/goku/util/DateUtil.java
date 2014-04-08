@@ -6,6 +6,11 @@ import hirondelle.date4j.DateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
+/**
+ * @author Jonathan
+ * @author ZhiAn
+ * 
+ */
 public class DateUtil {
   private static String[] weekdays = { null, "sunday", "monday", "tuesday",
       "wednesday", "thursday", "friday", "saturday" };
@@ -136,20 +141,21 @@ public class DateUtil {
     String[] s = string.split(" ");
     return parse(s);
   }
-  
+
   public static boolean periodClashesWithDay(DateRange period, DateTime day) {
     assert day != null;
     if (period == null) {
       return false;
     }
-    
-    if (isSameDay(period.getStartDate(), day) || isSameDay(period.getEndDate(), day)) {
+
+    if (isSameDay(period.getStartDate(), day)
+        || isSameDay(period.getEndDate(), day)) {
       return true;
     } else {
       return false;
     }
   }
-  
+
   // compare up to day
   public static boolean isSameDay(DateTime aDate, DateTime otherDate) {
     assert otherDate != null;
@@ -157,21 +163,23 @@ public class DateUtil {
       return false;
     }
 
-    if (aDate.truncate(DateTime.Unit.DAY).equals(otherDate.truncate(DateTime.Unit.DAY))) {
+    if (aDate.truncate(DateTime.Unit.DAY).equals(
+        otherDate.truncate(DateTime.Unit.DAY))) {
       return true;
     } else {
       return false;
     }
   }
- 
+
   // compare up to minutes
   public static boolean isSameDayAndTime(DateTime aDate, DateTime otherDate) {
     assert otherDate != null;
     if (aDate == null) {
       return false;
     }
-    
-    if (aDate.truncate(DateTime.Unit.MINUTE).equals(otherDate.truncate(DateTime.Unit.MINUTE))) {
+
+    if (aDate.truncate(DateTime.Unit.MINUTE).equals(
+        otherDate.truncate(DateTime.Unit.MINUTE))) {
       return true;
     } else {
       return false;
@@ -419,7 +427,7 @@ public class DateUtil {
   }
 
   public static String toString(DateTime date) {
-    if(date.getHour() == null) {
+    if (date.getHour() == null) {
       return DateOutput.formatDateOnlyDayMonth(date);
     } else {
       return DateOutput.formatDateTimeDayMonthHourMin(date);

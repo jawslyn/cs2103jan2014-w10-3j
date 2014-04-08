@@ -26,6 +26,8 @@ import javafx.scene.input.KeyEvent;
  * 3a. Close application if the user wants to exit 3b. Executes the command by
  * calling doAction(Action). 4. Feedback to the user the Result of the Action,
  * via the FeedbackController
+ * 
+ * @author ZhiAn
  */
 public class GokuController extends Controller {
 
