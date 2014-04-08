@@ -13,7 +13,7 @@ import com.google.gson.Gson;
  * analogous to real life tasks which the user wishes to note down.
  */
 
-public class Task implements Storeable {
+public class Task implements Storeable, Comparable<Task> {
 
   private Integer id;
   private String title;
@@ -182,5 +182,56 @@ public class Task implements Storeable {
       return;
     }
     this.impt = impt;
+  }
+
+  /*
+   * Case 1: If impt, task is higher on the list
+   * Case 2: Else by earliest start date or deadline
+   */
+  @Override
+  public int compareTo(Task thatTask) {
+    // Case 1:
+    if (this.impt==true && thatTask.impt==false) {
+      return -1;
+    } else if (this.impt==false && thatTask.impt==true){
+      return 1;
+    }
+    
+    // Case 2: compare by deadline or start date
+    if (this.deadline==null && this.period==null && thatTask.deadline==null && thatTask.period==null) {
+      return 0;
+    }
+    
+    DateTime thisDate = null;
+    DateTime thatDate = null;
+    
+    // get comparative date for this
+    if (this.deadline != null) {
+      assert this.period == null;
+      thisDate = this.deadline;
+    } else {
+      assert this.period != null;
+      thisDate = this.period.getStartDate();
+    }
+    
+    // get comparative date for that
+    if (thatTask.deadline != null) {
+      assert thatTask.period == null;
+      thatDate = thatTask.deadline;
+    } else {
+      assert thatTask.period != null;
+      thatDate = thatTask.period.getStartDate();
+    }
+    
+    // compare dates
+    if (thisDate==null && thatDate==null) {
+      return 0;
+    } else if (thisDate!=null && thatDate!=null) {
+      return thisDate.compareTo(thatDate);
+    } else if (thisDate != null) {
+      return -1;
+    } else {
+      return 1;
+    }
   }
 }

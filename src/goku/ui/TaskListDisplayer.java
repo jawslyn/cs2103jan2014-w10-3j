@@ -7,6 +7,7 @@ import hirondelle.date4j.DateTime;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
@@ -44,6 +45,13 @@ public class TaskListDisplayer {
       }
     }
 
+    // sort lists for display
+    Collections.sort(completed);
+    Collections.sort(overdue);
+    Collections.sort(today);
+    Collections.sort(tomorrow);
+    Collections.sort(remaining);
+    
     ht.put("completed", completed);
     ht.put("overdue", overdue);
     ht.put("today", today);
@@ -72,6 +80,12 @@ public class TaskListDisplayer {
         remaining.add(task);
       }
     }
+    
+    // sort lists for display
+    Collections.sort(today);
+    Collections.sort(tomorrow);
+    Collections.sort(remaining);
+    Collections.sort(past);
 
     System.out.println("---Today---");
     for (Task task : today) {
@@ -90,7 +104,7 @@ public class TaskListDisplayer {
       System.out.println(task.toString());
     }
   }
-
+  
   private boolean isOver(DateRange dateRange) {
     if (dateRange == null) {
       return false;
