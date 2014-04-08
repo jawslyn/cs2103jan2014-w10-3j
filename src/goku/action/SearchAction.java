@@ -23,14 +23,14 @@ public class SearchAction extends Action {
   public boolean testFree = false;
   public DateTime freeDateQuery;
 
-  private static final String MSG_SUCCESS = "Found tasks for \"%s\"...";
-
+  private static final String MSG_SUCCESS_BY_TITLE = "Found tasks for \"%s\"...";
   private static final String MSG_FAIL_BY_TITLE = "No relevant tasks for \"%s\".";
+  private static final String MSG_SUCCESS_BY_DATE = "Found tasks for %s...";
   private static final String MSG_FAIL = "No relevant tasks.";
-  private static final String IS_FREE = "Specified datetime is available.";
-  private static final String NOT_FREE = "Specified datetime is not available.";
-  private static final String FREE_SLOTS = "Here are your free timings of the day.";
-  private static final String NO_FREE_SLOTS = "Your day is fully packed!";
+  private static final String IS_FREE = "%s is available.";
+  private static final String NOT_FREE = "%s is not available.";
+  private static final String FREE_SLOTS = "Here are your free timings for %s.";
+  private static final String NO_FREE_SLOTS = "%s is fully packed!";
   public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
   public static final String ERR_NO_VALID_DATE_FOUND = "Can't search! Try entering a valid date after \"free\"";
   private static final String ERR_DEADLINE_PERIOD_CONFLICT = "Can't search! Conflicting deadline and period.";
@@ -62,9 +62,9 @@ public class SearchAction extends Action {
 
   private Result checkIfFree() {
     if (list.isFree(freeDateQuery) == true) {
-      return new Result(true, IS_FREE, null, null);
+      return new Result(true, String.format(IS_FREE, DateUtil.toString(freeDateQuery)), null, null);
     } else {
-      return new Result(false, null, NOT_FREE, null);
+      return new Result(false, null, String.format(NOT_FREE, DateUtil.toString(freeDateQuery)), null);
     }
   }
   
@@ -74,9 +74,9 @@ public class SearchAction extends Action {
     List<String> freeSlots = list.findFreeSlots(freeDateQuery);
     
     if (!freeSlots.isEmpty()) {
-      return new Result(true, FREE_SLOTS, null, freeSlots, null);
+      return new Result(true, String.format(FREE_SLOTS, DateUtil.toString(freeDateQuery)), null, freeSlots, null);
     } else {
-      return new Result(false, null, NO_FREE_SLOTS, null);
+      return new Result(false, null, String.format(NO_FREE_SLOTS, DateUtil.toString(freeDateQuery)), null);
     }
   }
 
@@ -124,7 +124,7 @@ public class SearchAction extends Action {
   public Result searchTasksOnDay() {
     List<Task> foundTasks = list.findTasksOnDay(onDateQuery);
     if (foundTasks.size() != 0) {
-      return new Result(true, String.format(MSG_SUCCESS, DateUtil.toString(onDateQuery)), null, foundTasks);
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE, DateUtil.toString(onDateQuery)), null, foundTasks);
     } else {
       return new Result(false, null, editMsgIfHaveOverdue(String.format(MSG_FAIL, DateUtil.toString(onDateQuery))), null);
     }
@@ -137,7 +137,7 @@ public class SearchAction extends Action {
     task.setDeadline(dline);
     List<Task> foundTasks = list.findTaskByDeadline(dline);
     if (foundTasks.size() != 0) {
-      return new Result(true, String.format(MSG_SUCCESS,
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE,
           DateUtil.toString(dline)), null, foundTasks);
     } else {
       return new Result(false, null, editMsgIfHaveOverdue(String.format(
@@ -165,7 +165,7 @@ public class SearchAction extends Action {
         }
       }
 
-      return new Result(true, String.format(MSG_SUCCESS, period.toString()),
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE, period),
           null, tasksDueInPeriod.asList());
     } else {
       return new Result(false, null, editMsgIfHaveOverdue(MSG_FAIL), null);
@@ -190,7 +190,7 @@ public class SearchAction extends Action {
     task.setPeriod(period);
     List<Task> foundTasks = list.findTaskByPeriod(period);
     if (foundTasks.size() != 0) {
-      return new Result(true, String.format(MSG_SUCCESS, period), null,
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE, period), null,
           foundTasks);
     } else {
       return new Result(false, null, editMsgIfHaveOverdue(MSG_FAIL), null);
@@ -205,7 +205,7 @@ public class SearchAction extends Action {
       return new Result(false, null, editMsgIfHaveOverdue(String.format(
           MSG_FAIL_BY_TITLE, title)), null);
     } else {
-      return new Result(true, String.format(MSG_SUCCESS, title), null,
+      return new Result(true, String.format(MSG_SUCCESS_BY_TITLE, title), null,
           foundTasks);
     }
   }
