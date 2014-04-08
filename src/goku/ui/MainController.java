@@ -1,6 +1,5 @@
 package goku.ui;
 
-import goku.Commands;
 import goku.DateRange;
 import goku.GOKU;
 import goku.Result;
@@ -17,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -133,6 +131,7 @@ public class MainController {
     controllers.add(cc);
     controllers.add(new HistoryController(inputField));
     controllers.add(new GokuController(goku, inputField, feedbackPane));
+    controllers.add(new LiveSearch(goku, inputField, feedbackPane));
   }
 
   /*
@@ -144,13 +143,7 @@ public class MainController {
    * respectively.
    */
   public void keyPressOnInputField(KeyEvent event) {
-    LiveSearch liveSearch = new LiveSearch(goku, feedbackPane);
     notifyControllers(event);
-    String[] tokens = inputField.getText().split(" ");
-    if (tokens.length > 0
-        && Arrays.asList(Commands.searchKeywords).contains(tokens[0])) {
-      liveSearch.search(inputField.getText());
-    }
   }
 
   /*
