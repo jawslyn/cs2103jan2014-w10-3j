@@ -8,11 +8,11 @@ import hirondelle.date4j.DateTime;
 
 import com.google.gson.Gson;
 
-/*
+/**
  * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
  * analogous to real life tasks which the user wishes to note down.
+ * 
  */
-
 public class Task implements Storeable, Comparable<Task> {
 
   private Integer id;

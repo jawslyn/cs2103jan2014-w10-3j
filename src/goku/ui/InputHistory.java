@@ -3,6 +3,13 @@ package goku.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stores a history of user input as strings and allows callers to look through
+ * this list in order.
+ * 
+ * @author ZhiAn
+ * 
+ */
 public class InputHistory {
   List<String> history;
   public int current; // index of current history pointed to

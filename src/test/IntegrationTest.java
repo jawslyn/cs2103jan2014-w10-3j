@@ -2,12 +2,15 @@ package test;
 
 
 import goku.GOKU;
+import goku.Result;
 import goku.Task;
 import goku.TaskList;
 import goku.action.Action;
 import goku.action.AddAction;
+import goku.action.DisplayAction;
 import goku.action.EditAction;
 import goku.action.MakeActionException;
+import goku.action.SearchAction;
 import goku.ui.InputParser;
 import goku.util.InvalidDateRangeException;
 
@@ -33,7 +36,7 @@ public class IntegrationTest {
 
   /*
    * Integration test for user adding a task.
-   * This will test our parser, action, tasklist
+   * This will test our parser, action, task list
    */
 
   /*
@@ -94,10 +97,54 @@ public class IntegrationTest {
     ea.doIt();
     assertEquals(list.getTaskById(1).getTitle(), "edited");
     
-   // assertFalse(list.getTaskById(1).getStatus());
-    ea = (EditAction) parser.parse("do 1");
+    assertNotNull(list.getTaskById(1)) ;
+    ea = (EditAction) parser.parse("done 1");
     ea.doIt();
-    assertTrue(list.getTaskById(1).getStatus());
+   // assertTrue(list.getTaskById(0).getStatus());
 
   }
+  
+  @Test
+  //This tests whether viewing all/completed tasks  works
+  public void user_addAndViewTasks() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add complete");
+    aa.doIt();
+    aa = (AddAction) parser.parse("add incomplete");
+    aa.doIt();
+    
+    DisplayAction da = (DisplayAction) parser.parse("view");
+    Result all = da.doIt();  
+    
+    assertEquals(all.getTasks().size(), 2);
+    
+    EditAction ea = (EditAction) parser.parse("do 1");
+    ea.doIt();
+    
+    da = (DisplayAction) parser.parse("view");
+    Result all2 = da.doIt();  
+    da = (DisplayAction) parser.parse("view completed");
+    Result completed = da.doIt();
+    
+    assertEquals(all2.getTasks().size(), 1);
+    assertEquals(completed.getTasks().size(), 1);   
+  }
+  
+  
+  @Test
+  //This tests whether searching for an existing task(s) works
+  public void user_addAndSearchTasks() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add original by today");
+    aa.doIt();
+    assertEquals(list.size(), 1);
+    assertEquals(list.getTaskById(1).getTitle(), "original");
+    
+    SearchAction sa = (SearchAction) parser.parse("search blah");
+    Result zeroFound = sa.doIt();
+    sa = (SearchAction) parser.parse("search origina");
+    Result oneFound = sa.doIt();
+    
+    assertNull(zeroFound.getTasks());
+    assertEquals(oneFound.getTasks().size(), 1);
+  }
+  
 }

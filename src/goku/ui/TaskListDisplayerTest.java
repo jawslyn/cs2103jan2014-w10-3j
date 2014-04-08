@@ -7,6 +7,11 @@ import hirondelle.date4j.DateTime;
 
 import org.junit.Test;
 
+/**
+ * @author Jocelyn
+ * @author ZhiAn
+ * 
+ */
 public class TaskListDisplayerTest {
   TaskListDisplayer tld = new TaskListDisplayer(System.out);
   TaskList list = new TaskList();
@@ -29,10 +34,12 @@ public class TaskListDisplayerTest {
     Task task = new Task();
     task.setTitle(title);
     if (daysAway < 0) {
-      DateTime deadline = DateUtil.getNow().minus(0, 0, -daysAway, 2, 0, 0, 0, DateTime.DayOverflow.LastDay);
+      DateTime deadline = DateUtil.getNow().minus(0, 0, -daysAway, 2, 0, 0, 0,
+          DateTime.DayOverflow.LastDay);
       task.setDeadline(deadline);
     } else {
-      DateTime deadline = DateUtil.getNow().plus(0, 0, daysAway, 2, 0, 0, 0, DateTime.DayOverflow.LastDay);
+      DateTime deadline = DateUtil.getNow().plus(0, 0, daysAway, 2, 0, 0, 0,
+          DateTime.DayOverflow.LastDay);
       task.setDeadline(deadline);
     }
     return task;

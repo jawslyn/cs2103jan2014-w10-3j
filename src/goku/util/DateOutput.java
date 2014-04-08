@@ -8,6 +8,11 @@ import java.util.Locale;
  * Formats dates into a more readable string
  * Mainly wrappers around DateTime.format.
  */
+/**
+ * @author Justin
+ * @author ZhiAn
+ * 
+ */
 public class DateOutput {
 
   /*

@@ -12,6 +12,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * @author Jocelyn
+ * @author ZhiAn
+ * 
+ */
 public class TaskListDisplayer {
   PrintStream ps;
 
@@ -51,7 +56,7 @@ public class TaskListDisplayer {
     Collections.sort(today);
     Collections.sort(tomorrow);
     Collections.sort(remaining);
-    
+
     ht.put("completed", completed);
     ht.put("overdue", overdue);
     ht.put("today", today);
@@ -80,7 +85,7 @@ public class TaskListDisplayer {
         remaining.add(task);
       }
     }
-    
+
     // sort lists for display
     Collections.sort(today);
     Collections.sort(tomorrow);
@@ -104,7 +109,7 @@ public class TaskListDisplayer {
       System.out.println(task.toString());
     }
   }
-  
+
   private boolean isOver(DateRange dateRange) {
     if (dateRange == null) {
       return false;

@@ -42,6 +42,9 @@ import javafx.stage.Stage;
  * this event is sent to the HistoryController, which responsibility is to
  * remember what the user has entered and to allow the user to scroll through
  * the history.
+ * 
+ * @author ZhiAn
+ * 
  */
 public class MainController {
 
@@ -183,6 +186,7 @@ public class MainController {
    */
   private class GreetAction extends Action {
     private static final String MSG = "Welcome to GOKU!\nHere are your tasks for today!";
+    private static final String NO_TASK_MSG = "Welcome to GOKU!\nYou have no tasks today, be free! :D";
 
     public GreetAction(GOKU goku) {
       super(goku);
@@ -194,12 +198,16 @@ public class MainController {
       try {
         sa.period = new DateRange(DateUtil.getNow(), DateUtil.getNow()
             .getEndOfDay());
-      } catch (InvalidDateRangeException e) {
-      }
-      Result result2 = sa.doIt();
-      List<Task> list2 = result2.getTasks();
+        Result result = sa.doIt();
+        List<Task> tasks = result.getTasks();
+        if (tasks == null || tasks.size() == 0) {
+          return new Result(true, NO_TASK_MSG, null, null);
+        }
 
-      return new Result(true, MSG, null, list2);
+        return new Result(true, MSG, null, tasks);
+      } catch (InvalidDateRangeException e) {
+        return new Result(false, MSG, null, null);
+      }
     }
   }
 }

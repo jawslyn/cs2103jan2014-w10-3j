@@ -7,6 +7,11 @@ import hirondelle.date4j.DateTime;
 
 import org.junit.Test;
 
+/**
+ * @author Jonathan
+ * @author ZhiAn
+ * 
+ */
 public class DateUtilTest {
   /*
    * Combination heuristics. All inputs below are well-formed
@@ -244,17 +249,17 @@ public class DateUtilTest {
     result = DateUtil.mergeDateAndTime(date, time, 0);
     assertEquals(expected, result);
   }
-  
+
   @Test
   public void isSameDay_success() {
     DateTime aDate = DateTime.forDateOnly(2014, 3, 4);
     DateTime otherDate = aDate;
     assertTrue(DateUtil.isSameDay(aDate, otherDate));
-    
+
     aDate = DateUtil.getNow();
     otherDate = DateUtil.getNow();
     assertTrue(DateUtil.isSameDay(aDate, otherDate));
-    
+
     assertTrue(DateUtil.isSameDay(DateUtil.getNow(), DateUtil.getNowDate()));
   }
 }

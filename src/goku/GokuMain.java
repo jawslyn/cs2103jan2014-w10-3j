@@ -4,6 +4,12 @@ import goku.ui.CLUserInterface;
 import goku.ui.FXGUI;
 import goku.ui.UserInterface;
 
+/**
+ * Entry point of GOKU
+ * 
+ * @author ZhiAn
+ * 
+ */
 public class GokuMain {
   static UserInterface ui;
   static GOKU goku = new GOKU();

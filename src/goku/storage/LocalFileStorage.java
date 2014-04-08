@@ -17,9 +17,12 @@ import java.util.logging.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-/*
+/**
  * LocalFileStorage saves objects into a file on the local file system. By
  * default the file has the name "store.goku".
+ * 
+ * @author ZhiAn
+ * 
  */
 public class LocalFileStorage implements Storage {
   private static final String ERR_NULL_STOREABLE_ARRAY = "Storeable[] cannot be null!";

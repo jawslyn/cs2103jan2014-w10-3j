@@ -27,11 +27,13 @@ import com.google.common.base.Splitter;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
 
-/*
- * FeedbackController takes care of outputting feedback to user.
- * The area where feedback is shown to user is a JavaFX VBox.
- * The VBox acts like a console, printing lines of input.
- * Each line is a child of the VBox.
+/**
+ * FeedbackController takes care of outputting feedback to user. The area where
+ * feedback is shown to user is a JavaFX VBox. The VBox acts like a console,
+ * printing lines of input. Each line is a child of the VBox.
+ * 
+ * @author ZhiAn
+ * 
  */
 public class FeedbackPane {
   private static final Paint ERROR_COLOUR = Color.rgb(255, 10, 0);
