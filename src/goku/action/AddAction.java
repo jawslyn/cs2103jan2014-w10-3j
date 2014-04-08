@@ -16,6 +16,7 @@ public class AddAction extends Action {
   private static final String ERR_FAIL = "Fail to add: \"%s\"";
   public static final String ERR_INSUFFICIENT_ARGS = "Can't add! Need title. Try \"add my task! by tomorrow\"";
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+  private static final String MSG_CLASH = "Attention: The task added clashes with other tasks!";
 
   public String title;
   public String deadline;
@@ -34,8 +35,11 @@ public class AddAction extends Action {
   private Result addTask() {
     addToUndoList();
     Task task = makeTask();
+    boolean hasClash = list.hasClash(task);
     int newId = list.addTask(task);
-    if (newId > 0) {
+    if (newId > 0 && hasClash) {
+      return clashAddTask();
+    } else if (newId > 0) {
       return successAddTask();
     } else {
       return failedToAddTask();
@@ -90,6 +94,15 @@ public class AddAction extends Action {
     Result result = Result.makeSuccessResult();
     result
         .setSuccessMsg(editMsgIfHaveOverdue(String.format(MSG_SUCCESS, title)));
+    result.setTasks(list.getAllIncomplete());
+    return result;
+  }
+
+  private Result clashAddTask() {
+    Result result = Result.makeSuccessResult();
+    result
+        .setSuccessMsg(editMsgIfHaveOverdue(String.format(MSG_SUCCESS, title)));
+    result.setClashMsg(MSG_CLASH);
     result.setTasks(list.getAllIncomplete());
     return result;
   }

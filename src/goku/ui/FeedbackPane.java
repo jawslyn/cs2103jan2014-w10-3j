@@ -136,6 +136,9 @@ public class FeedbackPane {
     if (result.isSuccess()) {
       displayLine("Yay!", SUCCESS_COLOUR);
       displayLine(result.getSuccessMsg());
+      if (result.getClashMsg() != null) {
+        displayLine(result.getClashMsg(), ERROR_COLOUR);
+      }
       if (result.getListMsg() != null) {
         displayLines(result.getListMsg());
       }
