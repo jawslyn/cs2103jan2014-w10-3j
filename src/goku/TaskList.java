@@ -373,6 +373,22 @@ public class TaskList implements Iterable<Task> {
     return "[" + formatStart + " - " + formatEnd + "]";
   }
 
+  public boolean hasClash(Task task) {
+    if (task.getDateRange() != null) {
+      for (Task taskFromList : _list) {
+        if (taskFromList.getDateRange() != null) {
+          if (DateUtil.isLaterThan(task.getEndDate(),
+              taskFromList.getStartDate())
+              && DateUtil.isEarlierThan(task.getStartDate(),
+                  taskFromList.getEndDate())) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   @Override
   public Iterator<Task> iterator() {
     return _list.listIterator();

@@ -2,6 +2,7 @@ package goku;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import goku.util.DateUtil;
 import goku.util.InvalidDateRangeException;
 import hirondelle.date4j.DateTime;
@@ -204,127 +205,191 @@ public class TaskListTest {
     assertReturnListIsSize(2);
 
   }
-  
-  @Test (expected = AssertionError.class)
-  public void findFreeSlots_AssertionErrorDateShouldNotHaveTime() throws InvalidDateRangeException {
+
+  @Test
+  public void hasClash_StartLaterEndEarlier_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("3pm"), DateUtil.parse("4pm")));
+    list.addTask(a);
+    assertTrue(list.hasClash(b));
+  }
+
+  @Test
+  public void hasClash_StartEarlierEndEarlier_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("12pm"), DateUtil.parse("3pm")));
+    list.addTask(a);
+    assertTrue(list.hasClash(b));
+  }
+
+  @Test
+  public void hasClash_StartLaterEndLater_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("4pm"), DateUtil.parse("7pm")));
+    list.addTask(a);
+    assertTrue(list.hasClash(b));
+  }
+
+  @Test
+  public void hasClash_NoClash_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("12pm"), DateUtil.parse("1pm")));
+    list.addTask(a);
+    assertTrue(!list.hasClash(b));
+    list.addTask(b);
+    Task c = new Task();
+    c.setPeriod(new DateRange(DateUtil.parse("7am"), DateUtil.parse("11pm")));
+    assertTrue(!list.hasClash(c));
+  }
+
+  @Test(expected = AssertionError.class)
+  public void findFreeSlots_AssertionErrorDateShouldNotHaveTime()
+      throws InvalidDateRangeException {
     DateTime now = DateUtil.getNow();
-    
+
     list.findFreeSlots(now);
   }
-  
+
   @Test
   public void findFreeSlots_DateHasNoTasks() throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
     assertListIsSize(0);
-    
+
     List<String> expected = new ArrayList<String>();
     expected.add("[00:00 - 23:59]");
-    
+
     assertEquals(expected, list.findFreeSlots(today));
   }
-  
+
   @Test
-  public void findFreeSlots_DateHasTaskThatOccupiesWholeDay() throws InvalidDateRangeException {
+  public void findFreeSlots_DateHasTaskThatOccupiesWholeDay()
+      throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
     Task aTask = makeTaskWithTitleAndTodayPeriod("a");
     list.addTask(aTask);
-    
+
     assertEquals(new ArrayList<String>(), list.findFreeSlots(today));
   }
-  
+
   @Test
-  public void findFreeSlots_TwoPeriodsNonOverlapping() throws InvalidDateRangeException {
+  public void findFreeSlots_TwoPeriodsNonOverlapping()
+      throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
     Task aTask = makeTaskWithTitle("a");
     Task bTask = makeTaskWithTitle("b");
-    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 1, 0, 0, 0, DateTime.DayOverflow.Spillover),
-        today.plus(0, 0, 0, 5, 0, 0, 0, DateTime.DayOverflow.Spillover)));
-    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 9, 0, 0, 0, DateTime.DayOverflow.Spillover), 
-        today.plus(0, 0, 0, 17, 0, 0, 0, DateTime.DayOverflow.Spillover)));
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 1, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 5, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 9, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 17, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
     list.addTask(aTask);
     list.addTask(bTask);
-    
+
     List<String> expected = new ArrayList<String>();
     expected.add("[00:00 - 00:59]");
     expected.add("[05:00 - 08:59]");
     expected.add("[17:00 - 23:59]");
-    
+
     assertEquals(expected, list.findFreeSlots(today));
   }
-  
+
   @Test
-  public void findFreeSlots_ThreePeriodsOverlapping() throws InvalidDateRangeException {
+  public void findFreeSlots_ThreePeriodsOverlapping()
+      throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
     Task aTask = makeTaskWithTitle("a");
     Task bTask = makeTaskWithTitle("b");
     Task cTask = makeTaskWithTitle("c");
-    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 11, 0, 0, 0, DateTime.DayOverflow.Spillover),
-        today.plus(0, 0, 0, 15, 0, 0, 0, DateTime.DayOverflow.Spillover)));
-    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 13, 0, 0, 0, DateTime.DayOverflow.Spillover), 
-        today.plus(0, 0, 0, 17, 0, 0, 0, DateTime.DayOverflow.Spillover)));
-    cTask.setPeriod(new DateRange(today.plus(0, 0, 0, 16, 0, 0, 0, DateTime.DayOverflow.Spillover), 
-        today.plus(0, 0, 0, 20, 0, 0, 0, DateTime.DayOverflow.Spillover)));
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 11, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 15, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 13, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 17, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    cTask.setPeriod(new DateRange(today.plus(0, 0, 0, 16, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 20, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
     list.addTask(aTask);
     list.addTask(bTask);
     list.addTask(cTask);
-    
+
     List<String> expected = new ArrayList<String>();
     expected.add("[00:00 - 10:59]");
     expected.add("[20:00 - 23:59]");
-    
+
     assertEquals(expected, list.findFreeSlots(today));
   }
-  
+
   @Test
-  public void findFreeSlots_ThreePeriodsSemiOverlapping() throws InvalidDateRangeException {
+  public void findFreeSlots_ThreePeriodsSemiOverlapping()
+      throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
     Task aTask = makeTaskWithTitle("a");
     Task bTask = makeTaskWithTitle("b");
     Task cTask = makeTaskWithTitle("c");
-    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 11, 0, 0, 0, DateTime.DayOverflow.Spillover),
-        today.plus(0, 0, 0, 15, 0, 0, 0, DateTime.DayOverflow.Spillover)));
-    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 13, 0, 0, 0, DateTime.DayOverflow.Spillover), 
-        today.plus(0, 0, 0, 17, 0, 0, 0, DateTime.DayOverflow.Spillover)));
-    cTask.setPeriod(new DateRange(today.plus(0, 0, 0, 21, 0, 0, 0, DateTime.DayOverflow.Spillover), 
-        today.plus(0, 0, 0, 23, 0, 0, 0, DateTime.DayOverflow.Spillover)));
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 11, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 15, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 13, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 17, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    cTask.setPeriod(new DateRange(today.plus(0, 0, 0, 21, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 23, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
     list.addTask(aTask);
     list.addTask(bTask);
     list.addTask(cTask);
-    
+
     List<String> expected = new ArrayList<String>();
     expected.add("[00:00 - 10:59]");
     expected.add("[17:00 - 20:59]");
     expected.add("[23:00 - 23:59]");
-    
+
     assertEquals(expected, list.findFreeSlots(today));
   }
-  
+
   @Test
-  public void findFreeSlots_StartingPeriodSpillOver() throws InvalidDateRangeException {
+  public void findFreeSlots_StartingPeriodSpillOver()
+      throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
     Task aTask = makeTaskWithTitle("a");
-    aTask.setPeriod(new DateRange(today.minusDays(1).
-        plus(0, 0, 0, 20, 0, 0, 0, DateTime.DayOverflow.Spillover),
-        today.plus(0, 0, 0, 15, 0, 0, 0, DateTime.DayOverflow.Spillover)));
+    aTask.setPeriod(new DateRange(today.minusDays(1).plus(0, 0, 0, 20, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 15, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
     list.addTask(aTask);
-    
+
     List<String> expected = new ArrayList<String>();
     expected.add("[15:00 - 23:59]");
-    
+
     assertEquals(expected, list.findFreeSlots(today));
   }
-  
+
   @Test
-  public void findFreeSlots_EndingPeriodSpillOver() throws InvalidDateRangeException {
+  public void findFreeSlots_EndingPeriodSpillOver()
+      throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
     Task aTask = makeTaskWithTitle("a");
-    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 20, 0, 0, 0, DateTime.DayOverflow.Spillover),
-        today.plusDays(1).plus(0, 0, 0, 15, 0, 0, 0, DateTime.DayOverflow.Spillover)));
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 20, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plusDays(1).plus(0, 0, 0, 15, 0,
+        0, 0, DateTime.DayOverflow.Spillover)));
     list.addTask(aTask);
-    
+
     List<String> expected = new ArrayList<String>();
     expected.add("[00:00 - 19:59]");
-    
+
     assertEquals(expected, list.findFreeSlots(today));
   }
 
@@ -340,13 +405,15 @@ public class TaskListTest {
     t.setDeadline(DateTime.forDateOnly(y, m, d));
     return t;
   }
-  
-  private Task makeTaskWithTitleAndTodayPeriod(String title) throws InvalidDateRangeException {
+
+  private Task makeTaskWithTitleAndTodayPeriod(String title)
+      throws InvalidDateRangeException {
     Task t = new Task();
     t.setTitle(title);
-    DateRange period = new DateRange(DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND), 
-        DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND));
-    t.setPeriod(period);    
+    DateRange period = new DateRange(DateUtil.getNow().getStartOfDay()
+        .truncate(DateTime.Unit.SECOND), DateUtil.getNow().getEndOfDay()
+        .truncate(DateTime.Unit.SECOND));
+    t.setPeriod(period);
     return t;
   }
 
