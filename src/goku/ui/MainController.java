@@ -25,7 +25,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -143,25 +142,7 @@ public class MainController {
    * respectively.
    */
   public void keyPressOnInputField(KeyEvent event) {
-    if (event.isControlDown()) {
-      handleControlKeypress(event);
-    } else {
-      notifyControllers(event);
-    }
-  }
-
-  /*
-   * Called when user presses a Ctrl + ? combination,
-   * where ? is any key.
-   */
-  private void handleControlKeypress(KeyEvent event) {
-    if (event.getCode() == KeyCode.Z) {
-      inputField.setText("undo");
-      notifyControllers(event);
-    } else if (event.getCode() == KeyCode.Y) {
-      inputField.setText("redo");
-      notifyControllers(event);
-    }
+    notifyControllers(event);
   }
 
   /*

@@ -50,11 +50,23 @@ public class GokuController extends Controller {
 
   @Override
   boolean isHandling(KeyEvent key) {
-    return key.getCode() == KeyCode.ENTER;
+    return key.getCode() == KeyCode.ENTER || isUndoOrRedo(key);
+  }
+
+  /*
+   * An undo or redo is indicated by the Ctrl+Z or Ctrl+Y
+   * key combination, respectively
+   */
+  boolean isUndoOrRedo(KeyEvent key) {
+    return key.isControlDown()
+        && (key.getCode() == KeyCode.Z || key.getCode() == KeyCode.Y);
   }
 
   @Override
-  public void handle(KeyEvent event) {
+  public void handle(KeyEvent key) {
+    if (isUndoOrRedo(key)) {
+      inputField.setText(key.getCode() == KeyCode.Z ? "undo" : "redo");
+    }
     commitInput();
   }
 
