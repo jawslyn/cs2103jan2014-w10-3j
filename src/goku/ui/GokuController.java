@@ -37,7 +37,7 @@ public class GokuController extends Controller {
   private Storage storage;
   private static final Logger LOGGER = Logger
       .getLogger(Logger.GLOBAL_LOGGER_NAME);
-  private FeedbackPane feedbackController;
+  private FeedbackPane feedback;
 
   public GokuController(GOKU goku, TextField inputField,
       FeedbackPane feedbackController) {
@@ -45,7 +45,7 @@ public class GokuController extends Controller {
     this.goku = goku;
     parser = new InputParser(goku);
     storage = StorageFactory.getDefaultStorage();
-    this.feedbackController = feedbackController;
+    this.feedback = feedbackController;
   }
 
   @Override
@@ -77,14 +77,14 @@ public class GokuController extends Controller {
     try {
       Action action = parser.parse(getUserInput());
       if (action instanceof ExitAction) {
-        feedbackController.sayGoodbye();
+        feedback.sayGoodbye();
         Platform.exit();
       }
       Result result = doAction(action);
       feedBack(result);
     } catch (MakeActionException | InvalidDateRangeException e) {
       LOGGER.log(Level.WARNING, "Bad user command.");
-      feedbackController.displayErrorMessage(e.getMessage());
+      feedback.displayErrorMessage(e.getMessage());
     }
     clearInput();
   }
@@ -118,7 +118,7 @@ public class GokuController extends Controller {
     if (result == null) {
       return;
     } else {
-      feedbackController.displayResult(result);
+      feedback.displayResult(result);
     }
   }
 
