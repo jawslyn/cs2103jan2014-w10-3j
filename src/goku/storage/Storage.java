@@ -4,8 +4,11 @@ import goku.TaskList;
 
 import java.io.IOException;
 
-/*
+/**
  * A Storage is an abstraction of a place where Storeable items can be stored.
+ * 
+ * @author ZhiAn
+ * 
  */
 public interface Storage {
 

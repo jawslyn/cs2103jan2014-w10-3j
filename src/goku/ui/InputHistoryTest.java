@@ -4,6 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+/**
+ * @author ZhiAn
+ * 
+ */
 public class InputHistoryTest {
   InputHistory history = new InputHistory();
 

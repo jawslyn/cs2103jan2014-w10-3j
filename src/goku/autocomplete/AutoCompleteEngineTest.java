@@ -6,6 +6,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * @author ZhiAn
+ * 
+ */
 public class AutoCompleteEngineTest {
   public AutoCompleteEngine auto = new AutoCompleteEngine();
 
