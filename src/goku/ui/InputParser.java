@@ -53,7 +53,7 @@ public class InputParser {
   private String[] helpKeywords = Commands.helpKeywords;
 
   private GOKU goku;
-  String[] params;
+  String[] params, lowerParams;
   Integer paramsByIndex, paramsFromIndex, paramsOnIndex;
 
   public InputParser(GOKU goku) {
@@ -75,7 +75,7 @@ public class InputParser {
    * are truncated
    */
   DateTime extractDeadline() {
-    int indexOfBy = Arrays.asList(params).lastIndexOf("by");
+    int indexOfBy = Arrays.asList(lowerParams).lastIndexOf("by");
     if (indexOfBy < 0) {
       return null;
     } else {
@@ -98,7 +98,7 @@ public class InputParser {
   }
 
   DateTime extractDateQuery() {
-    int indexOfOn = Arrays.asList(params).lastIndexOf("on");
+    int indexOfOn = Arrays.asList(lowerParams).lastIndexOf("on");
     if (indexOfOn < 0) {
       return null;
     } else {
@@ -143,8 +143,8 @@ public class InputParser {
    */
   DateRange extractPeriod() throws InvalidDateRangeException {
     DateRange dr = null;
-    int indexOfFrom = Arrays.asList(params).lastIndexOf("from");
-    int indexOfTo = Arrays.asList(params).lastIndexOf("to");
+    int indexOfFrom = Arrays.asList(lowerParams).lastIndexOf("from");
+    int indexOfTo = Arrays.asList(lowerParams).lastIndexOf("to");
     if (indexOfFrom >= 0 && indexOfTo >= 0) {
       paramsFromIndex = indexOfFrom;
       if (indexOfTo + 1 < params.length) {
@@ -429,9 +429,13 @@ public class InputParser {
     List<String> inputList = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList(input);
     String[] inputArray = inputList.toArray(new String[inputList.size()]);
-    String command = inputArray[0];
+    String command = inputArray[0].toLowerCase();
     params = inputArray.length > 1 ? Arrays.copyOfRange(inputArray, 1,
         inputArray.length) : new String[0];
+    lowerParams = new String[params.length];
+    for(int i=0; i< params.length; i++) {
+      lowerParams[i] = params[i].toLowerCase();
+    }
 
     if (Arrays.asList(addKeywords).contains(command)) {
       // determine importance

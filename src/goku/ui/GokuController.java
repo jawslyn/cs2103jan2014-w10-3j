@@ -93,7 +93,7 @@ public class GokuController extends Controller {
    * Retrieves user's input from the TextField
    */
   private String getUserInput() {
-    return inputField.getText().toLowerCase().trim();
+    return inputField.getText().trim();
   }
 
   /*
