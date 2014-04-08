@@ -333,6 +333,7 @@ public class InputParser {
         }
       }
 
+      params = Arrays.copyOfRange(params, 1, params.length);
       lowerParams = Arrays.copyOfRange(lowerParams, 1, lowerParams.length);
 
       if (params[0].equalsIgnoreCase("remove") && params.length > 1) {
