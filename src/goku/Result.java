@@ -7,6 +7,7 @@ public class Result {
   private static final String MSG_DEFAULT_FAILURE = "Failed.";
   private boolean isSuccess;
   private String successMsg;
+  private String clashMsg;
   private String errorMsg;
   private List<String> listMsg;
   public List<Task> listOfTask;
@@ -18,9 +19,18 @@ public class Result {
     setErrorMsg(errorMsg);
     setTasks(list);
   }
-  
-  public Result(boolean isSuccess, String successMsg, String errorMsg, List<String> listMsg,
-      List<Task> list) {
+
+  public Result(boolean isSuccess, String successMsg, String clashMsg,
+      String errorMsg, List<Task> list) {
+    this.isSuccess = isSuccess;
+    setSuccessMsg(successMsg);
+    setClashMsg(clashMsg);
+    setErrorMsg(errorMsg);
+    setTasks(list);
+  }
+
+  public Result(boolean isSuccess, String successMsg, String errorMsg,
+      List<String> listMsg, List<Task> list) {
     this.isSuccess = isSuccess;
     setSuccessMsg(successMsg);
     setErrorMsg(errorMsg);
@@ -31,7 +41,7 @@ public class Result {
   public void setTasks(List<Task> list) {
     this.listOfTask = list;
   }
-  
+
   public void setMsgList(List<String> list) {
     this.listMsg = list;
   }
@@ -52,10 +62,14 @@ public class Result {
     return successMsg;
   }
 
+  public String getClashMsg() {
+    return clashMsg;
+  }
+
   public List<String> getListMsg() {
     return listMsg;
   }
-  
+
   public List<Task> getTasks() {
     return listOfTask;
   }
@@ -70,6 +84,10 @@ public class Result {
 
   public void setSuccess(boolean isSuccess) {
     this.isSuccess = isSuccess;
+  }
+
+  public void setClashMsg(String clashMsg) {
+    this.clashMsg = clashMsg;
   }
 
   public void setSuccessMsg(String successMsg) {
