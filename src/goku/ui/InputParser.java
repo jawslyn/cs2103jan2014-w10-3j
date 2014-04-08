@@ -380,6 +380,18 @@ public class InputParser {
       searchAction.onDateQuery = dq;
       searchAction.dline = dl;
       searchAction.period = dr;
+      
+      // if datequery, deadline or periods are null, ignore keywords "on, by, from, to"
+      if (dq == null) {
+        paramsOnIndex = null;
+      }
+      if (dl == null) {
+        paramsByIndex = null;
+      }
+      if (dr == null) {
+        paramsFromIndex = null;
+      }
+      
       String title = extractTitle();
       if (!title.isEmpty()) {
         searchAction.title = title;
