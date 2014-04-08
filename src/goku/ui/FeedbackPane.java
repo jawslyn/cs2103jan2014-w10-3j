@@ -241,7 +241,7 @@ public class FeedbackPane {
     id.setTextFill(ID_COLOUR);
     HBox idWithImpt = new HBox();
     idWithImpt.getChildren().addAll(id, makeImptIcon());
-    idWithImpt.setAlignment(Pos.CENTER);
+    // idWithImpt.setAlignment(Pos.CENTER);
     // if (task.getImpt()) {
     // id.setTextFill(IMPT_COLOUR);
     // }
