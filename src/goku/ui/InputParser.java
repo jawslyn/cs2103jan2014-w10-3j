@@ -96,7 +96,7 @@ public class InputParser {
       return parsed;
     }
   }
-  
+
   DateTime extractDateQuery() {
     int indexOfOn = Arrays.asList(params).lastIndexOf("on");
     if (indexOfOn < 0) {
@@ -228,7 +228,8 @@ public class InputParser {
    * @return null if no parameters are specified, else an AddAction with the
    * title, due date, or deadline.
    */
-  private AddAction makeAddAction(boolean impt) throws MakeActionException, InvalidDateRangeException {
+  private AddAction makeAddAction(boolean impt) throws MakeActionException,
+      InvalidDateRangeException {
     if (params.length == 0) {
       throw new MakeActionException(AddAction.ERR_INSUFFICIENT_ARGS);
     }
@@ -310,15 +311,28 @@ public class InputParser {
    * 
    * @return null if we cannot decide which task to edit
    */
-  private EditAction makeEditAction() throws MakeActionException, InvalidDateRangeException {
-    if (params.length < 2) {
+  private EditAction makeEditAction(boolean impt) throws MakeActionException,
+      InvalidDateRangeException {
+    if (params.length == 0) {
       throw new MakeActionException(EditAction.ERR_INSUFFICIENT_ARGS);
     }
 
     EditAction editAction = new EditAction(goku);
+
     try {
+
       int id = Integer.parseInt(params[0]);
       editAction.id = id;
+
+      if (impt == true) {
+        editAction.toggleImportant = true;
+
+        if (params.length == 1) {
+          return editAction;
+        }
+      }
+      // int id = Integer.parseInt(params[0]);
+      // editAction.id = id;
       params = Arrays.copyOfRange(params, 1, params.length);
 
       if (params[0].equalsIgnoreCase("remove") && params.length > 1) {
@@ -330,10 +344,6 @@ public class InputParser {
             break;
           case "period" :
             editAction.removePeriod = true;
-            params = Arrays.copyOfRange(params, 2, params.length);
-            break;
-          case "important" :
-            editAction.removeImportant = true;
             params = Arrays.copyOfRange(params, 2, params.length);
             break;
         }
@@ -357,7 +367,8 @@ public class InputParser {
   /*
    * All inputs to search are taken to be the title of the Task to find
    */
-  private SearchAction makeSearchAction(boolean testFree) throws MakeActionException, InvalidDateRangeException {
+  private SearchAction makeSearchAction(boolean testFree)
+      throws MakeActionException, InvalidDateRangeException {
     if (params.length == 0) {
       throw new MakeActionException(SearchAction.ERR_INSUFFICIENT_ARGS);
     }
@@ -380,8 +391,9 @@ public class InputParser {
       searchAction.onDateQuery = dq;
       searchAction.dline = dl;
       searchAction.period = dr;
-      
-      // if datequery, deadline or periods are null, ignore keywords "on, by, from, to"
+
+      // if datequery, deadline or periods are null, ignore keywords
+      // "on, by, from, to"
       if (dq == null) {
         paramsOnIndex = null;
       }
@@ -391,7 +403,7 @@ public class InputParser {
       if (dr == null) {
         paramsFromIndex = null;
       }
-      
+
       String title = extractTitle();
       if (!title.isEmpty()) {
         searchAction.title = title;
@@ -405,7 +417,8 @@ public class InputParser {
    * @return NoAction if there is no input, UnknownAction if the command is not
    * known
    */
-  public Action parse(String input) throws MakeActionException, InvalidDateRangeException {
+  public Action parse(String input) throws MakeActionException,
+      InvalidDateRangeException {
     reset();
     Action action = null;
 
@@ -430,7 +443,12 @@ public class InputParser {
     } else if (Arrays.asList(deleteKeywords).contains(command)) {
       action = makeDeleteAction();
     } else if (Arrays.asList(editKeywords).contains(command)) {
-      action = makeEditAction();
+      // toggle importance
+      if (command.equals("edit!")) {
+        action = makeEditAction(true);
+      } else {
+        action = makeEditAction(false);
+      }
     } else if (Arrays.asList(completeKeywords).contains(command)) {
       action = makeCompleteAction();
     } else if (Arrays.asList(displayKeywords).contains(command)) {

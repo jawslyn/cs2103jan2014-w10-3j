@@ -234,12 +234,12 @@ public class InputParserTest {
     assertEquals(ea.title, null);
     assertTrue(ea.removePeriod);
 
-    a = p.parse("edit 1 remove important");
+    a = p.parse("edit! 1");
     assertTrue(a instanceof EditAction);
     ea = (EditAction) a;
     assertEquals(1, ea.id);
     assertEquals(ea.title, null);
-    assertTrue(ea.removeImportant);
+    assertTrue(ea.toggleImportant);
 
     a = p.parse("do 1 abc");
     assertTrue(a instanceof EditAction);
@@ -328,12 +328,13 @@ public class InputParserTest {
   }
 
   /*
-   * SearchAction - Check Free Feature (multiple inputs all combinations)
-   * At the parser level, search action is created first then the testFree parameter
-   * is flagged true if "free" is the command word detected. The next two test cases
-   * checks that the flagging is working properly. The next two test cases ensures
-   * that the dates should only be parsed if they are valid. If it's not valid, the
-   * action should not go through. There are only a total of 4 possible scenarios.
+   * SearchAction - Check Free Feature (multiple inputs all combinations) At the
+   * parser level, search action is created first then the testFree parameter is
+   * flagged true if "free" is the command word detected. The next two test
+   * cases checks that the flagging is working properly. The next two test cases
+   * ensures that the dates should only be parsed if they are valid. If it's not
+   * valid, the action should not go through. There are only a total of 4
+   * possible scenarios.
    */
   @Test
   public void parse_SearchAction_CheckFreeIsTrue() throws Exception {
@@ -387,12 +388,10 @@ public class InputParserTest {
   }
 
   /*
-   * extractDate() Specifics
-   * 1) Contains date and time => returns DateTime with date and time
-   * 2) Contains date only => returns DateTime with date only
-   * 3) Contains time only => returns DateTime with today as date and time
-   * 4) Returns null if input is not valid
-   * 5) Nanoseconds are truncated
+   * extractDate() Specifics 1) Contains date and time => returns DateTime with
+   * date and time 2) Contains date only => returns DateTime with date only 3)
+   * Contains time only => returns DateTime with today as date and time 4)
+   * Returns null if input is not valid 5) Nanoseconds are truncated
    */
   @Test
   public void extractDate_SpecificDateSpecificTime() {
@@ -447,15 +446,15 @@ public class InputParserTest {
   }
 
   /*
-   * extractPeriod() Specifics
-   * 1) Start: date+time End: date+time => Start: date+time End: date+time
-   * 2) Any uninitialised date will be set to today
-   * 3) Any uninitialised start time will be 00:00:00 (without nanoseconds)
-   * 4) Any uninitialised end time will be 23:59:59 (without nanoseconds)
-   * 5) If end date before start date, return null
+   * extractPeriod() Specifics 1) Start: date+time End: date+time => Start:
+   * date+time End: date+time 2) Any uninitialised date will be set to today 3)
+   * Any uninitialised start time will be 00:00:00 (without nanoseconds) 4) Any
+   * uninitialised end time will be 23:59:59 (without nanoseconds) 5) If end
+   * date before start date, return null
    */
   @Test
-  public void extractPeriod_SpecificDatesOnly() throws InvalidDateRangeException {
+  public void extractPeriod_SpecificDatesOnly()
+      throws InvalidDateRangeException {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -495,7 +494,8 @@ public class InputParserTest {
   }
 
   @Test
-  public void extractPeriod_SpecificTimesOnly() throws InvalidDateRangeException {
+  public void extractPeriod_SpecificTimesOnly()
+      throws InvalidDateRangeException {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from 10am to 2pm");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -555,7 +555,8 @@ public class InputParserTest {
   }
 
   @Test
-  public void extractPeriod_SpecificStartTimeSpecificEndDate() throws InvalidDateRangeException {
+  public void extractPeriod_SpecificStartTimeSpecificEndDate()
+      throws InvalidDateRangeException {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from 10am to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -598,7 +599,8 @@ public class InputParserTest {
   }
 
   @Ignore
-  public void extractDeadlineAndPeriod_PeriodThenDeadline() throws InvalidDateRangeException {
+  public void extractDeadlineAndPeriod_PeriodThenDeadline()
+      throws InvalidDateRangeException {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today to tmr by tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
@@ -619,7 +621,8 @@ public class InputParserTest {
   }
 
   @Test
-  public void extractDeadlineAndPeriod_DeadlineThenPeriod() throws InvalidDateRangeException {
+  public void extractDeadlineAndPeriod_DeadlineThenPeriod()
+      throws InvalidDateRangeException {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by today from today to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);

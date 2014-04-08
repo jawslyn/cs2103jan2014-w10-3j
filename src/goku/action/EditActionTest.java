@@ -171,7 +171,7 @@ public class EditActionTest {
 
   @Test
   // This tests whether removing importance from tasks works
-  public void doIt_removesImportantFromTask_returnsTaskWithoutImportant()
+  public void doIt_toggleImportantFromTask_returnsTaskWithoutImportant()
       throws Exception {
     Task toEdit;
     toEdit = new Task();
@@ -181,7 +181,7 @@ public class EditActionTest {
 
     EditAction editAction = new EditAction(goku);
     editAction.id = id;
-    editAction.removeImportant = true;
+    editAction.toggleImportant = true;
 
     assertTrue(toEdit.getImpt());
     Result result = editAction.doIt();

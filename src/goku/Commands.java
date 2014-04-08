@@ -6,7 +6,7 @@ import java.util.List;
 public class Commands {
   public static String[] addKeywords = { "add", "a", "add!" };
   public static String[] deleteKeywords = { "delete", "d", "remove", "r" };
-  public static String[] editKeywords = { "edit", "e", "update", "u" };
+  public static String[] editKeywords = { "edit", "e", "update", "u", "edit!" };
   public static String[] completeKeywords = { "done", "complete", "do",
       "finish", "fin" };
   public static String[] displayKeywords = { "display", "view", "show", "v" };

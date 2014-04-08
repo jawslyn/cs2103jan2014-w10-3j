@@ -33,7 +33,7 @@ public class EditAction extends Action {
   public Boolean isComplete;
   public boolean removeDeadline;
   public boolean removePeriod;
-  public boolean removeImportant;
+  public boolean toggleImportant;
 
   public EditAction(GOKU goku) {
     super(goku);
@@ -67,8 +67,8 @@ public class EditAction extends Action {
     addToUndoList();
     if (removeDeadline) {
       doRemoveDeadline();
-    } else if (removeImportant) {
-      doRemoveImportant();
+    } else if (toggleImportant) {
+      doToggleImportant();
     } else if (removePeriod) {
       doRemovePeriod();
     }
@@ -80,9 +80,9 @@ public class EditAction extends Action {
     t.setDeadline(null);
   }
 
-  private void doRemoveImportant() {
+  private void doToggleImportant() {
     Task t = list.getTaskById(id);
-    t.setImpt(false);
+    t.setImpt(!t.getImpt());
   }
 
   private void doRemovePeriod() {
