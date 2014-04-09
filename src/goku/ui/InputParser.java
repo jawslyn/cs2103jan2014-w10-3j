@@ -52,6 +52,7 @@ public class InputParser {
   private String[] undoKeywords = Commands.undoKeywords;
   private String[] redoKeywords = Commands.redoKeywords;
   private String[] helpKeywords = Commands.helpKeywords;
+  private String[] clearKeywords = Commands.clearKeywords;
 
   private GOKU goku;
   String[] params, lowerParams;
@@ -148,12 +149,12 @@ public class InputParser {
     int indexOfTo = Arrays.asList(lowerParams).lastIndexOf("to");
     if (indexOfFrom >= 0 && indexOfTo >= 0) {
       paramsFromIndex = indexOfFrom;
-      if (indexOfTo + 1 < params.length) {
+      if (indexOfTo + 1 < lowerParams.length) {
         /*
          * Parse start date
          */
-        String[] startCandidates = Arrays.copyOfRange(params, indexOfFrom + 1,
-            indexOfTo);
+        String[] startCandidates = Arrays.copyOfRange(lowerParams,
+            indexOfFrom + 1, indexOfTo);
 
         DateTime start = DateUtil.parse(startCandidates);
 
@@ -164,8 +165,8 @@ public class InputParser {
         /*
          * Parsed end date
          */
-        String[] endCandidates = Arrays.copyOfRange(params, indexOfTo + 1,
-            params.length);
+        String[] endCandidates = Arrays.copyOfRange(lowerParams, indexOfTo + 1,
+            lowerParams.length);
         DateTime end = DateUtil.parse(endCandidates);
 
         if (end != null && end.getHour() == null) {
@@ -314,7 +315,7 @@ public class InputParser {
    */
   private EditAction makeEditAction(boolean impt) throws MakeActionException,
       InvalidDateRangeException {
-    if (params.length == 0) {
+    if (params.length < 1) {
       throw new MakeActionException(EditAction.ERR_INSUFFICIENT_ARGS);
     }
 
@@ -332,9 +333,9 @@ public class InputParser {
           return editAction;
         }
       }
-      // int id = Integer.parseInt(params[0]);
-      // editAction.id = id;
+
       params = Arrays.copyOfRange(params, 1, params.length);
+      lowerParams = Arrays.copyOfRange(lowerParams, 1, lowerParams.length);
 
       if (params[0].equalsIgnoreCase("remove") && params.length > 1) {
         // removing a certain field of task
@@ -472,6 +473,8 @@ public class InputParser {
       action = new RedoAction(goku);
     } else if (Arrays.asList(helpKeywords).contains(command)) {
       action = new HelpAction(goku);
+    } else if (Arrays.asList(clearKeywords).contains(command) {
+      action = new ClearAction(goku);
     } else {
       action = new UnknownAction(goku, command);
     }
