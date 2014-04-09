@@ -5,6 +5,7 @@ import goku.DateRange;
 import goku.GOKU;
 import goku.action.Action;
 import goku.action.AddAction;
+import goku.action.ClearAction;
 import goku.action.DeleteAction;
 import goku.action.DisplayAction;
 import goku.action.EditAction;
@@ -473,7 +474,7 @@ public class InputParser {
       action = new RedoAction(goku);
     } else if (Arrays.asList(helpKeywords).contains(command)) {
       action = new HelpAction(goku);
-    } else if (Arrays.asList(clearKeywords).contains(command) {
+    } else if (Arrays.asList(clearKeywords).contains(command)) {
       action = new ClearAction(goku);
     } else {
       action = new UnknownAction(goku, command);

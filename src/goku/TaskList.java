@@ -49,6 +49,12 @@ public class TaskList implements Iterable<Task> {
     _list.clear();
   }
 
+  public void clearCompleted() {
+    for (Task task : getAllCompleted()) {
+      deleteTaskById(task.getId());
+    }
+  }
+
   @Override
   public TaskList clone() {
     TaskList cloned = new TaskList();
