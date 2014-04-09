@@ -35,6 +35,8 @@ public class EditAction extends Action {
   public boolean removePeriod;
   public boolean toggleImportant;
 
+  public String input;
+
   public EditAction(GOKU goku) {
     super(goku);
     // TODO Auto-generated constructor stub
@@ -60,6 +62,7 @@ public class EditAction extends Action {
     newCurrList.setUnusedId(newIdList);
 
     goku.getUndoList().offer(newCurrList);
+    goku.getUndoInputList().offer(input);
   }
 
   @Override

@@ -5,8 +5,8 @@ import goku.Result;
 import goku.TaskList;
 
 public class RedoAction extends Action {
-  private static final String MSG_SUCCESS = "Command undone!";
-  private static final String ERR_FAIL = "Failed to undo.";
+  private static final String MSG_SUCCESS = "Command executed: \"%s\"";
+  private static final String ERR_FAIL = "Failed to redo.";
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
 
   private boolean isEmpty = false;
@@ -30,24 +30,26 @@ public class RedoAction extends Action {
       return new Result(false, null, editMsgIfHaveOverdue(ERR_FAIL), goku
           .getTaskList().getAllIncomplete());
     } else {
-      return new Result(true, editMsgIfHaveOverdue(MSG_SUCCESS), null, goku
-          .getTaskList().getAllIncomplete());
+      return new Result(true, editMsgIfHaveOverdue(String.format(MSG_SUCCESS,
+          goku.getRedoInputList().pollLast())), null, goku.getTaskList()
+          .getAllIncomplete());
     }
   }
 
-  public void addToUndoList() {
+  public void addToUndoList(String input) {
     TaskList currList = new TaskList();
     currList = list.clone();
 
     goku.getUndoList().offer(currList);
+    goku.getUndoInputList().offer(input);
   }
 
   public boolean redoCommand() {
-    if (goku.getRedoList().isEmpty()) {
+    if (goku.getRedoList().isEmpty() || goku.getRedoInputList().isEmpty()) {
       return isEmpty;
     }
 
-    addToUndoList();
+    addToUndoList(goku.getRedoInputList().getLast());
     TaskList prevList = goku.getRedoList().pollLast();
     goku.setTaskList(prevList);
 

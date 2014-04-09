@@ -231,12 +231,14 @@ public class InputParser {
    * @return null if no parameters are specified, else an AddAction with the
    * title, due date, or deadline.
    */
-  private AddAction makeAddAction(boolean impt) throws MakeActionException,
-      InvalidDateRangeException {
+  private AddAction makeAddAction(boolean impt, String input)
+      throws MakeActionException, InvalidDateRangeException {
     if (params.length == 0) {
       throw new MakeActionException(AddAction.ERR_INSUFFICIENT_ARGS);
     }
     AddAction addAction = new AddAction(goku);
+    addAction.input = input;
+
     if (impt == true) {
       addAction.isImpt = true;
     }
@@ -248,12 +250,15 @@ public class InputParser {
     return addAction;
   }
 
-  private EditAction makeCompleteAction() throws MakeActionException {
+  private EditAction makeCompleteAction(String input)
+      throws MakeActionException {
     if (params.length < 1) {
       throw new MakeActionException(
           EditAction.ERR_INSUFFICIENT_ARGS_FOR_COMPLETION);
     }
     EditAction editAction = new EditAction(goku);
+    editAction.input = input;
+
     try {
       int id = Integer.parseInt(params[0]);
       editAction.id = id;
@@ -269,11 +274,14 @@ public class InputParser {
    * this is then assumed to be the ID of the Task to be deleted. Else the
    * inputs will be taken as the title of the task to be deleted.
    */
-  private DeleteAction makeDeleteAction() throws MakeActionException {
+  private DeleteAction makeDeleteAction(String input)
+      throws MakeActionException {
     if (params.length == 0) {
       throw new MakeActionException(DeleteAction.ERR_INSUFFICIENT_ARGS);
     }
     DeleteAction da = new DeleteAction(goku);
+    da.input = input;
+
     if (params.length == 1) {
       try {
         int id = Integer.parseInt(params[0]);
@@ -314,13 +322,14 @@ public class InputParser {
    * 
    * @return null if we cannot decide which task to edit
    */
-  private EditAction makeEditAction(boolean impt) throws MakeActionException,
-      InvalidDateRangeException {
+  private EditAction makeEditAction(boolean impt, String input)
+      throws MakeActionException, InvalidDateRangeException {
     if (params.length < 1) {
       throw new MakeActionException(EditAction.ERR_INSUFFICIENT_ARGS);
     }
 
     EditAction editAction = new EditAction(goku);
+    editAction.input = input;
 
     try {
 
@@ -432,6 +441,7 @@ public class InputParser {
     List<String> inputList = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList(input);
     String[] inputArray = inputList.toArray(new String[inputList.size()]);
+    String stringInput = Joiner.on(" ").join(inputArray);
     String command = inputArray[0].toLowerCase();
     params = inputArray.length > 1 ? Arrays.copyOfRange(inputArray, 1,
         inputArray.length) : new String[0];
@@ -443,21 +453,21 @@ public class InputParser {
     if (Arrays.asList(addKeywords).contains(command)) {
       // determine importance
       if (command.equals("add!")) {
-        action = makeAddAction(true);
+        action = makeAddAction(true, stringInput);
       } else {
-        action = makeAddAction(false);
+        action = makeAddAction(false, stringInput);
       }
     } else if (Arrays.asList(deleteKeywords).contains(command)) {
-      action = makeDeleteAction();
+      action = makeDeleteAction(stringInput);
     } else if (Arrays.asList(editKeywords).contains(command)) {
       // toggle importance
       if (command.equals("edit!")) {
-        action = makeEditAction(true);
+        action = makeEditAction(true, stringInput);
       } else {
-        action = makeEditAction(false);
+        action = makeEditAction(false, stringInput);
       }
     } else if (Arrays.asList(completeKeywords).contains(command)) {
-      action = makeCompleteAction();
+      action = makeCompleteAction(stringInput);
     } else if (Arrays.asList(displayKeywords).contains(command)) {
       action = makeDisplayAction();
     } else if (Arrays.asList(searchKeywords).contains(command)) {

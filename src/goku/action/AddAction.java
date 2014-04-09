@@ -27,6 +27,8 @@ public class AddAction extends Action {
   public DateRange period;
   public boolean isImpt;
 
+  public String input;
+
   public AddAction(GOKU goku) {
     super(goku);
     list = goku.getTaskList();
@@ -51,10 +53,12 @@ public class AddAction extends Action {
     currList = list.clone();
 
     goku.getUndoList().offer(currList);
+    goku.getUndoInputList().offer(input);
   }
 
   @Override
   public Result doIt() {
+    System.out.println(input);
     return addTask();
   }
 

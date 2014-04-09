@@ -27,8 +27,9 @@ public class DeleteAction extends Action {
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
 
   public Integer id;
-
   public String title;
+
+  public String input;
 
   public DeleteAction(GOKU goku) {
     super(goku);
@@ -39,6 +40,7 @@ public class DeleteAction extends Action {
     currList = list.clone();
 
     goku.getUndoList().offer(currList);
+    goku.getUndoInputList().offer(input);
   }
 
   public Result deleteTask() {
