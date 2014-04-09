@@ -19,6 +19,7 @@ public class Commands {
   public static String[] undoKeywords = { "undo", "revert", "rollback" };
   public static String[] redoKeywords = { "redo" };
   public static String[] helpKeywords = { "help", "h" };
+  public static String[] clearKeywords = { "clear" };
 
   public static List<String> getAllKeywords() {
     return Arrays.asList(mergeArrays(addKeywords, deleteKeywords, editKeywords,

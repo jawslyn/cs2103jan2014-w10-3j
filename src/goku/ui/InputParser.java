@@ -52,6 +52,7 @@ public class InputParser {
   private String[] undoKeywords = Commands.undoKeywords;
   private String[] redoKeywords = Commands.redoKeywords;
   private String[] helpKeywords = Commands.helpKeywords;
+  private String[] clearKeywords = Commands.clearKeywords;
 
   private GOKU goku;
   String[] params, lowerParams;
@@ -472,6 +473,8 @@ public class InputParser {
       action = new RedoAction(goku);
     } else if (Arrays.asList(helpKeywords).contains(command)) {
       action = new HelpAction(goku);
+    } else if (Arrays.asList(clearKeywords).contains(command) {
+      action = new ClearAction(goku);
     } else {
       action = new UnknownAction(goku, command);
     }
