@@ -129,6 +129,7 @@ public class SearchAction extends Action {
     return title;
   }
 
+  //@author A0096444X
   public Result searchTasksOnDay() {
     List<Task> foundTasks = list.findTasksOnDay(onDateQuery);
     if (foundTasks.size() != 0) {

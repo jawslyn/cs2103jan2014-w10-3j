@@ -250,6 +250,7 @@ public class DateUtilTest {
     assertEquals(expected, result);
   }
 
+  //@author A0096444X
   @Test
   public void isSameDay_success() {
     DateTime aDate = DateTime.forDateOnly(2014, 3, 4);

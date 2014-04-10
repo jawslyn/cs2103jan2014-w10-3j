@@ -33,6 +33,7 @@ public class DateUtil {
     return DateTime.now(TimeZone.getDefault());
   }
 
+  //@author A0096444X
   /*
    * Returns the current date (day) only
    */
@@ -156,6 +157,7 @@ public class DateUtil {
     }
   }
 
+  //@author A0096444X
   // compare up to day
   public static boolean isSameDay(DateTime aDate, DateTime otherDate) {
     assert otherDate != null;
@@ -171,6 +173,7 @@ public class DateUtil {
     }
   }
 
+  //@author A0096444X
   // compare up to minutes
   public static boolean isSameDayAndTime(DateTime aDate, DateTime otherDate) {
     assert otherDate != null;

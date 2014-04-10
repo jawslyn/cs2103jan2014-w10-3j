@@ -254,6 +254,7 @@ public class TaskListTest {
     assertTrue(!list.hasClash(c));
   }
 
+  //@author A0096444X
   @Test(expected = AssertionError.class)
   public void findFreeSlots_AssertionErrorDateShouldNotHaveTime()
       throws InvalidDateRangeException {
