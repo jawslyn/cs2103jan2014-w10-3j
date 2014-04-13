@@ -12,6 +12,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
 import com.google.common.base.Splitter;
@@ -31,6 +33,10 @@ public class CompletionController extends Controller {
   private StackPane suggestionBox;
   /* VBox to insert suggestions into */
   private VBox suggestionList;
+  private List<String> completions;
+  private int selectedSuggestion = -1;
+  private static final Paint SELECTED_SUGGESTION_FILL = Color.web("#8711BD");
+  private static final Paint UNSELECTED_SUGGESTION_FILL = Color.web("#323232");
 
   public CompletionController(TextField inputField, StackPane suggestionBox,
       VBox suggestionList) {
@@ -49,13 +55,55 @@ public class CompletionController extends Controller {
   public void handle(KeyEvent event) {
     KeyCode code = event.getCode();
     if (isCompletionCommitKey(code)) {
-      insertSuggestedText(getBestSuggestion());
+      cycleSuggestion();
     } else if (isCancelCompletionKey(code)) {
       cancelSuggestion();
     } else if (shouldGetCompletion(code)) {
-      List<String> completions = retrieveCompletions();
-      showCompletions(completions);
+      completions = retrieveCompletions();
+      showCompletions();
     }
+  }
+
+  private void cycleSuggestion() {
+    // cycle through the list of suggestions
+    if (suggestionList.getChildren().size() == 0) {
+      // no suggestions
+      return;
+    } else if (suggestionList.getChildren().size() == 1) {
+      // only 1 suggestion ,just fill it in
+      Text sel = (Text) suggestionList.getChildren().get(0);
+      fillSuggestion(sel.getText());
+    } else {
+      // many suggestions, cycle through them
+      if (selectedSuggestion < 0) {
+        // no suggestion was selected, select the first suggestion
+        selectedSuggestion = 0;
+      } else {
+        // cycle to the next available suggestion
+        Text prev = (Text) suggestionList.getChildren().get(selectedSuggestion);
+        selectedSuggestion = (selectedSuggestion + 1)
+            % suggestionList.getChildrenUnmodifiable().size();
+        unhighlightSuggestion(prev);
+      }
+      Text sel = (Text) suggestionList.getChildren().get(selectedSuggestion);
+      highglightSuggestion(sel);
+      fillSuggestion(sel.getText());
+    }
+  }
+
+  private void highglightSuggestion(Text sel) {
+    sel.setFill(SELECTED_SUGGESTION_FILL);
+    sel.setUnderline(true);
+  }
+
+  private void unhighlightSuggestion(Text sel) {
+    sel.setFill(UNSELECTED_SUGGESTION_FILL);
+    sel.setUnderline(false);
+  }
+
+  private void fillSuggestion(String suggestion) {
+    inputField.setText(suggestion + " ");
+    inputField.end();
   }
 
   /**
@@ -86,37 +134,13 @@ public class CompletionController extends Controller {
   }
 
   /**
-   * Inserts the most likely suggestion into the field where the user is
-   * entering input
-   */
-  private void insertSuggestedText(Text suggestedText) {
-    if (suggestedText == null) {
-      return;
-    }
-    inputField.setText(suggestedText.getText() + " ");
-    inputField.end();
-    hideSuggestions();
-  }
-
-  /**
-   * Gets the best suggestion from the list of suggestions
-   */
-  private Text getBestSuggestion() {
-    if (suggestionList.getChildren().size() == 0) {
-      return null;
-    }
-    Text suggestedText = (Text) suggestionList.getChildren().get(0);
-    return suggestedText;
-  }
-
-  /**
    * Shows a list of completion to the user
    */
-  private void showCompletions(List<String> completions) {
-    clearSuggestions();
+  private void showCompletions() {
     if (completions.size() == 0) {
       cancelSuggestion();
     } else {
+      clearSuggestions();
       for (String completion : completions) {
         // completions are only word completions for the current prefix,
         // so we need to calculate and only add those letters that were not
@@ -167,6 +191,7 @@ public class CompletionController extends Controller {
    */
   private void clearSuggestions() {
     suggestionList.getChildren().clear();
+    selectedSuggestion = -1;
   }
 
   /**

@@ -50,6 +50,14 @@
 	-fx-text-origin: baseline;
 }
 
+.suggestion-highlighted {
+	-fx-background-color: blue;
+}
+
+.suggestion {
+	-fx-background-color: rgba(0, 0, 0, 0);
+}
+
 #scrollPane {
 	-fx-background-color: rgba(0, 0, 0, 0);
 }
