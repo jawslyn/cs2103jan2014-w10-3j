@@ -52,7 +52,7 @@ public class CompletionController extends Controller {
   public void handle(KeyEvent event) {
     KeyCode code = event.getCode();
     if (isCompletionCommitKey(code)) {
-      cycleSuggestion();
+      cycleSuggestion(event.isShiftDown());
     } else if (isCancelCompletionKey(code)) {
       cancelSuggestion();
     } else if (shouldGetCompletion(code)) {
@@ -61,12 +61,13 @@ public class CompletionController extends Controller {
     }
   }
 
-  private void cycleSuggestion() {
+  private void cycleSuggestion(boolean reverse) {
+    int numSuggestions = suggestionList.getChildrenUnmodifiable().size();
     // cycle through the list of suggestions
-    if (suggestionList.getChildren().size() == 0) {
+    if (numSuggestions == 0) {
       // no suggestions
       return;
-    } else if (suggestionList.getChildren().size() == 1) {
+    } else if (numSuggestions == 1) {
       // only 1 suggestion ,just fill it in
       Text sel = (Text) suggestionList.getChildren().get(0);
       fillSuggestion(sel.getText() + " ");
@@ -79,7 +80,8 @@ public class CompletionController extends Controller {
       } else {
         // cycle to the next available suggestion
         Text prev = (Text) suggestionList.getChildren().get(selectedSuggestion);
-        selectedSuggestion = (selectedSuggestion + 1)
+        int toAdd = reverse ? numSuggestions - 1 : 1;
+        selectedSuggestion = (selectedSuggestion + toAdd)
             % suggestionList.getChildrenUnmodifiable().size();
         unhighlightSuggestion(prev);
       }
