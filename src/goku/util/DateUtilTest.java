@@ -34,20 +34,6 @@ public class DateUtilTest {
     assertTrue(now.isSameDayAs(result));
   }
 
-  @Test
-  public void parseWithWeekOffset_success() throws Exception {
-    DateTime base = new DateTime(2014, 4, 3, 0, 0, 0, 0); // this is a thursday
-    DateTime result, expected;
-    expected = base.plusDays(9);
-
-    result = DateUtil.parse("next saturday".split(" "));
-    assertEquals(expected.getDay(), result.getDay());
-
-    expected = base.plusDays(6);
-    result = DateUtil.parse("next wednesday".split(" "));
-    assertEquals(expected.getDay(), result.getDay());
-  }
-
   /*
    * Combination heuristics. All inputs below are well-formed
    * and should pass.
