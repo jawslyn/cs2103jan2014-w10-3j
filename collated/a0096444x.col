@@ -1,0 +1,2739 @@
+//@author: a0096444x
+
+
+
+	/**
+	 * origin: .\src\goku\action\SearchAction.java
+	 */
+
+package goku.action;
+
+import goku.DateRange;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+import hirondelle.date4j.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SearchAction extends Action {
+
+  public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
+  public static final String ERR_NO_VALID_DATE_FOUND = "Can't search! Try entering a valid date after \"free\"";
+  private static final String MSG_SUCCESS_BY_TITLE = "Found tasks for \"%s\"...";
+  private static final String MSG_FAIL_BY_TITLE = "No relevant tasks for \"%s\".";
+  private static final String MSG_SUCCESS_BY_DATE = "Found tasks for %s...";
+  private static final String MSG_FAIL = "No relevant tasks.";
+  private static final String IS_FREE = "%s is available.";
+  private static final String NOT_FREE = "%s is not available.";
+  private static final String FREE_SLOTS = "Here are your free timings for %s.";
+  private static final String NO_FREE_SLOTS = "%s is fully packed!";
+  private static final String ERR_DEADLINE_PERIOD_CONFLICT = "Can't search! Conflicting deadline and period.";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+
+  public String title;
+  public String deadline;
+  public String from;
+  public String to;
+  public DateTime dline;
+  public DateRange period;
+  public DateTime onDateQuery;
+  public boolean isSearchFree = false;
+  public DateTime freeDateQuery;
+
+  public SearchAction(GOKU goku) {
+    super(goku);
+    shouldSaveAfter = false;
+  }
+
+  /*
+   * Case 1: dateQuery contains specific date and time Checks whether dateQuery
+   * contains any tasks whose period coincides If there is => not free, else =>
+   * free
+   * 
+   * Case 2: dateQuery only contains date Shows users the list of free(?)
+   * timeslots of the specified day
+   */
+  public Result checkFreeTime() throws InvalidDateRangeException {
+    assert (freeDateQuery != null);
+
+    // Case 1: Specific date and time
+    if (freeDateQuery.getHour() != null) {
+      return checkIfFree();
+    } else { // Case 2: Only date given
+      return checkFreeSlots();
+    }
+  }
+
+  private Result checkIfFree() {
+    if (list.isFree(freeDateQuery) == true) {
+      return new Result(true, String.format(IS_FREE,
+          DateUtil.toString(freeDateQuery)), null, null);
+    } else {
+      return new Result(false, null, String.format(NOT_FREE,
+          DateUtil.toString(freeDateQuery)), null);
+    }
+  }
+
+  private Result checkFreeSlots() throws InvalidDateRangeException {
+    assert freeDateQuery.getHour() == null;
+
+    List<String> freeSlots = list.findFreeSlots(freeDateQuery);
+
+    if (!freeSlots.isEmpty()) {
+      return new Result(true, String.format(FREE_SLOTS,
+          DateUtil.toString(freeDateQuery)), null, freeSlots, null);
+    } else {
+      return new Result(false, null, String.format(NO_FREE_SLOTS,
+          DateUtil.toString(freeDateQuery)), null);
+    }
+  }
+
+  @Override
+  public Result doIt() {
+
+    Result result = null;
+
+    if (freeDateQuery != null) {
+      try {
+        result = checkFreeTime();
+      } catch (InvalidDateRangeException e) {
+        e.printStackTrace();
+      }
+    } else if (onDateQuery != null) {
+      result = searchTasksOnDay();
+    } else if (dline != null && period != null) {
+      result = searchByDeadlineInPeriod();
+    } else if (dline != null) {
+      result = searchByDeadline();
+    } else if (period != null) {
+      result = searchByPeriod();
+    } else {
+      result = searchTitle();
+    }
+
+    return result;
+  }
+
+  public String getDeadline() {
+    return deadline;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public Result searchTasksOnDay() {
+    List<Task> foundTasks = list.findTasksOnDay(onDateQuery);
+    if (foundTasks.size() != 0) {
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE,
+          DateUtil.toString(onDateQuery)), null, foundTasks);
+    } else {
+      return new Result(false, null, editMsgIfHaveOverdue(String.format(
+          MSG_FAIL, DateUtil.toString(onDateQuery))), null);
+    }
+  }
+
+  public Result searchByDeadline() {
+    Task task = new Task();
+
+    assert (dline != null);
+    task.setDeadline(dline);
+    List<Task> foundTasks = list.findTaskByDeadline(dline);
+    if (foundTasks.size() != 0) {
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE,
+          DateUtil.toString(dline)), null, foundTasks);
+    } else {
+      return new Result(false, null, editMsgIfHaveOverdue(String.format(
+          MSG_FAIL, DateUtil.toString(dline))), null);
+    }
+  }
+
+  /*
+   * Searches for tasks within a given period that has the specified deadline.
+   */
+  private Result searchByDeadlineInPeriod() {
+    // check for conflicting deadline and period
+    if (DateUtil.isEarlierThan(dline, period.getStartDate())
+        || DateUtil.isLaterThan(dline, period.getEndDate())) {
+      return new Result(false, null, ERR_DEADLINE_PERIOD_CONFLICT, null);
+    }
+
+    Result byPeriod = searchByPeriod();
+    List<Task> tasksDueInPeriod = new ArrayList<>();
+
+    if (byPeriod.getTasks() != null) {
+      for (Task task : byPeriod.getTasks()) {
+        if (task.getDeadline() != null
+            && DateUtil.isEarlierOrOn(task.getDeadline(), dline)) {
+          tasksDueInPeriod.add(task);
+        }
+      }
+
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE, period), null,
+          tasksDueInPeriod);
+    } else {
+      return new Result(false, null, editMsgIfHaveOverdue(MSG_FAIL), null);
+    }
+  }
+
+  /*
+   * Searches for tasks that fall within a specified period. Tasks that
+   * start/end, or has deadline within the period is a match. Example: --- Time
+   * line --------------------------------> 1 2 3 4 5 6 7 8 9 10 11
+   * ########################## | |-----| |---| | |------| | A B C D E F
+   * 
+   * | - a task with a deadline at that point in time |-----| a task with a
+   * period starting at the first | and ending at second | ### - the period we
+   * wish to query for Search should then return tasks, B, C, D, E
+   */
+  public Result searchByPeriod() {
+    Task task = new Task();
+
+    assert (period != null);
+
+    task.setPeriod(period);
+    List<Task> foundTasks = list.findTaskByPeriod(period);
+    if (foundTasks.size() != 0) {
+      return new Result(true, String.format(MSG_SUCCESS_BY_DATE, period), null,
+          foundTasks);
+    } else {
+      return new Result(false, null, editMsgIfHaveOverdue(MSG_FAIL), null);
+    }
+  }
+
+  /*
+   * If the title is enclosed by quotations (""), we treat this as an
+   * exact-match search. Meaning that the string in between the quotes *MUST* be
+   * found within a task's title in order for it to be considered a match. Else,
+   * a fuzzy search is executed, which is the default behavior.
+   */
+  public Result searchTitle() {
+    List<Task> foundTasks;
+    if (isSearchForExact()) {
+      title = title.substring(1, title.length() - 1);
+      foundTasks = list.findTaskByTitleExactly(title);
+    } else {
+      foundTasks = list.findTaskByTitle(title);
+    }
+    if (foundTasks.size() == 0) {
+      return new Result(false, null, editMsgIfHaveOverdue(String.format(
+          MSG_FAIL_BY_TITLE, title)), null);
+    } else {
+      return new Result(true, String.format(MSG_SUCCESS_BY_TITLE, title), null,
+          foundTasks);
+    }
+  }
+
+  /**
+   * If a exact match for the task title is required
+   * 
+   * @return true if the title begins and ends with a double quote
+   */
+  private boolean isSearchForExact() {
+    return (title.length() > 2 && title.charAt(0) == '"' && title.charAt(title
+        .length() - 1) == '"');
+  }
+
+	// End of segment: .\src\goku\action\SearchAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\SearchActionTest.java
+	 */
+
+package goku.action;
+
+import static org.junit.Assert.*;
+import goku.DateRange;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+import hirondelle.date4j.DateTime;
+
+import java.io.IOException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class SearchActionTest {
+  TaskList list;
+  GOKU goku;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+  }
+
+  @After
+  public void cleanUp() throws IOException {
+    list.clear();
+  }
+
+  @Test
+  public void searchTitle_returnsTasksWithSameTitle() throws Exception {
+    Task a = makeTaskWithTitle("hello world");
+    Task b = makeTaskWithTitle("byebye");
+    Task c = makeTaskWithTitle("thanks");
+
+    addAllTasks(a, b, c);
+
+    SearchAction search = new SearchAction(goku);
+    search.title = "hello";
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(1, result.getTasks().size());
+  }
+
+  /*
+   * This test isn't really deterministic.
+   * It is just to ensure that a misspelled search title will return
+   * some sane results.
+   */
+  @Test
+  public void searchTitle_fuzzy_returnsTaskWithCloseTitles() throws Exception {
+    Task a = makeTaskWithTitle("hello world");
+    Task b = makeTaskWithTitle("byebye");
+    Task c = makeTaskWithTitle("thanks");
+
+    addAllTasks(a, b, c);
+
+    SearchAction search = new SearchAction(goku);
+    search.title = "byebey";
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(1, result.getTasks().size());
+  }
+
+  /*
+   * No Time Involved => Only compare by dates
+   */
+  @Test
+  public void searchByDeadline_returnsTasksWithDeadlineBeforeWithoutTime()
+      throws Exception {
+    Task a = makeTaskWithDeadlineDaysLater("task a", 1);
+    Task b = makeTaskWithDeadlineDaysLater("task b", 2);
+    Task c = makeTaskWithDeadlineDaysLater("task c", 3);
+    Task d = makeTaskWithPeriodDaysRelative("task d", 1, 3);
+
+    addAllTasks(a, b, c, d);
+
+    Task dueTask = makeTaskWithDeadlineDaysLater("due task", 2);
+
+    SearchAction search = new SearchAction(goku);
+    search.dline = dueTask.getDeadline();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(2, result.getTasks().size());
+  }
+
+  @Test
+  public void searchByDeadline_returnsTaskWithDeadlineBeforeWithTime()
+      throws Exception {
+    Task a = makeTaskWithDeadlineDaysLaterWithTime("task a", 1, 10, 0, 0);
+    Task b = makeTaskWithDeadlineDaysLaterWithTime("task b", 2, 14, 0, 0);
+    Task c = makeTaskWithDeadlineDaysLater("task c", 3);
+    Task d = makeTaskWithPeriodDaysRelative("task d", 1, 3);
+
+    addAllTasks(a, b, c, d);
+
+    Task dueTask = makeTaskWithDeadlineDaysLaterWithTime("due task", 2, 14, 0,
+        0);
+
+    SearchAction search = new SearchAction(goku);
+    search.dline = dueTask.getDeadline();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(2, result.getTasks().size());
+  }
+
+  /*
+   * ---  Time line -------------------------------->
+   *   1    2  3  4   5   6    7    8   9  10   11 
+   *           ##########################
+   *   |    |-----|   |---|    |    |------|    |
+   *   A       B        C      D       E        F 
+   *   
+   *   | - a task with a deadline at that point in time
+   *   |-----| a task with a period starting at the first | and ending at second |
+   *   ### - the period we wish to query for
+   * Search should then return tasks, B, C, D, E.
+   * B - end date is within period
+   * C - entirely within period
+   * D - deadline is within period
+   * E - start date is within period
+   */
+  @Test
+  public void searchByPeriod_returnsTasksWithinPeriodWithoutTime()
+      throws Exception {
+    Task a = makeTaskWithDeadlineDaysLater("task a", 1);
+    Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
+    Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
+    Task d = makeTaskWithDeadlineDaysLater("task d", 7);
+    Task e = makeTaskWithPeriodDaysRelative("task e", 8, 10);
+    Task f = makeTaskWithDeadlineDaysLater("task f", 11);
+
+    addAllTasks(a, b, c, d, e, f);
+
+    Task periodTask = makeTaskWithPeriodDaysRelative("periodTask", 3, 9);
+
+    SearchAction search = new SearchAction(goku);
+    search.period = periodTask.getDateRange();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(4, result.getTasks().size());
+  }
+
+  /*
+   * Similar test to previous, but involves search period with time
+   */
+  @Test
+  public void searchByPeriod_returnsTasksWithinPeriodWithTime()
+      throws Exception {
+    Task a = makeTaskWithDeadlineDaysLater("task a", 1);
+    Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
+    Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
+    Task d = makeTaskWithDeadlineDaysLater("task d", 7);
+    Task e = makeTaskWithDeadlineDaysLaterWithTime("task e", 9, 15, 30, 0);
+    Task f = makeTaskWithPeriodDaysRelative("task f", 8, 10);
+    Task g = makeTaskWithDeadlineDaysLaterWithTime("task g", 11, 10, 0, 0);
+
+    addAllTasks(a, b, c, d, e, f, g);
+
+    Task periodTask = makeTaskWithPeriodDaysRelativeWithTime("periodTask", 3,
+        10, 0, 0, 9, 15, 30, 0);
+
+    SearchAction search = new SearchAction(goku);
+    search.period = periodTask.getDateRange();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(5, result.getTasks().size());
+  }
+
+  /*
+   * ---  Time line -------------------------------->
+   *   1    2  3  4   5   6    7    8   9  10   11 
+   *           ##########################
+   *   |    |-----|   |---|    |    |------|    |
+   *   A       B        C      D       E        F 
+   *   
+   *   | - a task with a deadline at that point in time
+   *   |-----| a task with a period starting at the first | and ending at second |
+   *   ### - the period we wish to query for
+   * Search should then return task D only.
+   * B - is within the period but does not have a deadline
+   * C - same as B
+   * E - same as C
+   * D - within the period, and has a deadline
+   */
+  @Test
+  public void searchByPeriodAndDeadline_returnsTasksWithDeadlineWithinPeriodWithoutTime()
+      throws Exception {
+    Task a = makeTaskWithDeadlineDaysLater("task a", 1);
+    Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
+    Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
+    Task d = makeTaskWithDeadlineDaysLater("task d", 7);
+    Task e = makeTaskWithPeriodDaysRelative("task e", 8, 10);
+    Task f = makeTaskWithDeadlineDaysLater("task f", 11);
+
+    addAllTasks(a, b, c, d, e, f);
+
+    Task periodTask = makeTaskWithPeriodDaysRelative("periodTask", 3, 9);
+    Task dueTask = makeTaskWithDeadlineDaysLater("dueTask", 8);
+
+    SearchAction search = new SearchAction(goku);
+    search.dline = dueTask.getDeadline();
+    search.period = periodTask.getDateRange();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(1, result.getTasks().size());
+  }
+
+  /*
+   * Similar to previous test, except deadline query now indicates time
+   */
+  @Test
+  public void searchByPeriodAndDeadline_returnsTasksWithDeadlineWithinPeriodWithDeadlineTime()
+      throws Exception {
+    Task a = makeTaskWithDeadlineDaysLater("task a", 1);
+    Task b = makeTaskWithPeriodDaysRelative("task b", 2, 4);
+    Task c = makeTaskWithPeriodDaysRelative("task c", 5, 6);
+    Task d = makeTaskWithDeadlineDaysLaterWithTime("task d", 8, 23, 50, 0);
+    Task e = makeTaskWithPeriodDaysRelative("task e", 8, 10);
+    Task f = makeTaskWithDeadlineDaysLater("task f", 11);
+
+    addAllTasks(a, b, c, d, e, f);
+
+    Task periodTask = makeTaskWithPeriodDaysRelative("periodTask", 3, 9);
+    Task dueTask = makeTaskWithDeadlineDaysLater("dueTask", 8);
+
+    SearchAction search = new SearchAction(goku);
+    search.dline = dueTask.getDeadline();
+    search.period = periodTask.getDateRange();
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals(1, result.getTasks().size());
+  }
+
+  /*
+   * Query date well within period of a task
+   * Returns false
+   */
+  @Test
+  public void checkIfFree_dateQueryWithinPeriodOfTask() throws Exception {
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 0, 0, 0, 0, 5, 23, 59, 59);
+    addAllTasks(task);
+
+    SearchAction search = new SearchAction(goku);
+    search.freeDateQuery = DateUtil.getNow().plusDays(1);
+    assertNotNull(search.freeDateQuery.getHour());
+
+    Result result = search.doIt();
+    assertFalse(result.isSuccess());
+  }
+
+  /*
+   * Query date on boundary of period of a task
+   * Returns false
+   */
+  @Test
+  public void checkIfFree_dateQueryOnBoundaryOfPeriodOfTask() throws Exception {
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 0, 0, 0, 0, 5, 23, 59, 59);
+    addAllTasks(task);
+
+    SearchAction search = new SearchAction(goku);
+    search.freeDateQuery = task.getDateRange().getEndDate();
+    assertNotNull(search.freeDateQuery.getHour());
+
+    Result result = search.doIt();
+    assertFalse(result.isSuccess());
+  }
+
+  /*
+   * Query date outside period of task
+   * Returns true
+   */
+  @Test
+  public void checkIfFree_dateQueryOutsidePeriodOfTask() throws Exception {
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 1, 0, 0, 0, 5, 23, 59, 59);
+    addAllTasks(task);
+
+    SearchAction search = new SearchAction(goku);
+    search.freeDateQuery = DateUtil.getNow();
+    assertNotNull(search.freeDateQuery.getHour());
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+  }
+
+  /*
+   * Query date in system where task has no period
+   * Returns true always
+   */
+  @Test
+  public void checkIfFree_dateQueryOnTasksWithNoPeriods() throws Exception {
+    Task task = makeTaskWithTitle("task a");
+    addAllTasks(task);
+
+    SearchAction search = new SearchAction(goku);
+    search.freeDateQuery = DateUtil.getNow();
+    assertNotNull(search.freeDateQuery.getHour());
+
+    Result result = search.doIt();
+    assertTrue(result.isSuccess());
+  }
+  
+  /*
+   * Returns free time slots given day
+   */
+  @Test
+  public void checkIfFree_dateQueryFindTimeSlots() throws Exception {
+    Task task = makeTaskWithPeriodDaysRelativeWithTime("task a", 0, 0, 0, 0, 5, 23, 59, 59);
+    addAllTasks(task);
+
+    SearchAction search = new SearchAction(goku);
+    search.freeDateQuery = DateUtil.getNow().plusDays(1);
+
+    Result result = search.doIt();
+    assertFalse(result.isSuccess());
+  }
+
+  private Task makeTaskWithTitle(String title) {
+    Task task = new Task();
+    task.setTitle(title);
+    return task;
+  }
+
+  private Task makeTaskWithPeriodDaysRelative(String title, int startDaysLater,
+      int endDaysLater) throws MakeActionException, InvalidDateRangeException {
+    Task task = new Task();
+    task.setTitle(title);
+    DateTime start = DateUtil.getNowDate().plusDays(startDaysLater);
+    DateTime end = DateUtil.getNowDate().plusDays(endDaysLater);
+    DateRange period = new DateRange(start, end);
+    task.setPeriod(period);
+    return task;
+  }
+
+  private Task makeTaskWithPeriodDaysRelativeWithTime(String title,
+      int startDaysLater, int startHour, int startMin, int startSec,
+      int endDaysLater, int endHour, int endMin, int endSec) throws MakeActionException, InvalidDateRangeException {
+    Task task = new Task();
+    task.setTitle(title);
+    DateTime start = DateUtil.getNowDate().plus(0, 0, startDaysLater,
+        startHour, startMin, startSec, 0, DateTime.DayOverflow.Spillover);
+    DateTime end = DateUtil.getNowDate().plus(0, 0, endDaysLater, endHour,
+        endMin, endSec, 0, DateTime.DayOverflow.Spillover);
+    DateRange period = new DateRange(start, end);
+    task.setPeriod(period);
+    return task;
+  }
+
+  private Task makeTaskWithDeadlineDaysLater(String title, int daysLater) {
+    Task task = new Task();
+    task.setTitle(title);
+    DateTime deadline = DateUtil.getNowDate().plusDays(daysLater);
+    task.setDeadline(deadline);
+    return task;
+  }
+
+  private Task makeTaskWithDeadlineDaysLaterWithTime(String title,
+      int daysLater, int hour, int min, int sec) {
+    Task task = new Task();
+    task.setTitle(title);
+    DateTime deadline = DateUtil.getNowDate().plusDays(daysLater)
+        .plus(0, 0, 0, hour, min, sec, 0, DateTime.DayOverflow.Spillover);
+    task.setDeadline(deadline);
+    return task;
+  }
+
+  private void addAllTasks(Task... task) {
+    for (Task t : task) {
+      list.addTask(t);
+    }
+  }
+
+}
+
+	// End of segment: .\src\goku\action\SearchActionTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\DateRange.java
+	 */
+
+  @Override
+  public String toString() {
+    return DateOutput.formatDateTimeDayMonthHourMin(startDate) + " to "
+        + DateOutput.formatDateTimeDayMonthHourMin(endDate);
+  }
+}
+
+	// End of segment: .\src\goku\DateRange.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\Result.java
+	 */
+
+  public List<Task> getTasks() {
+    return listOfTask;
+  }
+
+  public boolean isSuccess() {
+    return isSuccess;
+  }
+
+  public void setErrorMsg(String errorMsg) {
+    this.errorMsg = errorMsg;
+  }
+
+  public void setSuccess(boolean isSuccess) {
+    this.isSuccess = isSuccess;
+  }
+
+  public void setClashMsg(String clashMsg) {
+    this.clashMsg = clashMsg;
+  }
+
+  public void setSuccessMsg(String successMsg) {
+    this.successMsg = successMsg;
+  }
+}
+
+	// End of segment: .\src\goku\Result.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\Task.java
+	 */
+
+  /*
+   * Case 1: If impt, task is higher on the list Case 2: Else by earliest start
+   * date or deadline
+   */
+  @Override
+  public int compareTo(Task thatTask) {
+    // Case 1:
+    if (this.isImpt != null && thatTask.isImpt != null) {
+      if (this.isImpt == true && thatTask.isImpt == false) {
+        return -1;
+      } else if (this.isImpt == false && thatTask.isImpt == true) {
+        return 1;
+      }
+    }
+
+    // Case 2: compare by deadline or start date
+    if (this.deadline == null && this.period == null) {
+      if (thatTask.deadline != null || thatTask.period != null) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else if (this.deadline != null || this.period != null) {
+      if (thatTask.deadline == null && thatTask.period == null) {
+        return -1;
+      }
+    }
+
+    DateTime thisDate = null;
+    DateTime thatDate = null;
+
+    // get comparative date for this
+    if (this.deadline != null) {
+      assert this.period == null;
+      thisDate = this.deadline;
+    } else {
+      assert this.period != null;
+      thisDate = this.period.getStartDate();
+    }
+
+    // get comparative date for that
+    if (thatTask.deadline != null) {
+      assert thatTask.period == null;
+      thatDate = thatTask.deadline;
+    } else {
+      assert thatTask.period != null;
+      thatDate = thatTask.period.getStartDate();
+    }
+
+    // compare dates
+    if (thisDate == null && thatDate == null) {
+      return 0;
+    } else if (thisDate != null && thatDate != null) {
+      return thisDate.compareTo(thatDate);
+    } else if (thisDate != null) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
+}
+
+	// End of segment: .\src\goku\Task.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\TaskListTest.java
+	 */
+
+package goku;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+import hirondelle.date4j.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class TaskListTest {
+  private TaskList list;
+  private List<Task> returnList;
+
+  @Before
+  public void setup() {
+    list = new TaskList();
+    returnList = new ArrayList<>();
+  }
+
+  @Test
+  public void addTask_multipleTasks_returnsCorrectSize() {
+    assertListIsSize(0);
+    list.addTask(new Task());
+    assertListIsSize(1);
+    list.addTask(new Task());
+    assertListIsSize(2);
+  }
+
+  @Test
+  public void addTask_willAlwaysMaintainSequentialId() {
+    list.addTask(new Task());
+    int second = list.addTask(new Task());
+    int third = list.addTask(new Task());
+    list.addTask(new Task());
+    list.deleteTaskById(third);
+    list.deleteTaskById(second);
+    int shouldBeSecond = list.addTask(new Task());
+    int shouldBeThird = list.addTask(new Task());
+    assertEquals(second, shouldBeSecond);
+    assertEquals(third, shouldBeThird);
+  }
+
+  @Test
+  public void getTaskById_IdNotFound_returnsNull() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("abcdef");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    int idNotFound = aTask.getId() + otherTask.getId() + 1;
+    Task returned = list.getTaskById(idNotFound);
+    assertNull(returned);
+    assertListIsSize(2);
+  }
+
+  @Test
+  public void getTaskById_IdFound_returnsTaskWithId() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("abcdef");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    Task returned = list.getTaskById(otherTask.getId());
+    assertEquals(otherTask.getId(), returned.getId());
+    assertEquals(otherTask.getTitle(), returned.getTitle());
+    assertListIsSize(2);
+  }
+
+  @Test
+  public void findTaskByTitle_noMatchFound_returnsEmptyTaskList() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("abcdef");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+    assertListIsSize(2);
+
+    Task toFind = new Task();
+    toFind.setTitle("123");
+    returnList = list.findTaskByTitle("123");
+    assertReturnListIsSize(0);
+    assertListIsSize(2);
+  }
+
+  @Test
+  public void findTaskByTitle_matchesFound_returnsTaskListWithMatches() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("abcdef");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+    assertListIsSize(2);
+
+    Task toFind = new Task();
+    toFind.setTitle("abc");
+    returnList = list.findTaskByTitle("abc");
+    assertReturnListIsSize(2);
+    assertListIsSize(2);
+  }
+
+  @Test
+  public void findTaskByDeadLine_multipleMatches_returnsListWithMultipleMatches()
+      throws Exception {
+    Task aTask = makeTaskWithTitleAndDeadline("abc", 3, 8, 2014);
+    Task otherTask = makeTaskWithTitleAndDeadline("def", 4, 8, 2014);
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    Task dueTask = makeTaskWithTitleAndDeadline("123", 5, 8, 2014);
+    returnList = list.findTaskByDeadline(dueTask.getDeadline());
+    assertReturnListIsSize(2);
+  }
+
+  @Test
+  public void findTaskByDeadLine_uniqueMatch_returnsListWithOneMatch()
+      throws Exception {
+    Task aTask = makeTaskWithTitleAndDeadline("abc", 3, 8, 2014);
+    Task otherTask = makeTaskWithTitleAndDeadline("def", 5, 8, 2014);
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    Task dueTask = makeTaskWithTitleAndDeadline("123", 4, 8, 2014);
+    returnList = list.findTaskByDeadline(dueTask.getDeadline());
+    assertReturnListIsSize(1);
+  }
+
+  @Test
+  public void findTaskByDeadLine_noMatch_returnsEmptyList() throws Exception {
+    Task aTask = makeTaskWithTitleAndDeadline("abc", 3, 8, 2014);
+    Task otherTask = makeTaskWithTitleAndDeadline("def", 5, 8, 2014);
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    Task dueTask = makeTaskWithTitleAndDeadline("123", 2, 8, 2014);
+    returnList = list.findTaskByDeadline(dueTask.getDeadline());
+    assertReturnListIsSize(0);
+  }
+
+  @Test
+  public void deleteTaskById_idNotFound_doesNotChangeList() throws Exception {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("abcdef");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    int idNotFound = aTask.getId() + otherTask.getId() + 1;
+    list.deleteTaskById(idNotFound);
+    assertListIsSize(2);
+  }
+
+  @Test
+  public void deleteTaskById_idFound_removesTaskFromList() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("abcdef");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+
+    assertListIsSize(2);
+    list.deleteTaskById(aTask.getId());
+    assertListIsSize(1);
+    list.deleteTaskById(otherTask.getId());
+    assertListIsSize(0);
+  }
+
+  @Test
+  public void deleteTaskByTitle_noMatch_doesNotChangeList() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("123");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+    assertListIsSize(2);
+
+    // Task toDelete = makeTaskWithTitle("xyz");
+    returnList = list.deleteTaskByTitle("xyz");
+    assertListIsSize(2);
+    assertReturnListIsSize(0);
+  }
+
+  @Test
+  public void deleteTaskByTitle_uniqueMatch_removesTaskFromList() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("123");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+    assertListIsSize(2);
+
+    returnList = list.deleteTaskByTitle("ab");
+    assertListIsSize(1);
+    assertReturnListIsSize(1);
+  }
+
+	// End of segment: .\src\goku\TaskListTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\TaskListTest.java
+	 */
+
+  @Test
+  public void findFreeSlots_DateHasNoTasks() throws InvalidDateRangeException {
+    DateTime today = DateUtil.getNowDate();
+    assertListIsSize(0);
+
+    List<String> expected = new ArrayList<String>();
+    expected.add("[00:00 - 23:59]");
+
+    assertEquals(expected, list.findFreeSlots(today));
+  }
+
+  @Test
+  public void findFreeSlots_DateHasTaskThatOccupiesWholeDay()
+      throws InvalidDateRangeException {
+    DateTime today = DateUtil.getNowDate();
+    Task aTask = makeTaskWithTitleAndTodayPeriod("a");
+    list.addTask(aTask);
+
+    assertEquals(new ArrayList<String>(), list.findFreeSlots(today));
+  }
+
+  @Test
+  public void findFreeSlots_TwoPeriodsNonOverlapping()
+      throws InvalidDateRangeException {
+    DateTime today = DateUtil.getNowDate();
+    Task aTask = makeTaskWithTitle("a");
+    Task bTask = makeTaskWithTitle("b");
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 1, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 5, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 9, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 17, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    list.addTask(aTask);
+    list.addTask(bTask);
+
+    List<String> expected = new ArrayList<String>();
+    expected.add("[00:00 - 00:59]");
+    expected.add("[05:00 - 08:59]");
+    expected.add("[17:00 - 23:59]");
+
+    assertEquals(expected, list.findFreeSlots(today));
+  }
+
+  @Test
+  public void findFreeSlots_ThreePeriodsOverlapping()
+      throws InvalidDateRangeException {
+    DateTime today = DateUtil.getNowDate();
+    Task aTask = makeTaskWithTitle("a");
+    Task bTask = makeTaskWithTitle("b");
+    Task cTask = makeTaskWithTitle("c");
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 11, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 15, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 13, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 17, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    cTask.setPeriod(new DateRange(today.plus(0, 0, 0, 16, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 20, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    list.addTask(aTask);
+    list.addTask(bTask);
+    list.addTask(cTask);
+
+    List<String> expected = new ArrayList<String>();
+    expected.add("[00:00 - 10:59]");
+    expected.add("[20:00 - 23:59]");
+
+    assertEquals(expected, list.findFreeSlots(today));
+  }
+
+  @Test
+  public void findFreeSlots_ThreePeriodsSemiOverlapping()
+      throws InvalidDateRangeException {
+    DateTime today = DateUtil.getNowDate();
+    Task aTask = makeTaskWithTitle("a");
+    Task bTask = makeTaskWithTitle("b");
+    Task cTask = makeTaskWithTitle("c");
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 11, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 15, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    bTask.setPeriod(new DateRange(today.plus(0, 0, 0, 13, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 17, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    cTask.setPeriod(new DateRange(today.plus(0, 0, 0, 21, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 23, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    list.addTask(aTask);
+    list.addTask(bTask);
+    list.addTask(cTask);
+
+    List<String> expected = new ArrayList<String>();
+    expected.add("[00:00 - 10:59]");
+    expected.add("[17:00 - 20:59]");
+    expected.add("[23:00 - 23:59]");
+
+    assertEquals(expected, list.findFreeSlots(today));
+  }
+
+  @Test
+  public void findFreeSlots_StartingPeriodSpillOver()
+      throws InvalidDateRangeException {
+    DateTime today = DateUtil.getNowDate();
+    Task aTask = makeTaskWithTitle("a");
+    aTask.setPeriod(new DateRange(today.minusDays(1).plus(0, 0, 0, 20, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plus(0, 0, 0, 15, 0, 0, 0,
+        DateTime.DayOverflow.Spillover)));
+    list.addTask(aTask);
+
+    List<String> expected = new ArrayList<String>();
+    expected.add("[15:00 - 23:59]");
+
+    assertEquals(expected, list.findFreeSlots(today));
+  }
+
+  @Test
+  public void findFreeSlots_EndingPeriodSpillOver()
+      throws InvalidDateRangeException {
+    DateTime today = DateUtil.getNowDate();
+    Task aTask = makeTaskWithTitle("a");
+    aTask.setPeriod(new DateRange(today.plus(0, 0, 0, 20, 0, 0, 0,
+        DateTime.DayOverflow.Spillover), today.plusDays(1).plus(0, 0, 0, 15, 0,
+        0, 0, DateTime.DayOverflow.Spillover)));
+    list.addTask(aTask);
+
+    List<String> expected = new ArrayList<String>();
+    expected.add("[00:00 - 19:59]");
+
+    assertEquals(expected, list.findFreeSlots(today));
+  }
+
+  private Task makeTaskWithTitle(String title) {
+    Task t = new Task();
+    t.setTitle(title);
+    return t;
+  }
+
+  private Task makeTaskWithTitleAndDeadline(String title, int d, int m, int y) {
+    Task t = new Task();
+    t.setTitle(title);
+    t.setDeadline(DateTime.forDateOnly(y, m, d));
+    return t;
+  }
+
+  private Task makeTaskWithTitleAndTodayPeriod(String title)
+      throws InvalidDateRangeException {
+    Task t = new Task();
+    t.setTitle(title);
+    DateRange period = new DateRange(DateUtil.getNow().getStartOfDay()
+        .truncate(DateTime.Unit.SECOND), DateUtil.getNow().getEndOfDay()
+        .truncate(DateTime.Unit.SECOND));
+    t.setPeriod(period);
+    return t;
+  }
+
+  private void assertListIsSize(int size) {
+    assertEquals(size, list.size());
+  }
+
+  private void assertReturnListIsSize(int size) {
+    assertEquals(size, returnList.size());
+  }
+}
+
+	// End of segment: .\src\goku\TaskListTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\CLUserInterface.java
+	 */
+
+  /**
+   * @return string that user entered
+   */
+  @Override
+  public String getUserInput() {
+    return sc.nextLine();
+  }
+
+  public void getUserInputUntilExit() {
+    while (true) {
+      printPrompt();
+      try {
+        String input = getUserInput();
+        Action action = parser.parse(input);
+        if (action instanceof ExitAction) {
+          return;
+        }
+        doAction(action);
+      } catch (MakeActionException | InvalidDateRangeException e) {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  private void printExitMessage() {
+    System.out.println(GOKU_EXIT_MESSAGE);
+  }
+
+  private void printPrompt() {
+    System.out.print(GOKU_PROMPT);
+  }
+
+  private void printWelcomeMessage() {
+    System.out.println(GOKU_WELCOME_MESSAGE);
+  }
+
+  @Override
+  public void run() {
+    printWelcomeMessage();
+    trytoloadfile();
+    getUserInputUntilExit();
+    printExitMessage();
+  }
+
+  public void save() {
+    try {
+      storage.saveAll(goku.getTaskList());
+    } catch (IOException e) {
+      System.out.println("Error saving tasks.");
+    }
+  }
+
+  private void trytoloadfile() {
+    try {
+      goku.setTaskList(storage.loadStorage());
+    } catch (FileNotFoundException e) {
+      LOGGER.warning("File cannot be found, no tasks loaded.");
+    } catch (IOException e) {
+      LOGGER.warning("Error loading file, no tasks loaded.");
+    } catch (LoadTasksException e) {
+      e.printStackTrace();
+    }
+    LOGGER.info("Successfully loaded file: " + storage.getName());
+  }
+}
+
+	// End of segment: .\src\goku\ui\CLUserInterface.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\InputParser.java
+	 */
+
+package goku.ui;
+
+import goku.Commands;
+import goku.DateRange;
+import goku.GOKU;
+import goku.action.Action;
+import goku.action.AddAction;
+import goku.action.ClearAction;
+import goku.action.DeleteAction;
+import goku.action.DisplayAction;
+import goku.action.EditAction;
+import goku.action.ExitAction;
+import goku.action.HelpAction;
+import goku.action.MakeActionException;
+import goku.action.NoAction;
+import goku.action.RedoAction;
+import goku.action.SearchAction;
+import goku.action.UndoAction;
+import goku.action.UnknownAction;
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+import hirondelle.date4j.DateTime;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+
+/**
+ * InputParser parses an input String into an {@link Action}. The steps taken
+ * are: 1. Split the input into tokens. Each token is guaranteed to be non-empty
+ * and trimmed 2. The first token is checked to see if it is a command. This
+ * check is done by iterating through the arrays of keywords. 3. The appropriate
+ * subclass of Action is made using the makeXAction methods. 4. In the event
+ * when any of the Actions are null, a NoAction is returned.
+ */
+public class InputParser {
+  String[] params, lowerParams;
+  Integer paramsByIndex, paramsFromIndex, paramsOnIndex;
+  /*
+   * Keywords that are used to associate an input to a particular action.
+   */
+  private String[] addKeywords = Commands.addKeywords;
+  private String[] deleteKeywords = Commands.deleteKeywords;
+  private String[] editKeywords = Commands.editKeywords;
+  private String[] completeKeywords = Commands.completeKeywords;
+  private String[] displayKeywords = Commands.displayKeywords;
+  private String[] searchKeywords = Commands.searchKeywords;
+  private String[] exitKeywords = Commands.exitKeywords;
+  private String[] undoKeywords = Commands.undoKeywords;
+  private String[] redoKeywords = Commands.redoKeywords;
+  private String[] helpKeywords = Commands.helpKeywords;
+  private String[] clearKeywords = Commands.clearKeywords;
+  private GOKU goku;
+
+  public InputParser(GOKU goku) {
+    this.goku = goku;
+    paramsByIndex = null;
+    paramsFromIndex = null;
+  }
+
+  public void reset() {
+    paramsByIndex = null;
+    paramsFromIndex = null;
+  }
+
+  /*
+   * extractDeadline() Specifics 1) Contains date and time => returns DateTime
+   * with date and time 2) Contains date only => returns DateTime with date,
+   * time initialised to 23:59:59 3) Contains time only => returns DateTime with
+   * today as date and time 4) Returns null if input is not valid 5) Nanoseconds
+   * are truncated
+   */
+  DateTime extractDeadline() {
+    int indexOfBy = Arrays.asList(lowerParams).lastIndexOf("by");
+    if (indexOfBy < 0) {
+      return null;
+    } else {
+      paramsByIndex = indexOfBy;
+    }
+    // get the rest of the params after "by"
+    String[] candidates = Arrays.copyOfRange(lowerParams, indexOfBy + 1,
+        lowerParams.length);
+    DateTime parsed = DateUtil.parse(candidates);
+    if (parsed == null) {
+      return parsed;
+    }
+
+    // add time 23:59 to deadline if no time was specified
+    if (parsed.getHour() == null) {
+      return initTimeToEndOfDay(parsed);
+    } else {
+      return parsed;
+    }
+  }
+
+  DateTime extractDateQuery() {
+    int indexOfOn = Arrays.asList(lowerParams).lastIndexOf("on");
+    if (indexOfOn < 0) {
+      return null;
+    } else {
+      paramsOnIndex = indexOfOn;
+    }
+    // get the rest of the params after "on"
+    String[] candidates = Arrays.copyOfRange(lowerParams, indexOfOn + 1,
+        params.length);
+    DateTime parsed = DateUtil.parse(candidates);
+    if (parsed == null) {
+      return parsed;
+    } else {
+      return parsed.truncate(DateTime.Unit.DAY);
+    }
+  }
+
+  private DateTime parseDate() {
+    if (params.length < 1) {
+      return null;
+    }
+
+    return DateUtil.parse(params);
+  }
+
+  /*
+   * A period is identified by the presence of the keywords "from" and "to".
+   * Assumption: the period is always at the end of the input,
+   * 
+   * i.e. whatever follows "from" will parsed into a date representing the
+   * start, and what follows "to" will be parsed into a date representing the
+   * end.
+   * 
+   * Valid inputs are ["from", "2pm 12/2", "to" "3pm 12/2"]. When the parse is
+   * successful @param params is modified such that the parsed strings,
+   * including "from" and "to", is removed - essentially params is shortened.
+   * 
+   * extractPeriod() Specifics 1) Start: date+time End: date+time => Start:
+   * date+time End: date+time 2) Any uninitialised date will be set to today 3)
+   * Any uninitialised start time will be 00:00:00 (without nanoseconds) 4) Any
+   * uninitialised end time will be 23:59:59 (without nanoseconds) 5) If end
+   * date before start date, return null
+   */
+  DateRange extractPeriod() throws InvalidDateRangeException {
+    DateRange dr = null;
+    int indexOfFrom = Arrays.asList(lowerParams).lastIndexOf("from");
+    int indexOfTo = Arrays.asList(lowerParams).lastIndexOf("to");
+    if (indexOfFrom >= 0 && indexOfTo >= 0) {
+      paramsFromIndex = indexOfFrom;
+      if (indexOfTo + 1 < lowerParams.length) {
+        /*
+         * Parse start date
+         */
+        String[] startCandidates = Arrays.copyOfRange(lowerParams,
+            indexOfFrom + 1, indexOfTo);
+
+        DateTime start = DateUtil.parse(startCandidates);
+
+        if (start != null && start.getHour() == null) {
+          start = initTimeToStartOfDay(start);
+        }
+
+        /*
+         * Parsed end date
+         */
+        String[] endCandidates = Arrays.copyOfRange(lowerParams, indexOfTo + 1,
+            lowerParams.length);
+        DateTime end = DateUtil.parse(endCandidates);
+
+        if (end != null && end.getHour() == null) {
+          end = initTimeToEndOfDay(end);
+        }
+
+        if (start != null && end != null) {
+          dr = new DateRange(start, end);
+        }
+      }
+    }
+    return dr;
+  }
+
+  /*
+   * Similar to extractDate and extractPeriod, extractTitle finds the relevant
+   * title content in params and returns the title string.
+   * 
+   * Variables paramsByIndex and paramsFromIndex indicates the possible cutoff
+   * point in the input string between title and date time inputs. extractTitle
+   * cuts off from the earliest inde indicated by the two variables.
+   */
+  String extractTitle() {
+    int indexToSplit;
+
+    if (paramsByIndex != null && paramsFromIndex != null) {
+      assert paramsByIndex > 0;
+      assert paramsFromIndex > 0;
+      indexToSplit = Math.min(paramsByIndex, paramsFromIndex);
+    } else if (paramsByIndex != null) {
+      indexToSplit = paramsByIndex;
+    } else if (paramsFromIndex != null) {
+      indexToSplit = paramsFromIndex;
+    } else {
+      return Joiner.on(" ").join(params);
+    }
+
+    return Joiner.on(" ").join(Arrays.copyOfRange(params, 0, indexToSplit));
+  }
+
+  private DateTime initTimeToStartOfDay(DateTime date) {
+    String parsedString = date.format("YYYY-MM-DD");
+    parsedString = parsedString.concat(" 00:00:00");
+
+    return new DateTime(parsedString);
+  }
+
+  private DateTime initTimeToEndOfDay(DateTime date) {
+    String parsedString = date.format("YYYY-MM-DD");
+    parsedString = parsedString.concat(" 23:59:59");
+
+    return new DateTime(parsedString);
+  }
+
+  /*
+   * Add expects to have parameters, minimally params[0] should be the title of
+   * the task.
+   * 
+   * @param importance of task (true or false)
+   * 
+   * @return null if no parameters are specified, else an AddAction with the
+   * title, due date, or deadline.
+   */
+  private AddAction makeAddAction(boolean isImpt, String input)
+      throws MakeActionException, InvalidDateRangeException {
+    if (params.length == 0) {
+      throw new MakeActionException(AddAction.ERR_INSUFFICIENT_ARGS);
+    }
+    AddAction addAction = new AddAction(goku);
+    addAction.input = input;
+
+    if (isImpt == true) {
+      addAction.isImpt = true;
+    }
+    DateTime dl = extractDeadline();
+    DateRange dr = extractPeriod();
+    addAction.dline = dl;
+    addAction.period = dr;
+    addAction.title = extractTitle();
+    return addAction;
+  }
+
+  private EditAction makeCompleteAction(String input)
+      throws MakeActionException {
+    if (params.length < 1) {
+      throw new MakeActionException(
+          EditAction.ERR_INSUFFICIENT_ARGS_FOR_COMPLETION);
+    }
+    EditAction editAction = new EditAction(goku);
+    editAction.input = input;
+
+    try {
+      int id = Integer.parseInt(params[0]);
+      editAction.id = id;
+      editAction.isComplete = true;
+    } catch (NumberFormatException e) {
+      return null;
+    }
+    return editAction;
+  }
+
+  /*
+   * Delete can take in a single parameter which can be parsed into an integer,
+   * this is then assumed to be the ID of the Task to be deleted. Else the
+   * inputs will be taken as the title of the task to be deleted.
+   */
+  private DeleteAction makeDeleteAction(String input)
+      throws MakeActionException {
+    if (params.length == 0) {
+      throw new MakeActionException(DeleteAction.ERR_INSUFFICIENT_ARGS);
+    }
+    DeleteAction da = new DeleteAction(goku);
+    da.input = input;
+
+    if (params.length == 1) {
+      try {
+        int id = Integer.parseInt(params[0]);
+        da.id = id;
+      } catch (NumberFormatException e) {
+        da.id = null;
+        da.title = params[0];
+      }
+    } else {
+      da.title = Joiner.on(" ").join(params);
+    }
+    return da;
+  }
+
+  private DisplayAction makeDisplayAction() throws MakeActionException {
+
+    DisplayAction da = new DisplayAction(goku);
+
+    String nonArrayParams = Joiner.on(" ").join(params).toLowerCase();
+    if (nonArrayParams.equals("completed")) {
+      da.viewComplete = true;
+    } else if (nonArrayParams.equals("overdue")) {
+      da.viewOverdue = true;
+    } else if (nonArrayParams.equals("over")) {
+      da.viewOverdue = true;
+    } else if (nonArrayParams.equals("all")) {
+      da.viewAll = true;
+    } else if (!nonArrayParams.isEmpty()) {
+      throw new MakeActionException(DisplayAction.ERR_INVALID_DISPLAY);
+    }
+
+    return da;
+  }
+
+	// End of segment: .\src\goku\ui\InputParser.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\InputParserTest.java
+	 */
+
+package goku.ui;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import goku.DateRange;
+import goku.GOKU;
+import goku.action.Action;
+import goku.action.AddAction;
+import goku.action.DeleteAction;
+import goku.action.DisplayAction;
+import goku.action.EditAction;
+import goku.action.ExitAction;
+import goku.action.HelpAction;
+import goku.action.MakeActionException;
+import goku.action.NoAction;
+import goku.action.SearchAction;
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+import hirondelle.date4j.DateTime;
+
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.google.common.base.Splitter;
+
+public class InputParserTest {
+  InputParser p;
+  Action a;
+
+  @Before
+  public void setUp() throws Exception {
+    GOKU goku = new GOKU();
+    p = new InputParser(goku);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    p = null;
+    a = null;
+  }
+
+  @Test(expected = MakeActionException.class)
+  public void parse_AddAction_throwsException() throws Exception {
+    a = p.parse("");
+    assertTrue(a instanceof NoAction);
+    a = p.parse(null);
+    assertTrue(a instanceof NoAction);
+    a = p.parse("add");
+    assertTrue(a instanceof NoAction);
+  }
+
+  @Test
+  public void parse_AddAction() throws Exception {
+    a = p.parse("add this is a title");
+    assertTrue(a instanceof AddAction);
+    AddAction aa;
+    aa = (AddAction) a;
+    assertEquals("this is a title", aa.getTitle());
+    a = p.parse("add this is a title         ");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a title", aa.getTitle());
+
+    a = p.parse("add 12");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("12", aa.getTitle());
+
+    DateTime now = DateUtil.getNow();
+    a = p.parse("add this is a task by    tomorrow    ");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a task", aa.getTitle());
+    DateTime later = aa.dline;
+    assertTrue(later.gt(now));
+
+    now = DateUtil.getNow();
+    a = p.parse("add this is a task by today");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals(now.getDay(), aa.dline.getDay());
+    assertEquals(now.getMonth(), aa.dline.getMonth());
+
+    a = p.parse("add this is a task from today to tomorrow    ");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a task", aa.getTitle());
+    assertNotNull(aa.period);
+
+    a = p.parse("add this is a task from 3pm to 4pm    ");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a task", aa.getTitle());
+    assertNotNull(aa.period);
+
+    a = p.parse("add this is a task by 3pm tomorrow");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a task", aa.getTitle());
+    DateTime due = aa.dline;
+    assertEquals(new Integer(15), due.getHour());
+
+    a = p.parse("add this is a task by 1.45pm   tomorrow");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a task", aa.getTitle());
+    due = aa.dline;
+    assertEquals(new Integer(13), due.getHour());
+    assertEquals(new Integer(45), due.getMinute());
+
+    a = p.parse("add this is a task by 1:45pm   tomorrow");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a task", aa.getTitle());
+    due = aa.dline;
+    assertEquals(new Integer(13), due.getHour());
+    assertEquals(new Integer(45), due.getMinute());
+
+    a = p.parse("add this is a task from     3pm 12/3     to 1pm 20/8/14");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("this is a task", aa.getTitle());
+    DateTime from = aa.period.getStartDate();
+    DateTime to = aa.period.getEndDate();
+    assertTrue(from.getHour() == 15);
+    assertTrue(from.getDay() == 12);
+    assertTrue(from.getMonth() == 3);
+    assertTrue(to.getHour() == 13);
+    assertTrue(to.getDay() == 20);
+    assertTrue(to.getMonth() == 8);
+    assertTrue(to.getYear() == 2014);
+    assertNotNull(aa.period);
+
+    a = p.parse("add buy pokeballs from today to tomorrow");
+    assertTrue(a instanceof AddAction);
+    aa = (AddAction) a;
+    assertEquals("buy pokeballs", aa.title);
+    assertNotNull(aa.period);
+  }
+
+  @Test(expected = MakeActionException.class)
+  public void parse_DeleteAction_throwsException() throws Exception {
+    a = p.parse("delete");
+    assertTrue(a instanceof NoAction);
+  }
+
+  @Test
+  public void parse_DeleteAction() throws Exception {
+    DeleteAction da;
+
+    a = p.parse("delete 1");
+    assertTrue(a instanceof DeleteAction);
+    da = (DeleteAction) a;
+    assertEquals(new Integer(1), da.id);
+    assertNull(da.title);
+
+    a = p.parse("delete 1 task");
+    assertTrue(a instanceof DeleteAction);
+    da = (DeleteAction) a;
+    assertEquals("1 task", da.title);
+
+    a = p.parse("delete abc");
+    assertTrue(a instanceof DeleteAction);
+    da = (DeleteAction) a;
+    assertEquals("abc", da.title);
+  }
+
+  @Test(expected = MakeActionException.class)
+  public void parse_EditAction_throwsException() throws Exception {
+    a = p.parse("edit");
+
+    a = p.parse("edit 1");
+
+    a = p.parse("edit a abc");
+  }
+
+  @Test
+  public void parse_EditAction() throws Exception {
+    EditAction ea;
+
+    a = p.parse("edit 1 abc");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals("abc", ea.title);
+    assertEquals(1, ea.id);
+
+    a = p.parse("edit 1 123");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals("123", ea.title);
+    assertEquals(1, ea.id);
+    assertNull(ea.isComplete);
+    assertNull(ea.dline);
+    assertNull(ea.period);
+
+    a = p.parse("edit 1 from 3pm to 6pm");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertNull(ea.title);
+    assertNull(ea.dline);
+    assertNotNull(ea.period);
+
+    resetParamIndex();
+    a = p.parse("edit 1 remove");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals("remove", ea.title);
+
+    a = p.parse("edit 1 remove rubbish");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, "remove rubbish");
+
+    a = p.parse("edit 1 remove deadline");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, null);
+    assertTrue(ea.shouldRemoveDeadline);
+
+    a = p.parse("edit 1 remove period");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, null);
+    assertTrue(ea.shouldRemovePeriod);
+
+    a = p.parse("edit! 1");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertEquals(ea.title, null);
+    assertTrue(ea.shouldToggleImportant);
+
+    a = p.parse("do 1 abc");
+    assertTrue(a instanceof EditAction);
+    ea = (EditAction) a;
+    assertEquals(1, ea.id);
+    assertTrue(ea.isComplete);
+    assertNull(ea.dline);
+    assertNull(ea.period);
+  }
+
+  @Test
+  public void parse_DisplayAction() throws Exception {
+    a = p.parse("display");
+    assertTrue(a instanceof DisplayAction);
+
+    a = p.parse("display completed");
+    assertTrue(a instanceof DisplayAction);
+    DisplayAction da = (DisplayAction) a;
+    assertTrue(da.viewComplete);
+
+    a = p.parse("display overdue");
+    assertTrue(a instanceof DisplayAction);
+    da = (DisplayAction) a;
+    assertTrue(da.viewOverdue);
+
+    a = p.parse("display over");
+    assertTrue(a instanceof DisplayAction);
+    da = (DisplayAction) a;
+  }
+
+  @Test(expected = MakeActionException.class)
+  public void parse_SearchAction_throwsException() throws Exception {
+    a = p.parse("search");
+    assertTrue(a instanceof NoAction);
+  }
+
+  @Test
+  public void parse_SearchAction() throws Exception {
+    SearchAction sa;
+
+    a = p.parse("search abc");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertEquals("abc", sa.title);
+
+    a = p.parse("search by tomorrow");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertNull(sa.title);
+    assertNotNull(sa.dline);
+
+    a = p.parse("search from today to tomorrow");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertNull(sa.title);
+    assertNotNull(sa.period);
+
+    a = p.parse("search from today to sunday by tmr 5pm");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertNull(sa.title);
+    assertNotNull(sa.period);
+    assertNotNull(sa.dline.getHour());
+
+    a = p.parse("search by tmr 5pm from today to sunday");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertNull(sa.title);
+    assertNotNull(sa.period);
+    assertEquals(sa.period.getStartDate(), DateUtil.getNowDate()
+        .getStartOfDay().truncate(DateTime.Unit.SECOND));
+    assertEquals((Integer) 17, sa.dline.getHour());
+
+    a = p.parse("search abc by tomorrow");
+    assertTrue(a instanceof SearchAction);
+    sa = (SearchAction) a;
+    assertNotNull(sa.title);
+    assertNotNull(sa.dline);
+
+  }
+
+  @Test(expected = MakeActionException.class)
+  public void parse_SearchAction_CheckFree_throwsException() throws Exception {
+    a = p.parse("free");
+    assertTrue(a instanceof NoAction);
+  }
+
+  /*
+   * SearchAction - Check Free Feature (multiple inputs all combinations) At the
+   * parser level, search action is created first then the testFree parameter is
+   * flagged true if "free" is the command word detected. The next two test
+   * cases checks that the flagging is working properly. The next two test cases
+   * ensures that the dates should only be parsed if they are valid. If it's not
+   * valid, the action should not go through. There are only a total of 4
+   * possible scenarios.
+   */
+  @Test
+  public void parse_SearchAction_CheckFreeIsTrue() throws Exception {
+    a = p.parse("free today");
+    assertTrue(a instanceof SearchAction);
+
+    SearchAction sa = (SearchAction) a;
+    assertTrue(sa.isSearchFree);
+  }
+
+  @Test
+  public void parse_SearchAction_CheckFreeIsFalse() throws Exception {
+    a = p.parse("search today");
+    assertTrue(a instanceof SearchAction);
+
+    SearchAction sa = (SearchAction) a;
+    assertFalse(sa.isSearchFree);
+  }
+
+  @Test
+  public void parse_SearchAction_CheckFreeDateQueryValid() throws Exception {
+    a = p.parse("free tmr 10am");
+    assertTrue(a instanceof SearchAction);
+
+    SearchAction sa = (SearchAction) a;
+    assertNotNull(sa.freeDateQuery);
+  }
+
+  @Test(expected = MakeActionException.class)
+  public void parse_SearchAction_CheckFreeDateQueryInvalid() throws Exception {
+    a = p.parse("free meh");
+    assertTrue(a instanceof NoAction);
+  }
+
+  @Test
+  public void parse_HelpAction() throws Exception {
+    a = p.parse("help");
+    assertTrue(a instanceof HelpAction);
+    a = p.parse("h");
+    assertTrue(a instanceof HelpAction);
+  }
+
+  @Test
+  public void parse_ExitAction() throws Exception {
+    a = p.parse("exit");
+    assertTrue(a instanceof ExitAction);
+    a = p.parse("quit");
+    assertTrue(a instanceof ExitAction);
+    a = p.parse("q");
+    assertTrue(a instanceof ExitAction);
+  }
+
+  /*
+   * extractDate() Specifics 1) Contains date and time => returns DateTime with
+   * date and time 2) Contains date only => returns DateTime with date only 3)
+   * Contains time only => returns DateTime with today as date and time 4)
+   * Returns null if input is not valid 5) Nanoseconds are truncated
+   */
+  @Test
+  public void extractDate_SpecificDateSpecificTime() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by tmr 10am");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+
+    assertNotNull(resultDate.getDay());
+    assertEquals((Integer) 10, resultDate.getHour());
+  }
+
+  @Test
+  public void extractDate_SpecificDateOnly() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+
+    assertNotNull(resultDate.getDay());
+    assertEquals((Integer) 23, resultDate.getHour());
+    assertEquals((Integer) 59, resultDate.getMinute());
+  }
+
+  @Test
+  public void extractDate_SpecificTimeOnly() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by 12pm");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+    assertEquals(DateUtil.getNowDate().getDay(), resultDate.getDay());
+    assertEquals((Integer) 12, resultDate.getHour());
+    assertEquals((Integer) 00, resultDate.getMinute());
+  }
+
+  @Test
+  public void extractDate_NoValidInput() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by aaa");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+
+    assertNull(resultDate);
+  }
+
+  /*
+   * extractPeriod() Specifics 1) Start: date+time End: date+time => Start:
+   * date+time End: date+time 2) Any uninitialised date will be set to today 3)
+   * Any uninitialised start time will be 00:00:00 (without nanoseconds) 4) Any
+   * uninitialised end time will be 23:59:59 (without nanoseconds) 5) If end
+   * date before start date, return null
+   */
+  @Test
+  public void extractPeriod_SpecificDatesOnly()
+      throws InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today to tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNowDate().getStartOfDay().truncate(DateTime.Unit.SECOND),
+        resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1).getEndOfDay()
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+  }
+
+	// End of segment: .\src\goku\ui\InputParserTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\UserInterface.java
+	 */
+
+package goku.ui;
+
+import goku.Result;
+
+/**
+ * This interface governs the interactions between the UI (be it CLI or GUI) and
+ * GokuMain. It acts as the parser from UI to Main and processes the result from
+ * Main to UI
+ * 
+ **/
+public interface UserInterface {
+
+  /*** STRING CONSTANTS ***/
+  public static final String INPUT_ERROR = "Input cannot be recognised.";
+  public static final String DATE_ERROR = "Invalid date(s).";
+
+  String getUserInput();
+
+  /**
+   * Method: feedBack
+   * 
+   * @param result
+   *          obtained from Main
+   */
+  void feedBack(Result result);
+
+  void run();
+
+}
+
+	// End of segment: .\src\goku\ui\UserInterface.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateOutputTest.java
+	 */
+
+package goku.util;
+
+import static org.junit.Assert.assertEquals;
+import hirondelle.date4j.DateTime;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class DateOutputTest {
+  public static final String TOMORROW = "tomorrow";
+  public static final String HOURS_LATER = "h later";
+  public static final String DAYS_LATER = "d later";
+  public static final String NEXT_WEEK = "next week";
+
+  DateTime base;
+
+  @Before
+  public void setup() {
+    base = DateUtil.getNow();
+  }
+
+  @Test
+  public void formatTimeOnly12h_returnsTimeOnly() throws Exception {
+    DateTime dateTime = DateTime.forTimeOnly(13, 15, 0, 0);
+    String output = DateOutput.formatTimeOnly12h(dateTime);
+    assertEquals("1.15pm", output);
+    dateTime = DateTime.forTimeOnly(0, 15, 0, 0);
+    output = DateOutput.formatTimeOnly12h(dateTime);
+    assertEquals("12.15am", output);
+  }
+
+  @Test
+  public void formatTimeOnly24h_returnsTimeOnly() throws Exception {
+    DateTime dateTime = DateTime.forTimeOnly(13, 15, 0, 0);
+    String output = DateOutput.formatTimeOnly24h(dateTime);
+    assertEquals("13:15h", output);
+    dateTime = DateTime.forTimeOnly(1, 15, 0, 0);
+    output = DateOutput.formatTimeOnly24h(dateTime);
+    assertEquals("01:15h", output);
+  }
+
+  @Test
+  public void formatTimeOnlyHoursLater_returnsHoursLater() throws Exception {
+    DateTime dt = base.plus(0, 0, 0, 2, 0, 0, 0, DateTime.DayOverflow.FirstDay);
+    String actual = DateOutput.formatTimeOnlyHoursLater(dt);
+    if (dt.getDay() == base.getDay()) {
+      assertEquals("2" + HOURS_LATER, actual);
+    }
+  }
+
+	// End of segment: .\src\goku\util\DateOutputTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtil.java
+	 */
+
+  /*
+   * Returns the current date (day) only
+   */
+  public static DateTime getNowDate() {
+    return DateTime.today(TimeZone.getDefault());
+  }
+
+  public static boolean isEarlierOrOn(DateTime aDate, DateTime otherDate) {
+    if (aDate == null || otherDate == null) {
+      return false;
+    }
+
+    // no time indicated => compare only by date
+    if (aDate.getHour() == null || otherDate.getHour() == null) {
+      return isEarlierThanOrOnByDate(aDate, otherDate);
+    }
+    return aDate.lteq(otherDate);
+  }
+
+  public static boolean isEarlierThan(DateTime aDate, DateTime otherDate) {
+    if (aDate == null || otherDate == null) {
+      return false;
+    }
+
+    // no time indicated => compare only by date
+    if (aDate.getHour() == null || otherDate.getHour() == null) {
+      return isEarlierThanByDate(aDate, otherDate);
+    }
+    return aDate.lt(otherDate);
+  }
+
+  public static boolean isEarlierThanByDate(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(),
+        aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+
+    return aDateOnly.lt(otherDateOnly);
+  }
+
+  public static boolean isEarlierThanOrOnByDate(DateTime aDate,
+      DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(),
+        aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+
+    return aDateOnly.lteq(otherDateOnly);
+  }
+
+  public static boolean isLaterOrOn(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+    return aDate.gteq(otherDate);
+  }
+
+  public static boolean isLaterThan(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+    return aDate.gt(otherDate);
+  }
+
+  public static boolean isLaterThanByDate(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(),
+        aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+
+    return aDateOnly.gt(otherDateOnly);
+  }
+
+  public static boolean isLaterThanOrOnByDate(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+
+    DateTime aDateOnly = DateTime.forDateOnly(aDate.getYear(),
+        aDate.getMonth(), aDate.getDay());
+    DateTime otherDateOnly = DateTime.forDateOnly(otherDate.getYear(),
+        otherDate.getMonth(), otherDate.getDay());
+
+    return aDateOnly.gteq(otherDateOnly);
+  }
+
+  public static DateTime parse(String string) {
+    String[] s = string.split(" ");
+    return parse(s);
+  }
+
+  public static boolean periodClashesWithDay(DateRange period, DateTime day) {
+    assert day != null;
+    if (period == null) {
+      return false;
+    }
+
+    if (isSameDay(period.getStartDate(), day)
+        || isSameDay(period.getEndDate(), day)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+	// End of segment: .\src\goku\util\DateUtil.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtil.java
+	 */
+
+  // compare up to day
+  public static boolean isSameDay(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+
+    if (aDate.truncate(DateTime.Unit.DAY).equals(
+        otherDate.truncate(DateTime.Unit.DAY))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+	// End of segment: .\src\goku\util\DateUtil.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtil.java
+	 */
+
+  // compare up to minutes
+  public static boolean isSameDayAndTime(DateTime aDate, DateTime otherDate) {
+    assert otherDate != null;
+    if (aDate == null) {
+      return false;
+    }
+
+    if (aDate.truncate(DateTime.Unit.MINUTE).equals(
+        otherDate.truncate(DateTime.Unit.MINUTE))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /*
+   * Parses and array of String into a DateTime. It looks at each element and
+   * decides if it looks like a date or a time, It parses according to the rules
+   * described above, returning the appropriate date or time component, in a
+   * DateTime. All the information is then merged into a final DateTime.
+   * 
+   * pre: inputs contain Strings which are non-empty and trimmed
+   * 
+   * @return null when parsing fails, i.e. no date or time can be interpreted
+   * from the inputs.
+   * 
+   * Caution: For each component, day, date, time, once found, the rest of the
+   * input will NOT be tested for possibility of that component. Test priority
+   * in order of offset, day > date, then time.
+   */
+  public static DateTime parse(final String[] inputs) {
+    DateTime date = null, time = null;
+    boolean offsetFound = false, dateFound = false, timeFound = false;
+    boolean next = false;
+
+    int daysOffsets = 0;
+    try {
+      for (String input : inputs) {
+        if (!next) {
+          next = parseOffset(input);
+        }
+        if (!dateFound) {
+          date = parseDay(input, next);
+          if (date == null) {
+            date = parseDate(input);
+          }
+          dateFound = date == null ? false : true;
+        }
+        if (!timeFound) {
+          time = parseTime(input);
+          timeFound = time == null ? false : true;
+        }
+
+        // stop searching if all components found
+        if (offsetFound == true && dateFound == true && timeFound == true) {
+          break;
+        }
+      }
+    } catch (Exception e) {
+      // this catches an exception thrown by DateTime's parse methods.
+      // when there is a parsing error, e.g. time given is 123.45pm,
+      // an exception is thrown and we treat it as no time was given
+      // TODO return null;
+    }
+    return mergeDateAndTime(date, time, daysOffsets);
+  }
+
+	// End of segment: .\src\goku\util\DateUtil.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtil.java
+	 */
+
+  /*
+   * Parses a string into a DateTime where only the date matters. We can handled
+   * cases: 1) Day and Month specified, 2) Day and Month and Year specified
+   */
+  // dd/mm or dd/mm/yy
+
+  public static DateTime parseDate(String string) {
+    if (string
+        .matches("(([0-2]?[0-9])|(3[01]))[/-](0?[1-9]?|[12][0-2])[/-]?\\d*")) {
+      String date[] = string.split("[-/]");
+      Integer day, month, year;
+      day = Integer.parseInt(date[0]);
+      month = Integer.parseInt(date[1]);
+      year = date.length > 2 ? Integer.parseInt(date[2]) + 2000 : getNow()
+          .getYear();
+      return DateTime.forDateOnly(year, month, day);
+    } else {
+      return null;
+    }
+  }
+
+  /*
+   * Parses a string into a DateTime where only the date matters It handles
+   * keywords like today, tomorrow, and names of weekdays. It will convert the
+   * weekdays to the nearest weekday that has not passed. I.e. if today is
+   * Tuesday, and string is Wednesday, the DateTime will be 1 day after today.
+   * if today is Tuesday, and string is Wednesday, the DateTime will be 7 days
+   * after today.
+   */
+  public static DateTime parseDay(String string, boolean next) {
+    string = string.toLowerCase();
+    DateTime today = getNowDate();
+    switch (string) {
+      case "today" :
+        return today;
+      case "tomorrow" :
+      case "tml" :
+      case "tmr" :
+        return DateTime.today(TimeZone.getDefault()).plusDays(1);
+      default :
+        return next ? getNearestNextWeekday(string)
+            : getNearestDateToWeekday(string);
+    }
+  }
+
+  private static DateTime getNearestNextWeekday(String weekday) {
+    int weekDayInt = weekdayToInteger(weekday);
+    if (weekDayInt < 0) {
+      return null;
+    }
+    int nowWeekDayInt = getNow().getWeekDay();
+    DateTime nearest = getNearestDateToWeekday(getNow(), weekDayInt);
+    DateTime nextWeekDay = nearest;
+    if (nowWeekDayInt <= weekDayInt) {
+      nextWeekDay = nearest.plusDays(7);
+    }
+    return nextWeekDay;
+  }
+
+  static boolean isOffsetWord(String candidate) {
+    candidate = candidate.trim().toLowerCase();
+    for (String offsetWord : weekOffsets) {
+      if (offsetWord.contains(candidate)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /*
+   * Given a starting date, finds the nearest weekday from this date that
+   * matches the target weekday
+   */
+  public static DateTime getNearestDateToWeekday(DateTime baseDate,
+      Integer targetWeekday) {
+    Integer baseWeekday = baseDate.getWeekDay();
+    Integer days = (targetWeekday - baseWeekday);
+    if (days <= 0) {
+      days += 7;
+    }
+    baseDate = baseDate.plusDays(days);
+    baseDate = baseDate.getEndOfDay().truncate(DateTime.Unit.SECOND);
+    return baseDate;
+  }
+
+  /*
+   * Gets the nearest date closest to a weekday. If the string is not
+   * recognized, a null object is returned
+   * 
+   * @params weekday a recognized string that represents a weekday
+   */
+  private static DateTime getNearestDateToWeekday(String weekday) {
+    int weekDayInt = weekdayToInteger(weekday);
+    if (weekDayInt < 0) {
+      return null;
+    }
+    return getNearestDateToWeekday(getNow(), weekDayInt);
+  }
+
+  private static boolean parseOffset(String string) {
+    string = string.toLowerCase();
+    switch (string) {
+      case "next" :
+        return true;
+      default :
+        return false;
+    }
+  }
+
+  /*
+   * Parses a string into a time. A time can optionally have am or pm appended
+   * to the actual time. The actual time can be either 1) hour 2) hour delimiter
+   * minute The delimiter is either a ":" or "."
+   */
+  public static DateTime parseTime(String string) {
+    Integer hour = null;
+    Integer min = 0;
+    if (string.matches("(([01]?[0-9]|2[0-3])[:.][0-5][0-9])")) {
+      String[] results = string.split("[:.]");
+      hour = Integer.parseInt(results[0]);
+      min = Integer.parseInt(results[1]);
+      return DateTime.forTimeOnly(hour, min, 0, 0);
+    } else if (string.matches("(([1-9]|1[0-2])([:.]?[0-5][0-9])?[ap]m)")) {
+      String[] results = string.split("[:.\\D]");
+      hour = Integer.parseInt(results[0]);
+      if (string.contains("pm")) {
+        // 12pm becomes 12, 1pm becomes 13
+        hour += (hour == 12 ? 0 : 12);
+      }
+      if (results.length > 1) { // has minute component
+        min = Integer.parseInt(results[1]);
+      }
+      return DateTime.forTimeOnly(hour, min, 0, 0);
+    } else {
+      return null;
+    }
+  }
+
+  public static Date toDate(DateTime dateTime) {
+    if (dateTime == null) {
+      return null;
+    }
+    return new Date(dateTime.getMilliseconds(TimeZone.getDefault()));
+  }
+
+  /*
+   * converts a weekday into an integer which date4j uses
+   */
+  public static Integer weekdayToInteger(String weekday) {
+    for (int i = 0; i < weekdays.length; i++) {
+      if (weekdays[i] != null && weekdays[i].contains(weekday)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /*
+   * Merge the date component of date with the time component of time.
+   * 
+   * 
+   * @param date a DateTime where only the date matters
+   * 
+   * @param date a DateTime where only the time matters
+   * 
+   * @return null when both params are null, or when only one is null, it tries
+   * to merge intelligently, using the current date or midnight time.
+   */
+  public static DateTime mergeDateAndTime(DateTime date, DateTime time,
+      Integer offsetDays) {
+    if (date == null && time == null) {
+      return null;
+    }
+    DateTime result = null;
+
+    if (date == null) {
+      date = getNow();
+      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
+          time.getHour(), time.getMinute(), time.getSecond(), null);
+    } else if (time == null) {
+      result = date;
+    } else {
+      result = new DateTime(date.getYear(), date.getMonth(), date.getDay(),
+          time.getHour(), time.getMinute(), time.getSecond(), null);
+    }
+
+    return result.plusDays(offsetDays);
+  }
+
+  public static String toString(DateTime date) {
+    if (date.getHour() == null) {
+      return DateOutput.formatDateOnlyDayMonth(date);
+    } else {
+      return DateOutput.formatDateTimeDayMonthHourMin(date);
+    }
+  }
+}
+	// End of segment: .\src\goku\util\DateUtil.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtilTest.java
+	 */
+
+package goku.util;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import hirondelle.date4j.DateTime;
+
+import org.junit.Test;
+
+public class DateUtilTest {
+  /*
+   * Combination heuristics. All inputs below are well-formed and should pass.
+   */
+  @Test
+  public void parseDay_success() throws Exception {
+    DateTime now = DateUtil.getNow();
+    DateTime result, expected;
+
+    expected = now.plusDays(1);
+    result = DateUtil.parseDay("toMOrrow", false);
+    assertTrue(expected.isSameDayAs(result));
+    result = DateUtil.parseDay("tMl", false);
+    assertTrue(expected.isSameDayAs(result));
+    result = DateUtil.parseDay("tMr", false);
+    assertTrue(expected.isSameDayAs(result));
+    result = DateUtil.parseDay("todaY", false);
+    assertTrue(now.isSameDayAs(result));
+  }
+
+  /*
+   * Combination heuristics. All inputs below are well-formed and should pass.
+   */
+  @Test
+  public void parseDate_success() throws Exception {
+    DateTime now = DateUtil.getNow(), actual, expected;
+
+    actual = DateUtil.parseDate("1/1");
+    expected = DateTime.forDateOnly(now.getYear(), 1, 1);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("01/1");
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("01/01");
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("1/01");
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("10/01");
+    expected = DateTime.forDateOnly(now.getYear(), 1, 10);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("19/4");
+    expected = DateTime.forDateOnly(now.getYear(), 4, 19);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("21/4");
+    expected = DateTime.forDateOnly(now.getYear(), 4, 21);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("31/8");
+    expected = DateTime.forDateOnly(now.getYear(), 8, 31);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4/3");
+    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4/3/12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("04/03/12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4-3");
+    expected = DateTime.forDateOnly(now.getYear(), 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("4-3-12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("04-03-12");
+    expected = DateTime.forDateOnly(2012, 3, 4);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("31-8");
+    expected = DateTime.forDateOnly(now.getYear(), 8, 31);
+    assertTrue(expected.isSameDayAs(actual));
+
+    actual = DateUtil.parseDate("31-8-123");
+    expected = DateTime.forDateOnly(2123, 8, 31);
+    assertTrue(expected.isSameDayAs(actual));
+  }
+
+  @Test
+  public void parseDate_invalidDates_returnsNullDateTime() throws Exception {
+    DateTime actual;
+
+    actual = DateUtil.parseDate("34-3-12");
+    assertNull(actual);
+
+    actual = DateUtil.parseDate("004-3-12");
+    assertNull(actual);
+
+    actual = DateUtil.parseDate("4-23-12");
+    assertNull(actual);
+
+    actual = DateUtil.parseDate("4-023-12");
+    assertNull(actual);
+  }
+
+	// End of segment: .\src\goku\util\DateUtilTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtilTest.java
+	 */
+
+  @Test
+  public void isSameDay_success() {
+    DateTime aDate = DateTime.forDateOnly(2014, 3, 4);
+    DateTime otherDate = aDate;
+    assertTrue(DateUtil.isSameDay(aDate, otherDate));
+
+    aDate = DateUtil.getNow();
+    otherDate = DateUtil.getNow();
+    assertTrue(DateUtil.isSameDay(aDate, otherDate));
+
+    assertTrue(DateUtil.isSameDay(DateUtil.getNow(), DateUtil.getNowDate()));
+  }
+}
+
+	// End of segment: .\src\goku\util\DateUtilTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\InvalidDateRangeException.java
+	 */
+
+package goku.util;
+
+@SuppressWarnings("serial")
+public class InvalidDateRangeException extends Exception {
+
+  public InvalidDateRangeException(String message) {
+    super(message);
+  }
+}
+
+	// End of segment: .\src\goku\util\InvalidDateRangeException.java
+
+
+
+
+

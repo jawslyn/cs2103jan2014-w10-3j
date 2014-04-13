@@ -1,0 +1,1505 @@
+//@author: a0101232h
+
+
+
+	/**
+	 * origin: .\src\goku\action\AddAction.java
+	 */
+
+  private void addToUndoList() {
+    TaskList currList = new TaskList();
+    currList = list.clone();
+
+    goku.getUndoList().offer(currList);
+    goku.getUndoInputList().offer(input);
+  }
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (list.getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+
+  private Result clashAddTask() {
+    Result result = Result.makeSuccessResult();
+    result
+        .setSuccessMsg(editMsgIfHaveOverdue(String.format(MSG_SUCCESS, title)));
+    result.setClashMsg(MSG_CLASH);
+    result.setTasks(list.getAllIncomplete());
+    return result;
+  }
+}
+	// End of segment: .\src\goku\action\AddAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\ClearAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+import goku.TaskList;
+
+/*
+ * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
+ * analogous to real life tasks which the user wishes to note down.
+ */
+public class ClearAction extends Action {
+  private static final String MSG_SUCCESS = "Completed tasks cleared!";
+  private static final String ERR_FAIL = "Fail to clear, no completed tasks!";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+
+  public ClearAction(GOKU goku) {
+    super(goku);
+    list = goku.getTaskList();
+  }
+
+  private Result clear() {
+    if (list.getAllCompleted().isEmpty()) {
+      return new Result(false, null, editMsgIfHaveOverdue(ERR_FAIL), null);
+    }
+    addToUndoList();
+    list.clearCompleted();
+    return new Result(true, editMsgIfHaveOverdue(MSG_SUCCESS), null, null);
+  }
+
+  private void addToUndoList() {
+    TaskList currList = new TaskList();
+    currList = list.clone();
+
+    goku.getUndoList().offer(currList);
+  }
+
+  @Override
+  public Result doIt() {
+    return clear();
+  }
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (list.getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+}
+	// End of segment: .\src\goku\action\ClearAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\DeleteAction.java
+	 */
+
+  private void addToUndoList() {
+    TaskList currList = new TaskList();
+    currList = list.clone();
+
+    goku.getUndoList().offer(currList);
+    goku.getUndoInputList().offer(input);
+  }
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (list.getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+
+}
+
+	// End of segment: .\src\goku\action\DeleteAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\DisplayAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import hirondelle.date4j.DateTime;
+
+import java.util.List;
+
+public class DisplayAction extends Action {
+  public static final String ERR_INVALID_DISPLAY = "Invalid display option!";
+  private static final String MSG_SUCCESS = "Here are your tasks!";
+  private static final String MSG_SUCCESS_COMPLETED = "Here are your completed tasks!";
+  private static final String MSG_SUCCESS_OVERDUE = "Here are your overdue tasks!";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+  private static final String MSG_NO_COMPLETED = "You have not completed any tasks!\nEnter \"done [ID]\" to mark a task as completed!";
+  private static final String MSG_NO_INCOMPLETE = "There is currently no upcoming tasks!\nAdd some tasks now :)";
+  private static final String MSG_NO_OVERDUE = "No overdue tasks!";
+
+  DateTime byDeadline;
+  public boolean viewComplete;
+  public boolean viewOverdue;
+  public boolean viewAll;
+
+  public DisplayAction(GOKU goku) {
+    super(goku);
+    shouldSaveAfter = false;
+  }
+
+  private Result displayComplete() {
+    if (list.getAllCompleted().isEmpty()) {
+      return new Result(false, null, MSG_NO_COMPLETED, null);
+    } else {
+      return new Result(true, MSG_SUCCESS_COMPLETED, null,
+          list.getAllCompleted());
+    }
+  }
+
+  private Result displayDate() {
+    assert (byDeadline != null);
+    DateTime deadline = byDeadline;
+    Task t = new Task();
+    t.setDeadline(deadline);
+    List<Task> result = list.findTaskByDeadline(deadline);
+    return new Result(true, null, null, result);
+  }
+
+  private Result displayIncomplete() {
+    if (list.getAllIncomplete().isEmpty()) {
+      return new Result(true, editMsgIfHaveOverdue(MSG_NO_INCOMPLETE), null,
+          null);
+    } else {
+      return new Result(true, editMsgIfHaveOverdue(MSG_SUCCESS), null,
+          list.getAllIncomplete());
+    }
+  }
+
+  private Result displayOverdue() {
+    if (list.getOverdue().isEmpty()) {
+      return new Result(true, MSG_NO_OVERDUE, null, null);
+    } else {
+      return new Result(true, MSG_SUCCESS_OVERDUE, null, list.getOverdue());
+    }
+  }
+
+  private Result displayAll() {
+    if (list.size() == 0) {
+      return new Result(false, null, MSG_NO_INCOMPLETE, null);
+    } else {
+      return new Result(true, MSG_SUCCESS, null, list.asList());
+    }
+  }
+
+  @Override
+  public Result doIt() {
+    if (viewComplete == true) {
+      return displayComplete();
+    } else if (viewOverdue == true) {
+      return displayOverdue();
+    } else if (viewAll == true) {
+      return displayAll();
+    } else {
+      return displayIncomplete();
+    }
+  }
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (list.getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+
+}
+
+	// End of segment: .\src\goku\action\DisplayAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\EditAction.java
+	 */
+
+package goku.action;
+
+import goku.DateRange;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import goku.util.DateOutput;
+import hirondelle.date4j.DateTime;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/*
+ * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
+ * analogous to real life tasks which the user wishes to note down.
+ */
+public class EditAction extends Action {
+  public static final String ERR_NO_ID_GIVEN = "Can't edit, need ID! Try \"edit 1 new title!\"";
+  public static final String ERR_INSUFFICIENT_ARGS = "Can't edit, need ID! Try \"edit 1 new title!\"";
+  public static final String ERR_INSUFFICIENT_ARGS_FOR_COMPLETION = "Can't complete, need ID! Try \"done 1\"";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+  private final String MSG_SUCCESS = "Edited task %d\n";
+
+  public int id;
+  public String title;
+  public DateTime dline;
+  public DateRange period;
+  public Boolean isComplete;
+  public boolean shouldRemoveDeadline;
+  public boolean shouldRemovePeriod;
+  public boolean shouldToggleImportant;
+  public String input;
+
+  public EditAction(GOKU goku) {
+    super(goku);
+    // TODO Auto-generated constructor stub
+  }
+
+  @Override
+  public Result doIt() {
+    addToUndoList();
+    if (shouldRemoveDeadline) {
+      doRemoveDeadline();
+    } else if (shouldToggleImportant) {
+      doToggleImportant();
+    } else if (shouldRemovePeriod) {
+      doRemovePeriod();
+    }
+    return updateTask();
+  }
+
+  private void doRemoveDeadline() {
+    Task t = list.getTaskById(id);
+    t.setDeadline(null);
+  }
+
+  private void doToggleImportant() {
+    Task t = list.getTaskById(id);
+    t.setImpt(!t.isImpt());
+  }
+
+  private void doRemovePeriod() {
+    Task t = list.getTaskById(id);
+    t.setPeriod(null);
+  }
+
+  private Result updateTask() {
+    Task taskWithEdits = new Task();
+    taskWithEdits.setTitle(title);
+    taskWithEdits.setDeadline(dline);
+    taskWithEdits.setPeriod(period);
+    taskWithEdits.setStatus(isComplete);
+    Task t = list.getTaskById(id);
+
+    String oldTitle = t.getTitle();
+
+    t.updateWith(taskWithEdits);
+
+    if (isComplete != null && isComplete) {
+      list.editCompletedTaskById(id);
+      t.setId(0);
+    }
+
+    // issue is is that when we are setting a new period
+    // deadline is null, so the task has a deadline AND a period
+    // and when displaying the deadline is checked first, so the task seems to
+    // be not updated
+    // but actually it just didn't remove the deadline
+    if (dline != null) {
+      t.setDeadline(dline);
+      t.setPeriod(null);
+    } else if (period != null) {
+      t.setPeriod(period);
+      t.setDeadline(null);
+    }
+
+    String successMsg = String.format(MSG_SUCCESS, id);
+    String titleMsg = "Changed task's name \"%s\" to \"%s\"";
+    String dlineMsg = "Changed task's deadline to \"by %s\"";
+    String periodMsg = "Changed task's period to \"from %s to %s\"";
+    String incompleteMsg = "Task \"%s\" is marked as incomplete";
+    String completeMsg = "Task \"%s\" is marked as completed";
+    int msgCount = 0;
+
+    if (title != null) {
+      successMsg += String.format(titleMsg, oldTitle, title);
+      msgCount++;
+    }
+    if (dline != null) {
+      if (msgCount != 0) {
+        successMsg += "\n";
+      }
+      successMsg += String.format(dlineMsg,
+          DateOutput.formatTimeOnly12hIgnoreZeroMinutes(dline));
+      msgCount++;
+    }
+    if (period != null) {
+      if (msgCount != 0) {
+        successMsg += "\n";
+      }
+      successMsg += String.format(periodMsg,
+          DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+              .getStartDate()), DateOutput
+              .formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+                  .getEndDate()));
+    }
+
+    if (isComplete != null) {
+      if (isComplete) {
+        successMsg += String.format(completeMsg, t.getTitle());
+      } else {
+        successMsg += String.format(incompleteMsg, t.getTitle());
+      }
+    }
+
+    return new Result(true, editMsgIfHaveOverdue(successMsg), null,
+        list.getAllIncomplete());
+  }
+
+  private void addToUndoList() {
+    TaskList currList = new TaskList();
+    currList = list.clone();
+
+    TaskList newCurrList = new TaskList();
+    for (Task t : currList) {
+      Task newT = new Task(t);
+      newCurrList.addTaskWithoutSettingId(newT);
+    }
+
+    List<Integer> newIdList = new ArrayList<Integer>();
+    for (Integer id : list.getUnusedId()) {
+      newIdList.add(id);
+    }
+
+    Collections.sort(newIdList);
+    newCurrList.setRunningId(list.getRunningId());
+    newCurrList.setUnusedId(newIdList);
+
+    goku.getUndoList().offer(newCurrList);
+    goku.getUndoInputList().offer(input);
+  }
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (list.getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+
+}
+
+	// End of segment: .\src\goku\action\EditAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\RedoAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+import goku.TaskList;
+
+public class RedoAction extends Action {
+  private static final String MSG_SUCCESS = "Command executed: \"%s\"";
+  private static final String ERR_FAIL = "Failed to redo.";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+
+  private boolean isEmpty = false;
+
+  public RedoAction(GOKU goku) {
+    super(goku);
+    list = goku.getTaskList();
+    // TODO Auto-generated constructor stub
+  }
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (goku.getTaskList().getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+
+  @Override
+  public Result doIt() {
+    if (canRedo() == false) {
+      return new Result(false, null, editMsgIfHaveOverdue(ERR_FAIL), goku
+          .getTaskList().getAllIncomplete());
+    } else {
+      return new Result(true, editMsgIfHaveOverdue(String.format(MSG_SUCCESS,
+          goku.getRedoInputList().pollLast())), null, goku.getTaskList()
+          .getAllIncomplete());
+    }
+  }
+
+  private void addToUndoList(String input) {
+    TaskList currList = new TaskList();
+    currList = list.clone();
+
+    goku.getUndoList().offer(currList);
+    goku.getUndoInputList().offer(input);
+  }
+
+  private boolean canRedo() {
+    if (goku.getRedoList().isEmpty() || goku.getRedoInputList().isEmpty()) {
+      return isEmpty;
+    }
+
+    addToUndoList(goku.getRedoInputList().getLast());
+    TaskList prevList = goku.getRedoList().pollLast();
+    goku.setTaskList(prevList);
+
+    return !isEmpty;
+  }
+}
+
+	// End of segment: .\src\goku\action\RedoAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\SearchAction.java
+	 */
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (list.getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+}
+
+	// End of segment: .\src\goku\action\SearchAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\UndoAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+import goku.TaskList;
+
+public class UndoAction extends Action {
+  private static final String MSG_SUCCESS = "Command undone: \"%s\"";
+  private static final String ERR_FAIL = "Failed to undo.";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+
+  private boolean isEmpty = false;
+
+  public UndoAction(GOKU goku) {
+    super(goku);
+    list = goku.getTaskList();
+    // TODO Auto-generated constructor stub
+  }
+
+  @Override
+  public Result doIt() {
+    if (canUndo() == false) {
+      return new Result(false, null, editMsgIfHaveOverdue(ERR_FAIL), goku
+          .getTaskList().getAllIncomplete());
+    } else {
+      return new Result(true, editMsgIfHaveOverdue(String.format(MSG_SUCCESS,
+          goku.getUndoInputList().pollLast())), null, goku.getTaskList()
+          .getAllIncomplete());
+    }
+  }
+
+  private String editMsgIfHaveOverdue(String msg) {
+    if (goku.getTaskList().getOverdue().size() != 0) {
+      msg += System.lineSeparator() + MSG_HAS_OVERDUE;
+    }
+    return msg;
+  }
+
+  private void addToRedoList(String input) {
+    TaskList currList = new TaskList();
+    currList = list.clone();
+
+    goku.getRedoInputList().offer(input);
+    goku.getRedoList().offer(currList);
+  }
+
+  private boolean canUndo() {
+    if (goku.getUndoList().isEmpty() || goku.getUndoInputList().isEmpty()) {
+      return isEmpty;
+    }
+
+    addToRedoList(goku.getUndoInputList().getLast());
+    TaskList prevList = goku.getUndoList().pollLast();
+    goku.setTaskList(prevList);
+
+    return !isEmpty;
+  }
+}
+
+	// End of segment: .\src\goku\action\UndoAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\UndoActionTest.java
+	 */
+
+package goku.action;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
+
+import java.util.Deque;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class UndoActionTest {
+  GOKU goku;
+  TaskList list;
+  Deque<TaskList> undoList;
+
+  @After
+  public void cleanUp() {
+    list.clear();
+  }
+
+  @Test
+  // This tests whether undoing adding action works
+  public void doIt_UndoAddAction() throws Exception {
+    AddAction add1 = new AddAction(goku);
+    add1.title = "hi abc";
+    AddAction add2 = new AddAction(goku);
+    add2.title = "hi abcdef";
+    AddAction add3 = new AddAction(goku);
+    add3.title = "hi def";
+    UndoAction undo = new UndoAction(goku);
+
+    Result result = undo.doIt();
+    assertEquals("Failed to undo.", result.getErrorMsg());
+
+    add1.doIt();
+    assertEquals(1, undoList.size());
+    add2.doIt();
+    assertEquals(2, undoList.size());
+    add3.doIt();
+    assertEquals(3, undoList.size());
+    undo.doIt();
+    assertEquals(2, undoList.size());
+
+    assertEquals(2, goku.getTaskList().size());
+
+    assertEquals("hi abc", goku.getTaskList().getTaskById(1).getTitle());
+    assertEquals("hi abcdef", goku.getTaskList().getTaskById(2).getTitle());
+
+  }
+
+  @Test
+  // This tests whether undoing deleting action works
+  public void doIt_UndoDeleteAction() throws Exception {
+    AddAction add1 = new AddAction(goku);
+    add1.title = "hi abc";
+    AddAction add2 = new AddAction(goku);
+    add2.title = "hi abcdef";
+    AddAction add3 = new AddAction(goku);
+    add3.title = "hi def";
+    DeleteAction delete = new DeleteAction(goku);
+    delete.id = 3;
+    UndoAction undo = new UndoAction(goku);
+
+    Result result = undo.doIt();
+    assertEquals("Failed to undo.", result.getErrorMsg());
+
+    add1.doIt();
+    assertEquals(1, undoList.size());
+    add2.doIt();
+    assertEquals(2, undoList.size());
+    add3.doIt();
+    assertEquals(3, undoList.size());
+    delete.doIt();
+    assertEquals(4, undoList.size());
+    assertEquals(2, goku.getTaskList().size());
+    undo.doIt();
+    assertEquals(3, goku.getTaskList().size());
+
+    assertEquals("hi abc", goku.getTaskList().getTaskById(1).getTitle());
+    assertEquals("hi abcdef", goku.getTaskList().getTaskById(2).getTitle());
+    assertEquals("hi def", goku.getTaskList().getTaskById(3).getTitle());
+  }
+
+  @Test
+  // This tests whether undoing editing action works
+  public void doIt_UndoEditAction() throws Exception {
+    AddAction add1 = new AddAction(goku);
+    add1.title = "hi abc";
+    DateTime prevDeadline = DateUtil.parse("monday");
+    add1.dline = prevDeadline;
+    EditAction editTitle = new EditAction(goku);
+    editTitle.id = 1;
+    editTitle.title = "bye abc";
+    UndoAction undo = new UndoAction(goku);
+
+    Result result = undo.doIt();
+    assertEquals("Failed to undo.", result.getErrorMsg());
+
+    add1.doIt();
+    assertEquals(1, undoList.size());
+    assertEquals(1, list.size());
+    editTitle.doIt();
+    assertEquals(2, undoList.size());
+    Task task1 = goku.getTaskList().getTaskById(1);
+    assertEquals("bye abc", task1.getTitle());
+    undo.doIt();
+    assertEquals(1, undoList.size());
+    Task task2 = goku.getTaskList().getTaskById(1);
+    assertEquals("hi abc", task2.getTitle());
+
+    EditAction editDate = new EditAction(goku);
+    editDate.id = 1;
+    DateTime newDeadline = DateUtil.parse("tuesday");
+    editDate.dline = newDeadline;
+    assertNotNull(editDate.dline);
+    editDate.doIt();
+    task1 = goku.getTaskList().getTaskById(1);
+    assertEquals(newDeadline, task1.getDeadline());
+    undo.doIt();
+    task2 = goku.getTaskList().getTaskById(1);
+    assertEquals(prevDeadline, task2.getDeadline());
+
+  }
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+    undoList = goku.getUndoList();
+  }
+}
+
+	// End of segment: .\src\goku\action\UndoActionTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\GOKU.java
+	 */
+
+package goku;
+
+import java.util.Deque;
+import java.util.LinkedList;
+
+import javafx.collections.ObservableList;
+
+/*
+ * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
+ * analogous to real life tasks which the user wishes to note down.
+ */
+public class GOKU {
+
+  private static TaskList _list;
+  private Deque<TaskList> undoList;
+  private Deque<String> undoInputList;
+  private Deque<TaskList> redoList;
+  private Deque<String> redoInputList;
+
+  public GOKU() {
+    _list = new TaskList();
+    undoList = new LinkedList<TaskList>();
+    undoInputList = new LinkedList<String>();
+    redoList = new LinkedList<TaskList>();
+    redoInputList = new LinkedList<String>();
+  }
+
+  public TaskList getTaskList() {
+    return _list;
+  }
+
+  public ObservableList<Task> getObservable() {
+    return _list.getObservable();
+  }
+
+  public Deque<TaskList> getUndoList() {
+    return undoList;
+  }
+
+  public Deque<TaskList> getRedoList() {
+    return redoList;
+  }
+
+  public Deque<String> getUndoInputList() {
+    return undoInputList;
+  }
+
+  public Deque<String> getRedoInputList() {
+    return redoInputList;
+  }
+
+  public void setTaskList(TaskList list) {
+    _list = list;
+  }
+
+  public void addToTaskList(TaskList list) {
+    for (Task task : list) {
+      _list.addTask(task);
+    }
+  }
+}
+
+	// End of segment: .\src\goku\GOKU.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\Task.java
+	 */
+
+package goku;
+
+import goku.storage.Storeable;
+import goku.util.DateUtil;
+import goku.util.DiffMatchPath;
+import hirondelle.date4j.DateTime;
+
+import com.google.gson.Gson;
+
+/**
+ * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
+ * analogous to real life tasks which the user wishes to note down.
+ * 
+ */
+public class Task implements Storeable, Comparable<Task> {
+
+  private Integer id;
+  private String title;
+  private DateTime deadline;
+  private DateRange period;
+  private String[] tags;
+  private String notes;
+  private Boolean isComplete;
+  private Boolean isImpt;
+
+  public Task() {
+  }
+
+  /*
+   * This constructor is used to clone a task
+   */
+  public Task(Task task) {
+    id = task.id;
+    title = task.title;
+    deadline = task.deadline;
+    period = task.period;
+    tags = task.tags;
+    notes = task.notes;
+    isComplete = task.isComplete;
+    isImpt = task.isImpt;
+  }
+
+  public Boolean titleMatches(String title) {
+    if (getTitle() == null || title == null) {
+      return false;
+    }
+    String aTitle = getTitle().toLowerCase();
+    String otherTitle = title.toLowerCase();
+    int match = (new DiffMatchPath()).match_main(aTitle, otherTitle, 0);
+    return match != -1;
+  }
+
+  public Boolean titleMatchesExactly(String title) {
+    if (getTitle() == null || title == null) {
+      return false;
+    }
+    String aTitle = getTitle().toLowerCase();
+    String otherTitle = title.toLowerCase();
+    return aTitle.contains(otherTitle);
+  }
+
+  public void updateWith(Task other) {
+    title = other.title == null ? title : other.title;
+    deadline = other.deadline == null ? deadline : other.deadline;
+    period = other.period == null ? period : other.period;
+    isComplete = other.isComplete == null ? isComplete : other.isComplete;
+    tags = other.tags == null ? tags : other.tags;
+    notes = other.notes == null ? notes : other.notes;
+    isImpt = other.isImpt == null ? isImpt : other.isImpt;
+  }
+
+  @Override
+  public String toStorageFormat() {
+    Gson gson = new Gson();
+    return gson.toJson(this);
+  }
+
+  @Override
+  public boolean equals(Object anObject) {
+    if (anObject == null) {
+      return false;
+    }
+    if (anObject instanceof Task) {
+      Task aTask = (Task) anObject;
+      if (id == null || aTask.id == null) {
+        return false;
+      }
+      return id.equals(aTask.id);
+    }
+    return false;
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public DateTime getDeadline() {
+    return deadline;
+  }
+
+  public DateRange getDateRange() {
+    return period;
+  }
+
+  public DateTime getStartDate() {
+    return period.getStartDate();
+  }
+
+  public DateTime getEndDate() {
+    return period.getEndDate();
+  }
+
+  public Boolean isImpt() {
+    return isImpt;
+  }
+
+	// End of segment: .\src\goku\Task.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\TaskList.java
+	 */
+
+package goku;
+
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+import hirondelle.date4j.DateTime;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+public class TaskList implements Iterable<Task> {
+  private Integer runningId = 1;
+  private List<Integer> unusedId = new ArrayList<Integer>();
+
+  private ObservableList<Task> _list;
+
+  public TaskList() {
+    _list = FXCollections.observableArrayList();
+  }
+
+  public int addTask(Task task) {
+    if (task.getId() == null) {
+      task.setId(makeId());
+    } else if (task.getId() == 0) {
+      task.setId(0);
+    } else {
+      task.setId(makeId());
+    }
+    boolean success = _list.add(task);
+    return success ? task.getId() : -1;
+  }
+
+  public boolean addTaskWithoutSettingId(Task task) {
+    // if (getTaskById(task.getId()) == null) {
+    return _list.add(task);
+    // }
+    // return false;
+  }
+
+  public List<Task> asList() {
+    return _list;
+  }
+
+  public void clear() {
+    _list.clear();
+  }
+
+  public void clearCompleted() {
+    for (Task task : getAllCompleted()) {
+      deleteTaskById(task.getId());
+    }
+  }
+
+  @Override
+  public TaskList clone() {
+    TaskList cloned = new TaskList();
+    for (Task task : _list) {
+      cloned.addTaskWithoutSettingId(task);
+    }
+
+    cloned.runningId = runningId;
+    cloned.unusedId = unusedId;
+
+    return cloned;
+  }
+
+  private List<Task> deleteTask(List<Task> matches) {
+    if (matches.size() == 1) {
+      Task deleted = deleteTaskById(matches.get(0).getId());
+      List<Task> results = new ArrayList<>();
+      results.add(deleted);
+      return results;
+    } else {
+      return matches;
+    }
+  }
+
+  public Task deleteTaskById(int id) {
+    int index = getIndexOfTaskById(id);
+    return index < 0 ? null : deleteTaskByIndex(index);
+  }
+
+  public Task deleteTaskByIndex(int index) {
+    Task t = getTaskByIndex(index);
+    unusedId.add(t.getId());
+    Collections.sort(unusedId);
+    return _list.remove(index);
+  }
+
+  public List<Task> deleteTaskByTitle(String title) {
+    return deleteTask(findTaskByTitle(title));
+  }
+
+  public void editCompletedTaskById(int id) {
+    unusedId.add(id);
+    Collections.sort(unusedId);
+  }
+
+  public List<Task> findTasksOnDay(DateTime dateQuery) {
+    List<Task> matches = new ArrayList<>();
+    for (Task task : _list) {
+      if (task.isOn(dateQuery)) {
+        matches.add(task);
+      }
+    }
+    return matches;
+  }
+
+  public List<Task> findTaskByDeadline(DateTime deadline) {
+    List<Task> matches = new ArrayList<>();
+    for (Task task : _list) {
+      if (task.isDueOn(deadline)) {
+        matches.add(task);
+      }
+    }
+    return matches;
+  }
+
+  public List<Task> findTaskByPeriod(DateRange range) {
+    List<Task> matches = new ArrayList<>();
+    for (Task task : _list) {
+      if (range.containsDate(task.getDeadline())
+          || range.intersectsWith(task.getDateRange())) {
+        matches.add(task);
+      }
+    }
+    return matches;
+  }
+
+  public List<Task> findTaskByTitle(String title) {
+    List<Task> matches = new ArrayList<>();
+    for (Task task : _list) {
+      if (task.titleMatches(title)) {
+        matches.add(task);
+      }
+    }
+    return matches;
+  }
+
+  public List<Task> findTaskByTitleExactly(String title) {
+    List<Task> matches = new ArrayList<>();
+    for (Task task : _list) {
+      if (task.titleMatchesExactly(title)) {
+        matches.add(task);
+      }
+    }
+    return matches;
+  }
+
+  public List<Task> getAllCompleted() {
+    List<Task> completed = new ArrayList<Task>();
+    for (Task task : _list) {
+      if (task.isDone() != null && task.isDone()) {
+        completed.add(task);
+      }
+    }
+    return completed;
+  }
+
+  public List<Task> getAllIncomplete() {
+    List<Task> incomplete = new ArrayList<Task>();
+    DateTime now = DateUtil.getNow();
+    for (Task task : _list) {
+      if ((((task.isDone()) == null || !task.isDone()))
+          && ((task.getDeadline() == null || DateUtil.isEarlierOrOn(now,
+              task.getDeadline())) && (task.getDateRange() == null || DateUtil
+              .isEarlierOrOn(now, task.getEndDate())))) {
+        incomplete.add(task);
+      }
+    }
+    return incomplete;
+  }
+
+  public ObservableList<Task> getArrayList() {
+    return _list;
+  }
+
+  private int getIndexOfTaskById(int id) {
+    return _list.indexOf(getTaskById(id));
+  }
+
+  public ObservableList<Task> getObservable() {
+    return _list;
+  }
+
+  public List<Task> getOverdue() {
+    List<Task> incomplete = new ArrayList<Task>();
+    DateTime now = DateUtil.getNow();
+    for (Task task : _list) {
+      if ((((task.isDone()) == null || !task.isDone()))) {
+        incomplete.add(task);
+      }
+    }
+
+    List<Task> overdue = new ArrayList<>();
+    for (Task task : incomplete) {
+      if ((task.getDeadline() != null && DateUtil.isEarlierOrOn(
+          task.getDeadline(), now))
+          || (task.getDateRange() != null && (DateUtil.isEarlierOrOn(
+              task.getEndDate(), now)))) {
+        overdue.add(task);
+      }
+    }
+    return overdue;
+  }
+
+  public Integer getRunningId() {
+    return runningId;
+  }
+
+  /*
+   * @param id
+   * 
+   * @returns the task with specified id
+   */
+  public Task getTaskById(int id) {
+    for (Task task : _list) {
+      if (task.getId() == id) {
+        return task;
+      }
+    }
+    return null;
+  }
+
+  protected Task getTaskByIndex(int index) {
+    return _list.get(index);
+  }
+
+  public List<Integer> getUnusedId() {
+    return unusedId;
+  }
+
+  public boolean isFree(DateTime dateTime) {
+
+    boolean result = true;
+
+    assert (dateTime != null);
+
+    for (Task task : _list) {
+      if (task.getDateRange() != null) {
+        DateTime taskStartDate = task.getDateRange().getStartDate();
+        DateTime taskEndDate = task.getDateRange().getEndDate();
+
+        if (DateUtil.isEarlierOrOn(dateTime, taskEndDate)
+            && DateUtil.isLaterOrOn(dateTime, taskStartDate)) {
+          result = false;
+          break;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  public List<String> findFreeSlots(DateTime date)
+      throws InvalidDateRangeException {
+    assert date.getHour() == null;
+
+    List<String> resultList = new ArrayList<String>();
+    ArrayList<DateRange> periodListOfDate = new ArrayList<DateRange>();
+
+    for (Task task : _list) {
+      if (DateUtil.periodClashesWithDay(task.getDateRange(), date)) {
+        periodListOfDate.add(task.getDateRange());
+      }
+    }
+
+    if (periodListOfDate.size() == 0) {
+      resultList
+          .add(timeSlotFormatter(date.getStartOfDay(), date.getEndOfDay()));
+    } else {
+      resultList = findFreeSlots(periodListOfDate, date);
+    }
+
+    return resultList;
+  }
+
+	// End of segment: .\src\goku\TaskList.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\FeedbackPane.java
+	 */
+
+  private void displayCompleteTask(Task task) {
+    Label tick = AwesomeDude.createIconLabel(AwesomeIcon.CHECK);
+    Label b1 = new Label("[");
+    Label b2 = new Label("]");
+
+    tick.setTextFill(DONE_COLOUR);
+    b1.setTextFill(ID_COLOUR);
+    b2.setTextFill(ID_COLOUR);
+    HBox tickHbox = new HBox();
+    tickHbox.getChildren().addAll(b1, tick, b2);
+    tickHbox.setAlignment(Pos.CENTER_LEFT);
+
+    Label title = new Label(task.getTitle());
+    title.setTextFill(NORMAL_COLOUR);
+    title.setWrapText(true);
+    VBox dateVBox = makeDateVbox(task, true);
+    // dateVBox.setStyle("-fx-background-color:rgba(85, 255, 68,0.2)");
+
+    output.add(tickHbox, 0, lines);
+    output.add(title, 1, lines);
+    output.add(dateVBox, 2, lines);
+    lines++;
+  }
+
+  private void displayRemainingTask(Task task) {
+    Label id = new Label("[" + task.getId().toString() + "]");
+    if (task.isImpt() == null || !task.isImpt()) {
+      id.setTextFill(ID_COLOUR);
+    } else {
+      id.setTextFill(IMPT_COLOUR);
+    }
+
+    HBox idWithImpt = new HBox();
+    Label impt = AwesomeDude.createIconLabel(AwesomeIcon.EXCLAMATION);
+    impt.setTextFill(IMPT_COLOUR);
+    idWithImpt.getChildren().addAll(id, impt);
+    idWithImpt.setAlignment(Pos.CENTER_LEFT);
+
+    Label title = new Label(task.getTitle());
+    title.setTextFill(NORMAL_COLOUR);
+    title.setWrapText(true);
+    title.setMinWidth(50.0);
+    VBox dateVBox = makeDateVbox(task, true);
+
+    if (task.isImpt() == null || !task.isImpt()) {
+      output.add(id, 0, lines);
+    } else {
+      output.add(idWithImpt, 0, lines);
+    }
+    output.add(title, 1, lines);
+    output.add(dateVBox, 2, lines);
+    lines++;
+  }
+
+  private void displayTask(Task task) {
+    Label id = new Label("[" + task.getId().toString() + "]");
+    if (task.isImpt() == null || !task.isImpt()) {
+      id.setTextFill(ID_COLOUR);
+    } else {
+      id.setTextFill(IMPT_COLOUR);
+    }
+
+    HBox idWithImpt = new HBox();
+    Label impt = AwesomeDude.createIconLabel(AwesomeIcon.EXCLAMATION);
+    impt.setTextFill(IMPT_COLOUR);
+    idWithImpt.getChildren().addAll(id, impt);
+    idWithImpt.setAlignment(Pos.CENTER_LEFT);
+    // if (task.getImpt()) {
+    // id.setTextFill(IMPT_COLOUR);
+    // }
+    Label title = new Label(task.getTitle());
+    title.setTextFill(NORMAL_COLOUR);
+    title.setWrapText(true);
+    title.setMinWidth(50.0);
+    VBox dateVBox = makeDateVbox(task, false);
+
+    // output.add(id, 0, lines);
+    if (task.isImpt() == null || task.isImpt()) {
+      output.add(id, 0, lines);
+    } else {
+      output.add(idWithImpt, 0, lines);
+    }
+    output.add(title, 1, lines);
+    output.add(dateVBox, 2, lines);
+    lines++;
+  }
+
+  private VBox makeDateVbox(Task task, boolean isRemainingTask) {
+    VBox vbox = new VBox();
+    if (task.getDeadline() != null) {
+      HBox dl = makeDeadline(task, isRemainingTask);
+      vbox.getChildren().add(dl);
+    } else if (task.getDateRange() != null) {
+      HBox[] pr = makeDateRange(task, isRemainingTask);
+      vbox.getChildren().addAll(pr[0], pr[1]);
+    }
+    return vbox;
+  }
+
+  private void displayTaskListHeader(String header) {
+    HBox hbox = new HBox();
+    Label label = new Label("-" + header.toUpperCase() + "-");
+    label.setTextAlignment(TextAlignment.CENTER);
+    label.setTextFill(HEADER_COLOUR);
+    hbox.getChildren().add(label);
+    hbox.setAlignment(Pos.BOTTOM_CENTER);
+    output.add(hbox, 0, lines++, numColumns, 1);
+  }
+
+  /*
+   * Builds a Text that represents the period of a task.
+   * 
+   * @param t task to be shown
+   */
+  private HBox[] makeDateRange(Task t, boolean isRemainingTask) {
+    HBox[] hbox = new HBox[2];
+    hbox[0] = new HBox();
+    hbox[1] = new HBox();
+    hbox[0].setAlignment(Pos.CENTER_LEFT);
+    hbox[1].setAlignment(Pos.CENTER_LEFT);
+    hbox[0].setSpacing(5);
+    hbox[1].setSpacing(5);
+
+    Label sicon = AwesomeDude.createIconLabel(AwesomeIcon.CALENDAR_ALT);
+    Label eicon = AwesomeDude.createIconLabel(AwesomeIcon.LONG_ARROW_RIGHT);
+    sicon.setTextFill(DATE_COLOUR);
+    eicon.setTextFill(DATE_COLOUR);
+
+    DateRange period = t.getDateRange();
+    Label s, e;
+
+    if (isRemainingTask) {
+      s = new Label(
+          DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+              .getStartDate()));
+      e = new Label(
+          DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
+              .getEndDate()));
+    } else {
+      s = new Label(DateOutput.formatTimeOnly12hIgnoreZeroMinutes(period
+          .getStartDate()));
+      e = new Label(DateOutput.formatTimeOnly12hIgnoreZeroMinutes(period
+          .getEndDate()));
+    }
+    s.setTextFill(DATE_COLOUR);
+    e.setTextFill(DATE_COLOUR);
+    hbox[0].getChildren().addAll(sicon, s);
+    hbox[1].getChildren().addAll(eicon, e);
+    return hbox;
+  }
+
+  /*
+   * Builds a Text that represents the deadline of a task.
+   * 
+   * @param t task to be shown
+   */
+  private HBox makeDeadline(Task t, boolean isRemainingTask) {
+    HBox hbox = new HBox();
+    Label deadline;
+    if (isRemainingTask) {
+      deadline = new Label(""
+          + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(t
+              .getDeadline()));
+    } else {
+      deadline = new Label(""
+          + DateOutput.formatTimeOnly12hIgnoreZeroMinutes(t.getDeadline()));
+    }
+    deadline.setTextFill(DATE_COLOUR);
+    Label icon = AwesomeDude.createIconLabel(AwesomeIcon.CLOCK_ALT);
+    icon.setTextFill(DATE_COLOUR);
+    hbox.getChildren().addAll(icon, deadline);
+    hbox.setAlignment(Pos.CENTER_LEFT);
+    hbox.setSpacing(5);
+    return hbox;
+  }
+
+  public void sayGoodbye() {
+    clearArea();
+    displayLine("Goodbye!");
+  }
+}
+
+	// End of segment: .\src\goku\ui\FeedbackPane.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\TaskListDisplayer.java
+	 */
+
+  private boolean isOver(DateRange dateRange) {
+    if (dateRange == null) {
+      return false;
+    }
+    return isOver(dateRange.getEndDate());
+  }
+
+  public boolean isOver(DateTime date) {
+    if (date == null) {
+      return false;
+    }
+    return date.isInThePast(TimeZone.getDefault());
+  }
+
+  private boolean isOver(Task task) {
+    return isOver(task.getDateRange()) || isOver(task.getDeadline());
+  }
+
+  private boolean isToday(DateRange dateRange) {
+    if (dateRange == null) {
+      return false;
+    }
+    DateTime now = DateUtil.getNow();
+
+    return DateUtil.isLaterOrOn(dateRange.getStartDate(), now.getStartOfDay())
+        && DateUtil.isEarlierOrOn(dateRange.getEndDate(), now.getEndOfDay());
+  }
+
+  private boolean isToday(DateTime date) {
+    if (date == null) {
+      return false;
+    }
+    return DateUtil.getNow().isSameDayAs(date);
+  }
+
+  private boolean isToday(Task task) {
+    return isToday(task.getDeadline()) || isToday(task.getDateRange());
+  }
+
+  private boolean isTomorrow(DateRange dateRange) {
+    if (dateRange == null) {
+      return false;
+    }
+    return DateUtil.getNow().plusDays(1).isSameDayAs(dateRange.getStartDate());
+  }
+
+  private boolean isTomorrow(DateTime date) {
+    if (date == null) {
+      return false;
+    }
+    return DateUtil.getNow().plusDays(1).isSameDayAs(date);
+
+  }
+
+  private boolean isTomorrow(Task task) {
+    return isTomorrow(task.getDeadline()) || isTomorrow(task.getDateRange());
+  }
+}
+
+	// End of segment: .\src\goku\ui\TaskListDisplayer.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\TaskListDisplayerTest.java
+	 */
+
+package goku.ui;
+
+import goku.Task;
+import goku.TaskList;
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
+
+import org.junit.Test;
+
+public class TaskListDisplayerTest {
+  TaskListDisplayer tld = new TaskListDisplayer(System.out);
+  TaskList list = new TaskList();
+
+  @Test
+  public void testDisplay() {
+    Task a = makeTaskWithDeadline("task tmr", 1);
+    Task b = makeTaskWithDeadline("task today", 0);
+    Task c = makeTaskWithDeadline("task ytd", -1);
+    Task d = makeTaskWithDeadline("task next week", 7);
+    list.addTask(a);
+    list.addTask(b);
+    list.addTask(c);
+    list.addTask(d);
+  }
+
+	// End of segment: .\src\goku\ui\TaskListDisplayerTest.java
+
+
+
+
+

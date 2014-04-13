@@ -1,0 +1,1553 @@
+//@author: a0099858y
+
+
+
+	/**
+	 * origin: .\src\goku\action\AddActionTest.java
+	 */
+
+package goku.action;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class AddActionTest {
+  TaskList list;
+  GOKU goku;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+  }
+
+  @After
+  public void cleanUp() {
+    list.clear();
+  }
+
+  @Test
+  public void doIt_taskWithNoName_returnsFailureResult() throws Exception {
+  }
+
+  @Test
+  // This tests whether adding a task to the task list works
+  public void doIt_TaskWithName_returnsSuccessfulResult() throws Exception {
+    AddAction add = new AddAction(goku);
+    add.title = "hi";
+    Result actualResult = add.doIt();
+    assertTrue(actualResult.isSuccess());
+
+    assertEquals(1, list.size());
+    Task task = new Task();
+    task.setTitle("hi");
+    List<Task> addedTask = list.findTaskByTitle("hi");
+    assertEquals(1, addedTask.size());
+  }
+
+  @Test
+  // This tests whether adding tasks with unusual names to the task list works
+  public void doIt_TaskWithNullName_returnsSuccessfulResult() throws Exception {
+    AddAction add = new AddAction(goku);
+    add.title = null;
+    Result actualResult = add.doIt();
+    assertTrue(actualResult.isSuccess());
+    assertEquals(1, list.size());
+  }
+
+  @Test
+  // This tests whether adding tasks with long names to the task list works
+  public void doIt_TaskWithLongName_returnsSuccessfulResult() throws Exception {
+    AddAction add = new AddAction(goku);
+    add.title = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    Result actualResult = add.doIt();
+    assertTrue(actualResult.isSuccess());
+    assertEquals(1, list.size());
+  }
+
+  @Test
+  // This tests whether adding different tasks works
+  public void doIt_MultipleTasksWithName() throws Exception {
+    AddAction add1 = new AddAction(goku);
+    add1.title = "hi abc";
+    AddAction add2 = new AddAction(goku);
+    add2.title = "hi abcdef";
+    AddAction add3 = new AddAction(goku);
+    add3.title = "hi def";
+
+    Task task1 = new Task();
+    task1.setTitle("abc");
+    Task task2 = new Task();
+    task2.setTitle("def");
+
+    add1.doIt();
+    add2.doIt();
+    add3.doIt();
+    assertEquals(3, list.size());
+
+    List<Task> results;
+    results = list.findTaskByTitle("abc");
+    assertEquals(2, results.size());
+
+    results = list.findTaskByTitle("def");
+    assertEquals(2, results.size());
+  }
+
+}
+
+	// End of segment: .\src\goku\action\AddActionTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\DeleteActionTest.java
+	 */
+
+package goku.action;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class DeleteActionTest {
+  TaskList list;
+  GOKU goku;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+  }
+
+  @After
+  public void cleanUp() {
+    list.clear();
+  }
+
+  @Test
+  // This is to test whether deleting a task works
+  public void deleteTask_withIdFound_returnsSuccess() throws Exception {
+    Task aTask = new Task();
+    int id = list.addTask(aTask);
+    DeleteAction delete = new DeleteAction(goku);
+    delete.id = id;
+    Result result = delete.doIt();
+    assertEquals(0, list.size());
+    assertTrue(result.isSuccess());
+  }
+
+  @Test
+  // This is to test whether deleting a task with the wrong ID fails
+  public void deleteTask_withIdNotFound_returnsFailure() throws Exception {
+    Task aTask = new Task();
+    int id = list.addTask(aTask);
+
+    DeleteAction delete = new DeleteAction(goku);
+    delete.id = id + 1;
+    Result result = delete.doIt();
+    delete.title = null;
+
+    assertEquals(1, list.size());
+    assertFalse(result.isSuccess());
+  }
+
+  @Test
+  // This is to test whether deleting a task with the wrong ID and title fails
+  public void deleteTask_withIdNotFoundTitleNotFound_returnsFailure()
+      throws Exception {
+    Task aTask = new Task();
+    aTask.setTitle("abc");
+    int id = list.addTask(aTask);
+
+    DeleteAction delete = new DeleteAction(goku);
+    delete.id = id + 1;
+    Result result = delete.doIt();
+    delete.title = null;
+
+    assertEquals(1, list.size());
+    assertFalse(result.isSuccess());
+  }
+
+  @Test
+  // This is to test whether deleting a task with wrong ID but correct title
+  // works
+  public void deleteTask_withIdNotFoundButTitleFound_returnsSuccess()
+      throws Exception {
+    Task aTask = new Task();
+    aTask.setTitle("abc");
+    list.addTask(aTask);
+    assertEquals(1, list.size());
+
+    DeleteAction delete = new DeleteAction(goku);
+    delete.title = "abc";
+    Result result = delete.doIt();
+
+    assertEquals(0, list.size());
+    assertTrue(result.isSuccess());
+  }
+
+  @Test
+  // This is to test whether deleting with a term that matches multiple tasks
+  // fail
+  public void deleteTask_withIdNotFoundAndMultipleMatchesInTitle_returnsFailure()
+      throws Exception {
+    Task aTask = new Task();
+    aTask.setTitle("abcdef");
+    list.addTask(aTask);
+    Task otherTask = new Task();
+    otherTask.setTitle("abc123");
+    list.addTask(otherTask);
+
+    DeleteAction delete = new DeleteAction(goku);
+    delete.title = "abc";
+    Result result = delete.doIt();
+
+    assertEquals(2, list.size());
+    assertFalse(result.isSuccess());
+  }
+
+  @Test
+  // This is to test whether deleting a task with a null ID and title fails
+  public void deleteTask_withNullIdAndTitle_returnsFailure() throws Exception {
+    Task aTask = new Task();
+    aTask.setTitle("abc");
+    list.addTask(aTask);
+
+    DeleteAction delete = new DeleteAction(goku);
+    delete.id = null;
+    delete.title = null;
+    Result result = delete.doIt();
+
+    assertEquals(1, list.size());
+    assertFalse(result.isSuccess());
+  }
+
+  @Test
+  // This is to test whether deleting a task with a null title fails
+  public void deleteTask_withNullTitle_returnsFailure() throws Exception {
+    Task aTask = new Task();
+    aTask.setTitle(null);
+    list.addTask(aTask);
+
+    DeleteAction delete = new DeleteAction(goku);
+    delete.title = null;
+    Result result = delete.doIt();
+
+    assertEquals(1, list.size());
+    assertFalse(result.isSuccess());
+  }
+}
+	// End of segment: .\src\goku\action\DeleteActionTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\DisplayActionTest.java
+	 */
+
+package goku.action;
+
+import static org.junit.Assert.assertEquals;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import goku.util.DateUtil;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class DisplayActionTest {
+  private GOKU goku;
+  private TaskList list;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+  }
+
+  @Test
+  // This tests whether selectively displaying incomplete and/or complete tasks
+  // works
+  public void doIt_success() {
+    Task completedTask = new Task();
+    completedTask.setTitle("complete task");
+    completedTask.setStatus(true);
+
+    Task overdueTask = new Task();
+    overdueTask.setTitle("overdue task");
+    overdueTask.setDeadline(DateUtil.getNow().minusDays(3));
+
+    Task previousTask = new Task();
+    previousTask.setTitle("previous task");
+    previousTask.setStatus(true);
+    previousTask.setDeadline(DateUtil.getNow().minusDays(3));
+
+    Task task = new Task();
+    task.setTitle("task");
+
+    list.addTask(completedTask);
+    list.addTask(overdueTask);
+    list.addTask(previousTask);
+    list.addTask(task);
+
+    DisplayAction da = new DisplayAction(goku);
+    da.viewComplete = true;
+    da.viewOverdue = false;
+    Result onlyComplete = da.doIt();
+    assertEquals(2, onlyComplete.getTasks().size());
+
+    da.viewComplete = false;
+    da.viewOverdue = true;
+    Result onlyOverdue = da.doIt();
+    assertEquals(1, onlyOverdue.getTasks().size());
+
+    da.viewComplete = false;
+    da.viewOverdue = false;
+    Result onlyIncomplete = da.doIt();
+    assertEquals(1, onlyIncomplete.getTasks().size());
+
+  }
+}
+
+	// End of segment: .\src\goku\action\DisplayActionTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\EditActionTest.java
+	 */
+
+package goku.action;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import goku.DateRange;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class EditActionTest {
+  GOKU goku;
+  TaskList list;
+  Task toEdit;
+  Integer toEditId;
+  EditAction editAction;
+  Result result;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+    toEdit = new Task();
+    editAction = new EditAction(goku);
+  }
+
+  @After
+  public void cleanUp() {
+    list.clear();
+  }
+
+  @Test
+  public void editTask_changeTaskName() throws Exception {
+    toEdit.setTitle("hello");
+    toEditId = list.addTask(toEdit);
+
+    editAction.id = toEditId;
+    editAction.title = "byebye";
+    result = editAction.doIt();
+
+    assertTrue(result.isSuccess());
+    assertEquals("byebye", toEdit.getTitle());
+  }
+
+  @Test
+  public void editTask_makeComplete() throws Exception {
+    toEdit.setTitle("hello");
+    toEditId = list.addTask(toEdit);
+
+    editAction.id = toEditId;
+    editAction.isComplete = true;
+    assertNull(toEdit.isDone());
+    result = editAction.doIt();
+
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertTrue(toEdit.isDone());
+  }
+
+  @Test
+  // This tests whether editing works by checking the edited results
+  public void editTask_changeDeadline() throws Exception {
+    toEdit.setTitle("hello");
+    toEditId = list.addTask(toEdit);
+
+    editAction.id = toEditId;
+    DateTime deadline = DateUtil.getNow();
+    editAction.dline = deadline;
+    assertNull(toEdit.getDeadline());
+    result = editAction.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertEquals(deadline, toEdit.getDeadline());
+  }
+
+  @Test
+  public void editTaskWithDeadline_addPeriod_returnsTaskWithPeriod()
+      throws Exception {
+    Task toEdit, changedTask;
+    Integer id;
+    EditAction editAction;
+    Result result;
+
+    toEdit = new Task();
+    toEdit.setTitle("hello");
+    toEdit.setDeadline(DateUtil.getNow().plusDays(1));
+    id = list.addTask(toEdit);
+
+    editAction = new EditAction(goku);
+    editAction.id = id;
+    editAction.period = new DateRange(DateUtil.getNow().plusDays(1), DateUtil
+        .getNow().plusDays(2));
+    result = editAction.doIt();
+
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertNull(toEdit.getDeadline());
+    assertEquals(toEdit.getDateRange(), editAction.period);
+  }
+
+  @Test
+  public void editTaskWithPeriod_addDeadline_returnsTaskWithDeadline()
+      throws Exception {
+    Task toEdit, changedTask;
+    Integer id;
+    EditAction editAction;
+    Result result;
+
+    toEdit = new Task();
+    toEdit.setTitle("hello");
+    toEdit.setPeriod(new DateRange(DateUtil.getNow().plusDays(1), DateUtil
+        .getNow().plusDays(2)));
+    id = list.addTask(toEdit);
+
+    editAction = new EditAction(goku);
+    editAction.id = id;
+    editAction.dline = DateUtil.getNow().plusDays(1);
+    result = editAction.doIt();
+
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertNull(toEdit.getDateRange());
+    assertEquals(toEdit.getDeadline(), editAction.dline);
+  }
+
+  @Test
+  // This tests whether removing deadline from tasks works
+  public void doIt_removesDeadlineFromTask_returnsTaskWithoutDeadline()
+      throws Exception {
+    Task toEdit;
+    toEdit = new Task();
+    toEdit.setTitle("hello");
+    DateTime deadline = DateUtil.getNow();
+    toEdit.setDeadline(deadline);
+    Integer id = list.addTask(toEdit);
+
+    EditAction editAction = new EditAction(goku);
+    editAction.id = id;
+    editAction.shouldRemoveDeadline = true;
+
+    assertNotNull(toEdit.getDeadline());
+    Result result = editAction.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertNull(toEdit.getDeadline());
+  }
+
+  @Test
+  // This tests whether removing time period from tasks works
+  public void doIt_removesPeriodFromTask_returnsTaskWithoutPeriod()
+      throws Exception {
+    Task toEdit;
+    toEdit = new Task();
+    toEdit.setTitle("hello");
+    DateTime deadline = DateUtil.getNow();
+    toEdit.setPeriod(new DateRange(deadline, deadline.plusDays(1)));
+    Integer id = list.addTask(toEdit);
+
+    EditAction editAction = new EditAction(goku);
+    editAction.id = id;
+    editAction.shouldRemovePeriod = true;
+
+    assertNotNull(toEdit.getDateRange());
+    Result result = editAction.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertNull(toEdit.getDateRange());
+  }
+
+  @Test
+  // This tests whether removing importance from tasks works
+  public void doIt_toggleImportantFromTask_returnsTaskWithoutImportant()
+      throws Exception {
+    Task toEdit;
+    toEdit = new Task();
+    toEdit.setTitle("hello");
+    toEdit.setImpt(true);
+    Integer id = list.addTask(toEdit);
+
+    EditAction editAction = new EditAction(goku);
+    editAction.id = id;
+    editAction.shouldToggleImportant = true;
+
+    assertTrue(toEdit.isImpt());
+    Result result = editAction.doIt();
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertTrue(!toEdit.isImpt());
+  }
+
+}
+
+	// End of segment: .\src\goku\action\EditActionTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\NoAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+
+/*
+ * Represents an empty Action, an Action that does nothing,
+ * has no feedback, but is successful.
+ */
+public class NoAction extends Action {
+  public NoAction(GOKU goku) {
+    super(goku);
+  }
+
+  @Override
+  public Result doIt() {
+    return new Result(true, null, null, null);
+  }
+}
+
+	// End of segment: .\src\goku\action\NoAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\RedoActionTest.java
+	 */
+
+package goku.action;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
+
+import java.util.Deque;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class RedoActionTest {
+  GOKU goku;
+  TaskList list;
+  Deque<TaskList> undoList;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+    undoList = goku.getUndoList();
+  }
+
+  @After
+  public void cleanUp() {
+    list.clear();
+  }
+
+  @Test
+  // This tests whether redoing undoing adding action works
+  public void doIt_UndoAddAction() throws Exception {
+    AddAction add1 = new AddAction(goku);
+    add1.title = "hi abc";
+    AddAction add2 = new AddAction(goku);
+    add2.title = "hi abcdef";
+
+    UndoAction undo = new UndoAction(goku);
+    RedoAction redo = new RedoAction(goku);
+
+    Result result = undo.doIt();
+    assertEquals("Failed to undo.", result.getErrorMsg());
+
+    add1.doIt();
+    assertEquals(1, list.size());
+    assertEquals(1, undoList.size());
+    add2.doIt();
+    assertEquals(2, list.size());
+    assertEquals(2, undoList.size());
+    undo.doIt();
+    assertEquals(1, goku.getTaskList().size());
+    assertEquals(1, undoList.size());
+    redo.doIt();
+    assertEquals(2, goku.getTaskList().size());
+
+  }
+
+  @Test
+  // This tests whether undoing deleting action works
+  public void doIt_UndoDeleteAction() throws Exception {
+    AddAction add1 = new AddAction(goku);
+    add1.title = "hi abc";
+    AddAction add2 = new AddAction(goku);
+    add2.title = "hi abcdef";
+    AddAction add3 = new AddAction(goku);
+    add3.title = "hi def";
+    DeleteAction delete = new DeleteAction(goku);
+    delete.id = 3;
+    UndoAction undo = new UndoAction(goku);
+
+    Result result = undo.doIt();
+    assertEquals("Failed to undo.", result.getErrorMsg());
+
+    add1.doIt();
+    assertEquals(1, undoList.size());
+    add2.doIt();
+    assertEquals(2, undoList.size());
+    add3.doIt();
+    assertEquals(3, undoList.size());
+    delete.doIt();
+    assertEquals(4, undoList.size());
+    assertEquals(2, goku.getTaskList().size());
+    undo.doIt();
+    assertEquals(3, goku.getTaskList().size());
+
+    assertEquals("hi abc", goku.getTaskList().getTaskById(1).getTitle());
+    assertEquals("hi abcdef", goku.getTaskList().getTaskById(2).getTitle());
+    assertEquals("hi def", goku.getTaskList().getTaskById(3).getTitle());
+  }
+
+  @Test
+  // This tests whether undoing editing action works
+  public void doIt_UndoEditAction() throws Exception {
+    AddAction add1 = new AddAction(goku);
+    add1.title = "hi abc";
+    DateTime prevDeadline = DateUtil.parse("monday");
+    add1.dline = prevDeadline;
+    EditAction editTitle = new EditAction(goku);
+    editTitle.id = 1;
+    editTitle.title = "bye abc";
+    UndoAction undo = new UndoAction(goku);
+
+    Result result = undo.doIt();
+    assertEquals("Failed to undo.", result.getErrorMsg());
+
+    add1.doIt();
+    assertEquals(1, undoList.size());
+    assertEquals(1, list.size());
+    editTitle.doIt();
+    assertEquals(2, undoList.size());
+    Task task1 = goku.getTaskList().getTaskById(1);
+    assertEquals("bye abc", task1.getTitle());
+    undo.doIt();
+    assertEquals(1, undoList.size());
+    Task task2 = goku.getTaskList().getTaskById(1);
+    assertEquals("hi abc", task2.getTitle());
+
+    EditAction editDate = new EditAction(goku);
+    editDate.id = 1;
+    DateTime newDeadline = DateUtil.parse("tuesday");
+    editDate.dline = newDeadline;
+    assertNotNull(editDate.dline);
+    editDate.doIt();
+    task1 = goku.getTaskList().getTaskById(1);
+    assertEquals(newDeadline, task1.getDeadline());
+    undo.doIt();
+    task2 = goku.getTaskList().getTaskById(1);
+    assertEquals(prevDeadline, task2.getDeadline());
+
+  }
+}
+
+	// End of segment: .\src\goku\action\RedoActionTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\Result.java
+	 */
+
+package goku;
+
+import java.util.List;
+
+public class Result {
+  private static final String MSG_DEFAULT_SUCCESS = "Success!";
+  private static final String MSG_DEFAULT_FAILURE = "Failed.";
+  public List<Task> listOfTask;
+  private boolean isSuccess;
+  private String successMsg;
+  private String clashMsg;
+  private String errorMsg;
+  private List<String> listMsg;
+
+  public Result(boolean isSuccess, String successMsg, String errorMsg,
+      List<Task> list) {
+    this.isSuccess = isSuccess;
+    setSuccessMsg(successMsg);
+    setErrorMsg(errorMsg);
+    setTasks(list);
+  }
+
+  public Result(boolean isSuccess, String successMsg, String clashMsg,
+      String errorMsg, List<Task> list) {
+    this.isSuccess = isSuccess;
+    setSuccessMsg(successMsg);
+    setClashMsg(clashMsg);
+    setErrorMsg(errorMsg);
+    setTasks(list);
+  }
+
+  public Result(boolean isSuccess, String successMsg, String errorMsg,
+      List<String> listMsg, List<Task> list) {
+    this.isSuccess = isSuccess;
+    setSuccessMsg(successMsg);
+    setErrorMsg(errorMsg);
+    setMsgList(listMsg);
+    setTasks(list);
+  }
+
+  public void setTasks(List<Task> list) {
+    this.listOfTask = list;
+  }
+
+  public void setMsgList(List<String> list) {
+    this.listMsg = list;
+  }
+
+  public static Result makeSuccessResult() {
+    return new Result(true, MSG_DEFAULT_SUCCESS, null, null);
+  }
+
+  public static Result makeFailureResult() {
+    return new Result(false, null, MSG_DEFAULT_FAILURE, null);
+  }
+
+  public String getErrorMsg() {
+    return errorMsg;
+  }
+
+  public String getSuccessMsg() {
+    return successMsg;
+  }
+
+  public String getClashMsg() {
+    return clashMsg;
+  }
+
+  public List<String> getListMsg() {
+    return listMsg;
+  }
+
+	// End of segment: .\src\goku\Result.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\Task.java
+	 */
+
+  public Boolean isDone() {
+    return isComplete;
+  }
+
+  public Boolean isDueOn(DateTime date) {
+    return deadline != null && DateUtil.isEarlierOrOn(deadline, date);
+  }
+
+  public Boolean isOn(DateTime date) {
+    return deadline != null && DateUtil.isSameDay(deadline, date);
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setStatus(Boolean status) {
+    if (status == null) {
+      return;
+    }
+    isComplete = status;
+  }
+
+  public void setDeadline(DateTime deadline) {
+    this.deadline = deadline;
+  }
+
+  public void setPeriod(DateRange period) {
+    this.period = period;
+  }
+
+  public void setImpt(Boolean isImpt) {
+    if (isImpt == null) {
+      return;
+    }
+    this.isImpt = isImpt;
+  }
+
+	// End of segment: .\src\goku\Task.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\TaskList.java
+	 */
+
+  private List<String> findFreeSlots(ArrayList<DateRange> periodList,
+      DateTime date) throws InvalidDateRangeException {
+    List<String> result = new ArrayList<String>();
+    List<DateTime> periodTokens = new ArrayList<DateTime>();
+
+    periodList = mergeOverlapPeriods(periodList);
+
+    for (DateRange period : periodList) {
+      if (DateUtil.isSameDay(period.getStartDate(), date)) {
+        periodTokens.add(period.getStartDate());
+      } else {
+        periodTokens.add(date.getStartOfDay());
+      }
+      if (DateUtil.isSameDay(date, period.getEndDate())) {
+        periodTokens.add(period.getEndDate());
+      } else {
+        periodTokens.add(date.getEndOfDay());
+      }
+    }
+    assert periodTokens.size() % 2 == 0;
+
+    Collections.sort(periodTokens);
+
+    for (int i = -1; i <= periodTokens.size(); i = i + 2) {
+      // boundary case 1 (first iteration)
+      if (i == -1) {
+        if (DateUtil
+            .isSameDayAndTime(date.getStartOfDay(), periodTokens.get(0))) {
+          continue;
+        }
+        result.add(timeSlotFormatter(date.getStartOfDay(), periodTokens.get(0)
+            .minus(0, 0, 0, 0, 1, 0, 0, DateTime.DayOverflow.Spillover)));
+      } else if (i == periodTokens.size() - 1) { // boundary case (end case)
+        if (DateUtil.isSameDayAndTime(periodTokens.get(i), date.getEndOfDay())) {
+          continue;
+        }
+        result.add(timeSlotFormatter(periodTokens.get(i), date.getEndOfDay()));
+      } else {
+        result.add(timeSlotFormatter(
+            periodTokens.get(i),
+            periodTokens.get(i + 1).minus(0, 0, 0, 0, 1, 0, 0,
+                DateTime.DayOverflow.Spillover)));
+      }
+    }
+
+    return result;
+  }
+
+  private ArrayList<DateRange> mergeOverlapPeriods(
+      ArrayList<DateRange> periodList) throws InvalidDateRangeException {
+    for (int i = 0; i < periodList.size() - 1; i++) {
+      for (int j = i + 1; j < periodList.size(); j++) {
+        DateRange periodA = periodList.get(i);
+        DateRange periodB = periodList.get(j);
+        assert periodA != null && periodB != null;
+
+        if (periodA.intersectsWith(periodB)) {
+          DateTime start, end;
+          if (DateUtil.isEarlierOrOn(periodA.getStartDate(),
+              periodB.getStartDate())) {
+            start = periodA.getStartDate();
+          } else {
+            start = periodB.getStartDate();
+          }
+
+          if (DateUtil
+              .isEarlierOrOn(periodB.getEndDate(), periodA.getEndDate())) {
+            end = periodA.getEndDate();
+          } else {
+            end = periodB.getEndDate();
+          }
+
+          periodList.add(new DateRange(start, end));
+          periodList.remove(periodA);
+          periodList.remove(periodB);
+
+          if (periodList.size() == 1) {
+            return periodList;
+          } else {
+            i = -1;
+            break;
+          }
+        }
+      }
+    }
+
+    return periodList;
+  }
+
+  private String timeSlotFormatter(DateTime start, DateTime end) {
+    assert DateUtil.isEarlierOrOn(start, end);
+
+    String formatStart = String.format("%02d", start.getHour()) + ":"
+        + String.format("%02d", start.getMinute());
+    String formatEnd = String.format("%02d", end.getHour()) + ":"
+        + String.format("%02d", end.getMinute());
+
+    return "[" + formatStart + " - " + formatEnd + "]";
+  }
+
+  public boolean hasClash(Task task) {
+    if (task.getDateRange() != null) {
+      for (Task taskFromList : _list) {
+        if (taskFromList.getDateRange() != null) {
+          if (DateUtil.isLaterThan(task.getEndDate(),
+              taskFromList.getStartDate())
+              && DateUtil.isEarlierThan(task.getStartDate(),
+                  taskFromList.getEndDate())) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public Iterator<Task> iterator() {
+    return _list.listIterator();
+  }
+
+  private int makeId() {
+    if (unusedId.size() > 0) {
+      return unusedId.remove(0);
+    }
+    return runningId++;
+  }
+
+  public void setRunningId(Integer id) {
+    runningId = id;
+  }
+
+  public void setUnusedId(List<Integer> idList) {
+    unusedId = idList;
+  }
+
+  public int size() {
+    return _list.size();
+  }
+}
+
+	// End of segment: .\src\goku\TaskList.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\TaskListTest.java
+	 */
+
+  @Test
+  public void deleteTaskByTitle_multipleMatches_doesNotChangeList() {
+    Task aTask = makeTaskWithTitle("abc");
+    Task otherTask = makeTaskWithTitle("abcdef");
+    list.addTask(aTask);
+    list.addTask(otherTask);
+    assertListIsSize(2);
+
+    returnList = list.deleteTaskByTitle("abc");
+    assertReturnListIsSize(2);
+
+  }
+
+  @Test
+  public void hasClash_StartLaterEndEarlier_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("3pm"), DateUtil.parse("4pm")));
+    list.addTask(a);
+    assertTrue(list.hasClash(b));
+  }
+
+  @Test
+  public void hasClash_StartEarlierEndEarlier_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("12pm"), DateUtil.parse("3pm")));
+    list.addTask(a);
+    assertTrue(list.hasClash(b));
+  }
+
+  @Test
+  public void hasClash_StartLaterEndLater_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("4pm"), DateUtil.parse("7pm")));
+    list.addTask(a);
+    assertTrue(list.hasClash(b));
+  }
+
+  @Test
+  public void hasClash_NoClash_ReturnsTrueIfClash()
+      throws InvalidDateRangeException {
+    Task a = new Task();
+    a.setPeriod(new DateRange(DateUtil.parse("1pm"), DateUtil.parse("5pm")));
+    Task b = new Task();
+    b.setPeriod(new DateRange(DateUtil.parse("12pm"), DateUtil.parse("1pm")));
+    list.addTask(a);
+    assertFalse(list.hasClash(b));
+    list.addTask(b);
+    Task c = new Task();
+    c.setPeriod(new DateRange(DateUtil.parse("7am"), DateUtil.parse("11pm")));
+    assertTrue(list.hasClash(c));
+  }
+
+	// End of segment: .\src\goku\TaskListTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\TaskTest.java
+	 */
+
+package goku;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.gson.Gson;
+
+public class TaskTest {
+  private Task task1;
+  private Task task2;
+  private Task task3;
+
+  private Gson gson;
+
+  @Before
+  public void setup() {
+    gson = new Gson();
+
+    task1 = new Task();
+    task1.setId(1);
+    task1.setTitle("title");
+    task1.setStatus(false);
+
+    task2 = new Task();
+    task2.setId(10);
+
+    task3 = new Task();
+    task3.setId(11);
+  }
+
+  @Test
+  public void isDueOn_aDateInFuture_returnsTrue() throws Exception {
+    DateTime now = DateUtil.getNowDate();
+    DateTime future = now.plusDays(10);
+    Task task = new Task();
+    task.setDeadline(now);
+    assertTrue(task.isDueOn(future));
+  }
+
+  @Test
+  public void isDueOn_aDateInPast_returnsFalse() throws Exception {
+    DateTime now = DateUtil.getNowDate();
+    DateTime past = now.minusDays(10);
+    Task task = new Task();
+    task.setDeadline(now);
+    assertFalse(task.isDueOn(past));
+  }
+
+  @Test
+  public void Gson_returnCorrectString() {
+    String string1 = gson.toJson(task1);
+    Task taskA = gson.fromJson(string1, Task.class);
+    assertEquals(task1, taskA);
+    assertEquals(task1.getTitle(), taskA.getTitle());
+    String string2 = gson.toJson(task2);
+    Task taskB = gson.fromJson(string2, Task.class);
+    assertEquals(task2, taskB);
+    String string3 = gson.toJson(task3);
+    Task taskC = gson.fromJson(string3, Task.class);
+    assertEquals(task3, taskC);
+  }
+
+	// End of segment: .\src\goku\TaskTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateOutput.java
+	 */
+
+package goku.util;
+
+import hirondelle.date4j.DateTime;
+
+import java.util.Locale;
+
+/**
+ * Formats dates into a more readable string Mainly wrappers around
+ * DateTime.format.
+ */
+public class DateOutput {
+
+  /*
+   * converts DateTime -> "1.15pm"
+   */
+  public static String formatTimeOnly12h(DateTime dateTime) {
+    if (dateTime.getHour() == null) {
+      return dateTime.format("h12.mm");
+    } else {
+      return dateTime.format("h12.mma", Locale.getDefault()).toLowerCase();
+    }
+  }
+
+  /*
+   * converts DateTime -> "1.15pm"
+   */
+  public static String formatTimeOnly12hIgnoreZeroMinutes(DateTime dateTime) {
+    String time = formatTimeOnly12h(dateTime);
+    if (time.substring(time.indexOf(".")).contains("00")) {
+      return time.substring(0, time.indexOf("."))
+          + time.substring(time.indexOf(".") + 3);
+    }
+    return time;
+  }
+
+  /*
+   * converts DateTime -> "08:50h"
+   */
+  public static String formatTimeOnly24h(DateTime dateTime) {
+    return dateTime.format("hh:mm|h|").toLowerCase();
+  }
+
+  /*
+   * converts DateTime -> "3h later"
+   */
+  public static String formatTimeOnlyHoursLater(DateTime date) {
+    long hoursDifference = getDifferenceInHours(DateUtil.getNow(), date);
+    return hoursDifference + "h later";
+  }
+
+  /*
+   * converts DateTime -> "4/10"
+   */
+  public static String formatDateOnlyDayMonth(DateTime dateTime) {
+    return dateTime.format("D/M").toLowerCase();
+  }
+
+	// End of segment: .\src\goku\util\DateOutput.java
+
+
+
+
+
+	/**
+	 * origin: .\src\test\IntegrationTest.java
+	 */
+
+package test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import goku.action.Action;
+import goku.action.AddAction;
+import goku.action.DeleteAction;
+import goku.action.DisplayAction;
+import goku.action.EditAction;
+import goku.action.MakeActionException;
+import goku.action.SearchAction;
+import goku.action.UnknownAction;
+import goku.ui.InputParser;
+import goku.util.InvalidDateRangeException;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class IntegrationTest {
+  private static final EditAction EditAction = null;
+
+  String userInput;
+  InputParser parser;
+  private GOKU goku;
+  private TaskList list;
+
+  @Before
+  public void setup() {
+    goku = new GOKU();
+    list = goku.getTaskList();
+    userInput = "";
+    parser = new InputParser(goku);
+  }
+
+  /*
+   * Integration test for user adding a task. This will test our parser, action,
+   * task list
+   */
+
+  /*
+   * User adding a task without title
+   */
+  @Test(expected = MakeActionException.class)
+  public void user_addTaskWithNoTitle_throwsMakeActionException()
+      throws MakeActionException, InvalidDateRangeException {
+    userInput = "add";
+    parser.parse(userInput);
+  }
+
+  @Test
+  // This tests whether adding a single task increases task list size
+  public void user_addTaskWithTitle_increaseSizeOfList()
+      throws MakeActionException, InvalidDateRangeException {
+    Action a = parser.parse("add asdf");
+    assertTrue(a instanceof AddAction);
+    AddAction aa = (AddAction) a;
+    assertEquals("asdf", aa.title);
+    aa.doIt();
+    assertEquals(list.size(), 1);
+  }
+
+  @Test
+  // This tests whether adding an important task works
+  public void user_addImportantTask() throws MakeActionException,
+      InvalidDateRangeException {
+    AddAction aa = (AddAction) parser.parse("add! important task");
+    aa.doIt();
+    assertTrue(list.getTaskById(1).isImpt());
+
+    EditAction ea = (EditAction) parser.parse("edit! 1");
+    ea.doIt();
+    assertFalse(list.getTaskById(1).isImpt());
+  }
+
+  @Test
+  // This tests whether adding multiple tasks works
+  public void user_addMultipleTasks() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add task 1");
+    aa.doIt();
+    aa = (AddAction) parser.parse("add task 2 by 21/4");
+    aa.doIt();
+    aa = (AddAction) parser.parse("add task 3 from 22/4 to 28/4");
+    aa.doIt();
+    assertEquals(list.size(), 3);
+    assertEquals(list.getTaskById(1).getTitle(), "task 1");
+    Task taskTwo = list.getTaskById(2);
+    assertEquals(taskTwo.getTitle(), "task 2");
+    assertEquals(taskTwo.getDeadline().getDay(), new Integer(21));
+    assertEquals(taskTwo.getDeadline().getMonth(), new Integer(4));
+
+    Task taskThree = list.getTaskById(3);
+    assertEquals(taskThree.getTitle(), "task 3");
+    assertEquals(taskThree.getStartDate().getDay(), new Integer(22));
+    assertEquals(taskThree.getStartDate().getMonth(), new Integer(4));
+    assertEquals(taskThree.getEndDate().getDay(), new Integer(28));
+    assertEquals(taskThree.getEndDate().getMonth(), new Integer(4));
+  }
+
+  @Test
+  // This tests whether editing an existing task's title works
+  public void user_addAndEditTasksTitle() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add original by today");
+    aa.doIt();
+    assertEquals(list.size(), 1);
+    assertEquals(list.getTaskById(1).getTitle(), "original");
+
+    EditAction ea = (EditAction) parser.parse("edit 1 edited");
+    ea.doIt();
+    assertEquals(list.getTaskById(1).getTitle(), "edited");
+
+    assertNotNull(list.getTaskById(1));
+    ea = (EditAction) parser.parse("done 1");
+    ea.doIt();
+  }
+
+  @Test
+  // This tests whether editing a task's deadline and period works
+  public void user_EditTasksDeadlineAndPeriod() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add deadline by today");
+    aa.doIt();
+
+    SearchAction sa = (SearchAction) parser.parse("search by today");
+    Result deadline = sa.doIt();
+    assertEquals(deadline.getTasks().size(), 1);
+
+    EditAction ea = (EditAction) parser.parse("edit 1 by tmr");
+    ea.doIt();
+    deadline = sa.doIt();
+    assertNull(deadline.getTasks());
+
+    ea = (EditAction) parser.parse("edit 1 by today");
+    ea.doIt();
+    deadline = sa.doIt();
+    assertEquals(deadline.getTasks().size(), 1);
+
+    ea = (EditAction) parser.parse("edit 1 remove deadline");
+    ea.doIt();
+    deadline = sa.doIt();
+    assertNull(deadline.getTasks());
+
+    DeleteAction da = (DeleteAction) parser.parse("delete 1");
+    da.doIt();
+
+    aa = (AddAction) parser.parse("add period from 1pm to 5pm");
+    aa.doIt();
+
+    sa = (SearchAction) parser.parse("search from 1pm to 5pm");
+    Result period = sa.doIt();
+    assertEquals(period.getTasks().size(), 1);
+
+    ea = (EditAction) parser.parse("edit 1 from 6pm to 9pm");
+    ea.doIt();
+    period = sa.doIt();
+    assertNull(period.getTasks());
+
+    ea = (EditAction) parser.parse("edit 1 from 1pm to 5pm");
+    ea.doIt();
+    period = sa.doIt();
+    assertEquals(period.getTasks().size(), 1);
+
+    ea = (EditAction) parser.parse("edit 1 remove period");
+    ea.doIt();
+    period = sa.doIt();
+    assertNull(deadline.getTasks());
+  }
+
+  @Test
+  // This tests whether deleting tasks works
+  public void user_deleteTasks() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add task one");
+    aa.doIt();
+    aa = (AddAction) parser.parse("add task two");
+    aa.doIt();
+    aa = (AddAction) parser.parse("add task three");
+    aa.doIt();
+    assertEquals(list.size(), 3);
+
+    DeleteAction da = (DeleteAction) parser.parse("delete 1");
+    da.doIt();
+    assertEquals(list.size(), 2);
+
+    da = (DeleteAction) parser.parse("delete 3");
+    da.doIt();
+    assertEquals(list.size(), 1);
+
+    da = (DeleteAction) parser.parse("delete 2");
+    da.doIt();
+    assertEquals(list.size(), 0);
+
+  }
+
+  @Test
+  // This tests whether viewing all/completed tasks works
+  public void user_addAndViewTasks() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add complete");
+    aa.doIt();
+    aa = (AddAction) parser.parse("add incomplete");
+    aa.doIt();
+
+    DisplayAction da = (DisplayAction) parser.parse("view");
+    Result all = da.doIt();
+
+    assertEquals(all.getTasks().size(), 2);
+
+    EditAction ea = (EditAction) parser.parse("do 1");
+    ea.doIt();
+
+    da = (DisplayAction) parser.parse("view");
+    Result all2 = da.doIt();
+    da = (DisplayAction) parser.parse("view completed");
+    Result completed = da.doIt();
+
+    assertEquals(all2.getTasks().size(), 1);
+    assertEquals(completed.getTasks().size(), 1);
+  }
+
+  @Test
+  // This tests whether searching by title works
+  public void user_addAndSearchTasks() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add original by today");
+    aa.doIt();
+    assertEquals(list.size(), 1);
+    assertEquals(list.getTaskById(1).getTitle(), "original");
+
+    SearchAction sa = (SearchAction) parser.parse("search blah");
+    Result zeroFound = sa.doIt();
+    sa = (SearchAction) parser.parse("search origina");
+    Result oneFound = sa.doIt();
+
+    assertNull(zeroFound.getTasks());
+    assertEquals(oneFound.getTasks().size(), 1);
+  }
+
+  @Test
+  // This tests whether searching by deadline and period works
+  public void user_searchDeadlineAndPeriod() throws Exception {
+    AddAction aa = (AddAction) parser.parse("add deadline by today");
+    aa.doIt();
+    aa = (AddAction) parser.parse("add period from 1pm to 5pm");
+    aa.doIt();
+    aa = (AddAction) parser
+        .parse("add deadline and period by tmr from tmr 8am to tmr 10am");
+    aa.doIt();
+
+    Result search;
+
+    SearchAction sa = (SearchAction) parser.parse("search by today");
+    search = sa.doIt();
+    assertEquals(search.getTasks().size(), 1);
+
+    sa = (SearchAction) parser.parse("search from 10am to 9pm");
+    search = sa.doIt();
+    assertEquals(search.getTasks().size(), 1);
+
+    sa = (SearchAction) parser.parse("search by tmr ");
+    search = sa.doIt();
+    assertEquals(search.getTasks().size(), 2);
+
+    sa = (SearchAction) parser.parse("search from tmr 8am to tmr 11pm");
+    search = sa.doIt();
+    assertEquals(search.getTasks().size(), 1);
+
+    DeleteAction da = (DeleteAction) parser.parse("delete 1");
+    da.doIt();
+    sa = (SearchAction) parser.parse("search by today");
+    search = sa.doIt();
+    assertNull(search.getTasks());
+
+    da = (DeleteAction) parser.parse("delete 2");
+    da.doIt();
+    sa = (SearchAction) parser.parse("search by tmr");
+    search = sa.doIt();
+    assertEquals(search.getTasks().size(), 1);
+
+    da = (DeleteAction) parser.parse("delete 3");
+    da.doIt();
+    sa = (SearchAction) parser.parse("search by tmr");
+    search = sa.doIt();
+    assertNull(search.getTasks());
+  }
+
+  @Test
+  // This tests whether an invalid add input fails
+  public void user_InvalidCommand() throws Exception {
+    UnknownAction ua = (UnknownAction) parser.parse("addd fail");
+    Result fail = ua.doIt();
+    assertNull(fail.getTasks());
+  }
+
+  // Invalid period detected while running this test
+  // This tests whether adding a task with invalid period fails
+  // public void user_addInvalidPeriod() throws MakeActionException {
+  // AddAction aa = (AddAction) parser.parse("add fail from 9pm to 5pm") throw
+  // InvalidDateRangeException,;
+  // Result fail = aa.doIt();
+  // assertNull(fail.getTasks());
+  // }
+}
+
+	// End of segment: .\src\test\IntegrationTest.java
+
+
+
+
+

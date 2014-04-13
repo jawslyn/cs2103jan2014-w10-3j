@@ -1,0 +1,3670 @@
+//@author: a0099903r
+
+
+
+	/**
+	 * origin: .\src\goku\action\Action.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+import goku.TaskList;
+
+public abstract class Action {
+  GOKU goku;
+  TaskList list;
+  boolean shouldSaveAfter;
+
+  public Action(GOKU goku) {
+    this.goku = goku;
+    this.list = goku.getTaskList();
+    this.shouldSaveAfter = true;
+  }
+
+  public boolean shouldSave() {
+    return shouldSaveAfter;
+  }
+
+  public abstract Result doIt();
+}
+
+	// End of segment: .\src\goku\action\Action.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\AddAction.java
+	 */
+
+package goku.action;
+
+import goku.DateRange;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+import hirondelle.date4j.DateTime;
+
+/*
+ * Task is the core of GOKU. GOKU is designed to keep track of tasks, which are
+ * analogous to real life tasks which the user wishes to note down.
+ */
+public class AddAction extends Action {
+  public static final String ERR_INSUFFICIENT_ARGS = "Can't add! Need title. Try \"add my task! by tomorrow\"";
+  private static final String MSG_SUCCESS = "Added: \"%s\"";
+  private static final String ERR_FAIL = "Fail to add: \"%s\"";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+  private static final String MSG_CLASH = "Attention: The task added clashes with other tasks!";
+
+  public String title;
+  public String deadline;
+  public String from;
+  public String to;
+  public TaskList list;
+  public DateTime dline;
+  public DateRange period;
+  public boolean isImpt;
+  public String input;
+
+  public AddAction(GOKU goku) {
+    super(goku);
+    list = goku.getTaskList();
+  }
+
+  private Result addTask() {
+    addToUndoList();
+    Task task = makeTask();
+    boolean hasClash = list.hasClash(task);
+    int newId = list.addTask(task);
+    if (newId > 0 && hasClash) {
+      return clashAddTask();
+    } else if (newId > 0) {
+      return successAddTask();
+    } else {
+      return failedToAddTask();
+    }
+  }
+
+  @Override
+  public Result doIt() {
+    return addTask();
+  }
+
+  private Result failedToAddTask() {
+    Result result = Result.makeFailureResult();
+    result.setErrorMsg(editMsgIfHaveOverdue(String.format(ERR_FAIL, title)));
+    result.setTasks(list.getAllIncomplete());
+    return result;
+  }
+
+  public String getDeadline() {
+    return deadline;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  private Task makeTask() {
+    Task task = new Task();
+    assert (title != null);
+    task.setTitle(title);
+    task.setDeadline(dline);
+    task.setPeriod(period);
+    task.setImpt(isImpt);
+    return task;
+  }
+
+  private Result successAddTask() {
+    Result result = Result.makeSuccessResult();
+    result
+        .setSuccessMsg(editMsgIfHaveOverdue(String.format(MSG_SUCCESS, title)));
+    result.setTasks(list.getAllIncomplete());
+    return result;
+  }
+
+	// End of segment: .\src\goku\action\AddAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\DeleteAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.TaskList;
+
+import java.util.List;
+
+/* Delete removes a task from GOKU.
+ * It does so in 2 steps:
+ * 1 - Tries to find a unique match based on the given Task,
+ *    the match can be based on Title, or Id
+ * 2a- If a unique match is received, it removes the Task,
+ *      returning a success Result with TaskList.size() == 1
+ * 2b- If no match or multiple matches,
+ *      it returns a failure Result with TaskList.size() == 0
+ * 2c- If multiple matches,
+ *      returns a failure Result with TaskList.size() > 1
+ */
+
+public class DeleteAction extends Action {
+  public static final String ERR_INSUFFICIENT_ARGS = "Can't delete. Need an ID. Try \"delete 1\"";
+  private static final String MSG_SUCCESS = "Deleted [%s] %s. *hint* undo to undo ;)";
+  private static final String NO_MATCHES = "No matches found!";
+  private static final String ERR_FAILURE = "Many matches found for \"%s\".";
+  private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
+  private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+
+  public Integer id;
+  public String title;
+  public String input;
+
+  public DeleteAction(GOKU goku) {
+    super(goku);
+  }
+
+  private Result deleteTask() {
+    addToUndoList();
+    Task deletedTask = tryDeleteById();
+    if (deletedTask != null) {
+      return new Result(true, editMsgIfHaveOverdue(String.format(MSG_SUCCESS,
+          id, deletedTask.getTitle())), null, list.getAllIncomplete());
+    }
+    List<Task> possibleDeletion = list.deleteTaskByTitle(title);
+    if (possibleDeletion.size() == 0) {
+      return new Result(false, null, editMsgIfHaveOverdue(NO_MATCHES),
+          list.getAllIncomplete());
+    } else if (possibleDeletion.size() == 1) {
+      deletedTask = possibleDeletion.get(0);
+      return new Result(true, editMsgIfHaveOverdue(String.format(MSG_SUCCESS,
+          deletedTask.getId(), deletedTask.getTitle())), null,
+          list.getAllIncomplete());
+    } else {
+      return new Result(false, null, editMsgIfHaveOverdue(String.format(
+          ERR_FAILURE, title)), possibleDeletion);
+    }
+
+  }
+
+  @Override
+  public Result doIt() {
+    return deleteTask();
+  }
+
+  private Task tryDeleteById() {
+    if (id == null) {
+      return null;
+    }
+    return list.deleteTaskById(id);
+  }
+
+	// End of segment: .\src\goku\action\DeleteAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\ExitAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+
+public class ExitAction extends Action {
+
+  public ExitAction(GOKU goku) {
+    super(goku);
+  }
+
+  @Override
+  public Result doIt() {
+    return null;
+  }
+}
+
+	// End of segment: .\src\goku\action\ExitAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\HelpAction.java
+	 */
+
+package goku.action;
+
+import goku.GOKU;
+import goku.Result;
+
+import com.google.common.base.Joiner;
+
+public class HelpAction extends Action {
+  private static final String ADD_MSG = "use \"add\" to add tasks:\n\tadd task name";
+  private static final String ADD_DEADLINE_MSG = "specify deadline:\n\tadd task by tomrrow 3pm";
+  private static final String ADD_PERIOD_MSG = "specify period:\n\tadd task from 3/4 3pm to 7/4 1pm";
+  private static final String EDIT_MSG = "use \"edit\" to edit tasks:\n\tedit 1 new name";
+  private static final String DELETE_MSG = "use \"delete\" to delete tasks:\n\tdelete 1";
+  private static final String SEARCH_MSG = "use \"search\" to look for tasks:\n\tsearch by friday ";
+  private static final String UNDO_MSG = "use \"undo\" to undo your last action";
+
+  public HelpAction(GOKU goku) {
+    super(goku);
+  }
+
+  @Override
+  public Result doIt() {
+    String MSG = Joiner.on('\n').join(ADD_MSG, ADD_DEADLINE_MSG,
+        ADD_PERIOD_MSG, EDIT_MSG, DELETE_MSG, SEARCH_MSG, UNDO_MSG);
+    return new Result(true, MSG, null, null);
+  }
+}
+
+	// End of segment: .\src\goku\action\HelpAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\MakeActionException.java
+	 */
+
+package goku.action;
+
+@SuppressWarnings("serial")
+public class MakeActionException extends Exception {
+
+  public MakeActionException(String message) {
+    super(message);
+  }
+}
+
+	// End of segment: .\src\goku\action\MakeActionException.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\action\UnknownAction.java
+	 */
+
+package goku.action;
+
+import goku.CommandSuggester;
+import goku.GOKU;
+import goku.Result;
+
+/*
+ * UnknownAction represents some action which GOKU does not know of.
+ * This is likely to be a Command that is not understood by GOKU,
+ * such as random gibberish.
+ */
+public class UnknownAction extends Action {
+  public static final String ERR_UNKNOWN_ACTION = "Command \"%s\" is unknown.";
+  public static final String ERR_SUGGEST_ACTION = "Did you mean \"%s\"?";
+
+  public String command;
+
+  public UnknownAction(GOKU goku, String command) {
+    super(goku);
+    this.command = command;
+  }
+
+  @Override
+  public Result doIt() {
+    String suggestion = getCommandSuggestion(command);
+    return new Result(false, null, String.format(ERR_UNKNOWN_ACTION, command)
+        + " " + String.format(ERR_SUGGEST_ACTION, suggestion), null);
+  }
+
+  private String getCommandSuggestion(String command) {
+    return CommandSuggester.getSuggestion(command);
+  }
+
+}
+
+	// End of segment: .\src\goku\action\UnknownAction.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\autocomplete\AutoCompleteEngine.java
+	 */
+
+package goku.autocomplete;
+
+import java.util.List;
+
+/**
+ * An engine for multiple auto complete implementation. Decides which
+ * implementation to call base on the current context.
+ */
+public class AutoCompleteEngine {
+  public static final int commandContext = -1;
+
+  private WordAutoComplete wordAuto;
+  private CommandAutoComplete commandAuto;
+
+  public AutoCompleteEngine() {
+    wordAuto = new WordAutoComplete();
+    commandAuto = new CommandAutoComplete();
+  }
+
+  /*
+   * Completes a prefix based on a specified completionContext. A completion
+   * context indicates where the completion is for. For example, a completion
+   * when the user is typing in a command is different from when the user is
+   * entering the title of a task. In this case, -1 represents the context of
+   * entering a command.
+   */
+  public List<String> complete(String prefix, int completionContext) {
+    switch (completionContext) {
+      case -1 :
+        return commandAuto.complete(prefix);
+      default :
+        return wordAuto.complete(prefix);
+    }
+  }
+
+  /*
+   * Adds a word to the corpus, allowing this word to be autocompleted
+   * subsequently
+   */
+  public void addCompletion(String completion) {
+    wordAuto.addToCorpus(completion);
+  }
+
+  public int getCommandContext() {
+    return -1;
+  }
+
+  public int getNormalContext() {
+    return 0;
+  }
+}
+
+	// End of segment: .\src\goku\autocomplete\AutoCompleteEngine.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\autocomplete\AutoCompleteEngineTest.java
+	 */
+
+package goku.autocomplete;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class AutoCompleteEngineTest {
+  public AutoCompleteEngine auto = new AutoCompleteEngine();
+
+  @Test
+  public void complete_CommandContext() {
+    String[] expecteds = { "add" };
+    String[] actuals = listToArray(auto.complete("a",
+        AutoCompleteEngine.commandContext));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+
+  String[] listToArray(List<String> list) {
+    return list.toArray(new String[list.size()]);
+  }
+
+  void assertArraysHaveSameElements(String[] expecteds, String[] actuals) {
+    Arrays.sort(expecteds);
+    Arrays.sort(actuals);
+    try {
+      Assert.assertArrayEquals(expecteds, actuals);
+    } catch (AssertionError e) {
+      Assert.fail(e.getMessage());
+    }
+  }
+
+}
+
+	// End of segment: .\src\goku\autocomplete\AutoCompleteEngineTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\autocomplete\CommandAutoComplete.java
+	 */
+
+package goku.autocomplete;
+
+import goku.Commands;
+
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+/**
+ * CommandAutoComplete completes prefixes that is likely to be a command. This
+ * words exactly like a @see WordAutoComplete but just with a corpus that has
+ * all the commands GOKU accepts and recognizes
+ */
+public class CommandAutoComplete extends WordAutoComplete {
+
+  private final static Set<String> DEFAULT_CORPUS = makeCommandCorpus();
+
+  public CommandAutoComplete() {
+    super(DEFAULT_CORPUS);
+  }
+
+  private static SortedSet<String> makeCommandCorpus() {
+    SortedSet<String> defaultCorpus = new TreeSet<String>();
+    defaultCorpus.addAll(Commands.getAllKeywords());
+    return defaultCorpus;
+  }
+}
+
+	// End of segment: .\src\goku\autocomplete\CommandAutoComplete.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\autocomplete\CommandAutoCompleteTest.java
+	 */
+
+package goku.autocomplete;
+
+import org.junit.Test;
+
+public class CommandAutoCompleteTest extends WordAutoCompleteTest {
+  CommandAutoComplete auto = new CommandAutoComplete();
+
+  @Test
+  public void complete_a_success() {
+    String[] expecteds = { "add" };
+    String[] actuals = listToArray(auto.complete("a"));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+
+  @Test
+  public void complete_d_success() throws Exception {
+    String[] expecteds = { "delete", "display", "do" };
+    String[] actuals = listToArray(auto.complete("d"));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+
+  @Test
+  public void complete_e_success() throws Exception {
+    String[] expecteds = { "edit", "exit" };
+    String[] actuals = listToArray(auto.complete("e"));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+
+  @Test
+  public void complete_f_success() throws Exception {
+    String[] expecteds = { "finish", "find" };
+    String[] actuals = listToArray(auto.complete("f"));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+
+  @Test
+  public void complete_q_success() throws Exception {
+    String[] expecteds = { "quit" };
+    String[] actuals = listToArray(auto.complete("q"));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+
+  @Test
+  public void complete_s_success() throws Exception {
+    String[] expecteds = { "show", "search" };
+    String[] actuals = listToArray(auto.complete("s"));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+
+  @Test
+  public void complete_u_success() throws Exception {
+    String[] expecteds = { "undo", "update" };
+    String[] actuals = listToArray(auto.complete("u"));
+    assertArraysHaveSameElements(expecteds, actuals);
+  }
+}
+
+	// End of segment: .\src\goku\autocomplete\CommandAutoCompleteTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\autocomplete\WordAutoComplete.java
+	 */
+
+package goku.autocomplete;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+/**
+ * Completes a prefix that has been entered by the user. For completing command
+ * keywords, @see CommandAutoComplete WordAutoComplete makes a default corpus
+ * and completion suggestions are based of this default corpus. User has the
+ * ability to add more words to this corpus for WordAutoComplete to be able to
+ * suggest completions from them as well
+ */
+public class WordAutoComplete {
+  private final static SortedSet<String> DEFAULT_CORPUS = makeDefaultCorpus();
+  SortedSet<String> corpus;
+
+  public WordAutoComplete() {
+    this(DEFAULT_CORPUS);
+  }
+
+  public WordAutoComplete(List<String> words) {
+    this(new TreeSet<String>(words));
+  }
+
+  public WordAutoComplete(Set<String> words) {
+    corpus = new TreeSet<>();
+    addToCorpus(words);
+  }
+
+  public List<String> complete(String prefix) {
+    List<String> suggestions = new ArrayList<String>();
+    if (prefix == null || prefix.isEmpty()) {
+      return suggestions;
+    }
+    prefix = prefix.toLowerCase();
+    SortedSet<String> possible = corpus.tailSet(prefix);
+    for (String possibility : possible) {
+      if (isPossibleCompletion(possibility, prefix)) {
+        suggestions.add(possibility);
+      }
+    }
+    return suggestions;
+  }
+
+  private boolean isPossibleCompletion(String possibility, String prefix) {
+    return possibility.startsWith(prefix);
+  }
+
+  private static SortedSet<String> makeDefaultCorpus() {
+    SortedSet<String> defaultCorpus = new TreeSet<String>();
+    defaultCorpus.addAll(Arrays.asList((new String[] { "the", "and", "with",
+        "next", "monday", "tuesday", "wednesday", "thursday", "friday",
+        "saturday", "sunday", "week", "from", "by", "on", "do", "find", "play",
+        "meet", "meeting", "homework", "project", "completed", "overdue",
+        "remove", "period", "deadline", "important", "tomorrow" })));
+    return defaultCorpus;
+  }
+
+  public void addToCorpus(String word) {
+    corpus.add(word);
+  }
+
+  public void addToCorpus(Set<String> words) {
+    for (String word : words) {
+      addToCorpus(word);
+    }
+  }
+}
+
+	// End of segment: .\src\goku\autocomplete\WordAutoComplete.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\autocomplete\WordAutoCompleteTest.java
+	 */
+
+package goku.autocomplete;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+public class WordAutoCompleteTest {
+  private WordAutoComplete auto;
+  private static final String[] TEST_CORPUS_STRING_ARRAY = { "add", "edit",
+      "update", "delete", "assignment", "activity" };
+  private static final List<String> TEST_CORPUS = Arrays
+      .asList(TEST_CORPUS_STRING_ARRAY);
+
+  private static final String PREFIX_WITH_COMPLETION_1 = "a";
+  private static final String[] EXPECTED_COMPLETION_1_STRING = { "add",
+      "assignment", "activity" };
+  private static final String PREFIX_WITH_COMPLETION_2 = "A";
+  private static final String[] EXPECTED_COMPLETION_2_STRING = { "add",
+      "assignment", "activity" };
+  private static final String PREFIX_WITH_COMPLETION_3 = "Ad";
+  private static final String[] EXPECTED_COMPLETION_3_STRING = { "add" };
+  private static final String PREFIX_WITHOUT_COMPLETION_1 = "i";
+  private static final String PREFIX_WITHOUT_COMPLETION_2 = "dd";
+
+  @Before
+  public void setup() {
+    auto = new WordAutoComplete(TEST_CORPUS);
+  }
+
+  @Test
+  public void complete_null_returnsEmptyArray() {
+    String[] expected = {};
+    String[] actual = listToArray(auto.complete(null));
+    assertArraysHaveSameElements(expected, actual);
+  }
+
+  @Test
+  public void complete_emptyString_returnsEmptyArray() throws Exception {
+    String[] expected = {};
+    String[] actual = listToArray(auto.complete(""));
+    assertArraysHaveSameElements(expected, actual);
+  }
+
+  @Test
+  public void complete_prefixWithCompletion_returnsArrayWithValidCompletion()
+      throws Exception {
+    String[] expected, actual;
+    expected = EXPECTED_COMPLETION_1_STRING;
+    actual = listToArray(auto.complete(PREFIX_WITH_COMPLETION_1));
+    assertArraysHaveSameElements(expected, actual);
+    expected = EXPECTED_COMPLETION_2_STRING;
+    actual = listToArray(auto.complete(PREFIX_WITH_COMPLETION_2));
+    assertArraysHaveSameElements(expected, actual);
+    expected = EXPECTED_COMPLETION_3_STRING;
+    actual = listToArray(auto.complete(PREFIX_WITH_COMPLETION_3));
+    assertArraysHaveSameElements(expected, actual);
+  }
+
+  @Test
+  public void complete_prefixWithoutCompletion_returnsEmptyArray()
+      throws Exception {
+    String[] expected = {}, actual;
+    actual = listToArray(auto.complete(PREFIX_WITHOUT_COMPLETION_1));
+    assertArraysHaveSameElements(expected, actual);
+    actual = listToArray(auto.complete(PREFIX_WITHOUT_COMPLETION_2));
+    assertArraysHaveSameElements(expected, actual);
+  }
+
+  @Test
+  public void complete_addNewCompletion_returnsNewCompletion() throws Exception {
+    auto.addToCorpus("xhello");
+    String[] expected = { "xhello" }, actual;
+    actual = listToArray(auto.complete("x"));
+    assertArraysHaveSameElements(expected, actual);
+  }
+
+  String[] listToArray(List<String> list) {
+    return list.toArray(new String[list.size()]);
+  }
+
+  void assertArraysHaveSameElements(String[] expecteds, String[] actuals) {
+    Arrays.sort(expecteds);
+    Arrays.sort(actuals);
+    try {
+      Assert.assertArrayEquals(expecteds, actuals);
+    } catch (AssertionError e) {
+      Assert.fail(e.getMessage());
+    }
+  }
+
+}
+
+	// End of segment: .\src\goku\autocomplete\WordAutoCompleteTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\Commands.java
+	 */
+
+package goku;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Commands {
+  public static String[] addKeywords = { "add", "a", "add!" };
+  public static String[] deleteKeywords = { "delete", "d", "remove", "r" };
+  public static String[] editKeywords = { "edit", "e", "update", "u", "edit!" };
+  public static String[] completeKeywords = { "done", "complete", "do",
+      "finish", "fin" };
+  public static String[] displayKeywords = { "display", "view", "show", "v" };
+  public static String[] searchKeywords = { "search", "find", "f", "free" };
+  public static String[] exitKeywords = { "quit", "exit", "q" };
+  public static String[] undoKeywords = { "undo", "revert", "rollback" };
+  public static String[] redoKeywords = { "redo" };
+  public static String[] helpKeywords = { "help", "h" };
+  public static String[] clearKeywords = { "clear" };
+
+  public static List<String> getAllKeywords() {
+    return Arrays.asList(mergeArrays(addKeywords, deleteKeywords, editKeywords,
+        completeKeywords, displayKeywords, searchKeywords, exitKeywords,
+        undoKeywords, redoKeywords, helpKeywords));
+
+  }
+
+  public static String[] mergeArrays(String[]... arrays) {
+    String[] merged = {};
+    for (String[] array : arrays) {
+      String[] merged2 = new String[merged.length + array.length];
+      System.arraycopy(merged, 0, merged2, 0, merged.length);
+      System.arraycopy(array, 0, merged2, merged.length, array.length);
+      merged = merged2;
+    }
+    return merged;
+  }
+}
+
+	// End of segment: .\src\goku\Commands.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\CommandsTest.java
+	 */
+
+package goku;
+
+import java.util.List;
+
+import org.junit.Test;
+
+public class CommandsTest {
+
+  @Test
+  public void getAllKeywords_success() {
+    List<String> all = Commands.getAllKeywords();
+    System.out.println(all.size());
+  }
+
+}
+
+	// End of segment: .\src\goku\CommandsTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\CommandSuggester.java
+	 */
+
+package goku;
+
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+public class CommandSuggester {
+  private static List<String> allCommands = Commands.getAllKeywords();
+
+  public static String getSuggestion(String toSuggest) {
+    SortedSet<Suggestion> suggestions = getDistances(toSuggest);
+    return suggestions.first().word;
+  }
+
+  private static SortedSet<Suggestion> getDistances(String toSuggest) {
+    SortedSet<Suggestion> suggestions = new TreeSet<>();
+    for (String candidate : allCommands) {
+      suggestions.add(new Suggestion(distance(toSuggest, candidate), candidate,
+          toSuggest.length() - candidate.length()));
+    }
+    return suggestions;
+  }
+
+  // from
+  // http://www.jdepths.com/2012/11/levenshtein-edit-distance-algorithm-in.html
+  public static int distance(String s1, String s2) {
+    int edits[][] = new int[s1.length() + 1][s2.length() + 1];
+    for (int i = 0; i <= s1.length(); i++) {
+      edits[i][0] = i;
+    }
+    for (int j = 1; j <= s2.length(); j++) {
+      edits[0][j] = j;
+    }
+    for (int i = 1; i <= s1.length(); i++) {
+      for (int j = 1; j <= s2.length(); j++) {
+        int u = (s1.charAt(i - 1) == s2.charAt(j - 1) ? 0 : 1);
+        edits[i][j] = Math.min(edits[i - 1][j] + 1,
+            Math.min(edits[i][j - 1] + 1, edits[i - 1][j - 1] + u));
+        // this is useful for transposition but I need to get it to work first
+        // if (i > 1 && j > 1 && s1.charAt(i) == s2.charAt(j - 1)
+        // && s1.charAt(i - 1) == s2.charAt(j)) {
+        // edits[i][j] = Math.min(edits[i][j], edits[i - 2][j - 2] + 1);
+        // }
+      }
+    }
+    return edits[s1.length()][s2.length()];
+  }
+
+  private static class Suggestion implements Comparable<Suggestion> {
+    int distance;
+    String word;
+    int diff;
+
+    public Suggestion(int distance, String word, int diff) {
+      this.distance = distance;
+      this.word = word;
+      this.diff = diff;
+    }
+
+    @Override
+    public int compareTo(Suggestion s) {
+      if ((distance - s.distance) == 0) {
+        return Math.abs(diff) - Math.abs(s.diff);
+      } else {
+        return distance - s.distance;
+      }
+    }
+  }
+
+}
+
+	// End of segment: .\src\goku\CommandSuggester.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\CommandSuggesterTest.java
+	 */
+
+package goku;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+public class CommandSuggesterTest {
+
+  @Test
+  public void getSuggestion_success() {
+    assertEquals("add", CommandSuggester.getSuggestion("ad"));
+    assertEquals("add!", CommandSuggester.getSuggestion("addd"));
+    assertEquals("delete", CommandSuggester.getSuggestion("delete"));
+    assertEquals("delete", CommandSuggester.getSuggestion("delet"));
+    assertEquals("delete", CommandSuggester.getSuggestion("deleet"));
+    assertEquals("search", CommandSuggester.getSuggestion("saerch"));
+    assertEquals("search", CommandSuggester.getSuggestion("searhc"));
+    assertEquals("undo", CommandSuggester.getSuggestion("udno"));
+  }
+
+}
+
+	// End of segment: .\src\goku\CommandSuggesterTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\DateRange.java
+	 */
+
+package goku;
+
+import goku.util.DateOutput;
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+import hirondelle.date4j.DateTime;
+
+/**
+ * Represents a period of time which has a start and an end.
+ */
+public class DateRange {
+  DateTime startDate;
+  DateTime endDate;
+
+  private static final String ERR_INVALID_PERIOD = "Invalid period detected!";
+
+  public DateRange(DateTime startDate, DateTime endDate)
+      throws InvalidDateRangeException {
+    this.startDate = startDate;
+    this.endDate = endDate;
+
+    if (DateUtil.isEarlierOrOn(endDate, startDate)) {
+      throw new InvalidDateRangeException(ERR_INVALID_PERIOD);
+    }
+  }
+
+  public DateTime getStartDate() {
+    return startDate;
+  }
+
+  public DateTime getEndDate() {
+    return endDate;
+  }
+
+  public boolean containsDate(DateTime date) {
+    if (date == null) {
+      return false;
+    }
+    return DateUtil.isEarlierOrOn(date, getEndDate())
+        && DateUtil.isLaterOrOn(date, getStartDate());
+  }
+
+  public boolean intersectsWith(DateRange range) {
+    if (range == null) {
+      return false;
+    }
+    return containsDate(range.getStartDate())
+        || containsDate(range.getEndDate()) || isContainedIn(range);
+  }
+
+  private boolean isContainedIn(DateRange range) {
+    return startDate.gteq(range.getStartDate())
+        && endDate.lteq(range.getEndDate());
+  }
+
+	// End of segment: .\src\goku\DateRange.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\GokuMain.java
+	 */
+
+package goku;
+
+import goku.ui.CLUserInterface;
+import goku.ui.FXGUI;
+import goku.ui.UserInterface;
+
+/**
+ * Entry point of GOKU
+ */
+public class GokuMain {
+  static UserInterface ui;
+  static GOKU goku = new GOKU();
+
+  /*
+   * Runs either a Command Line or Graphical Interface polymorphically
+   */
+  public static void main(String[] args) {
+    ui = setUserInterface(args);
+    ui.run();
+  }
+
+  /*
+   * Determines which UserInterface to run based on the arguments to
+   * the program.
+   */
+  private static UserInterface setUserInterface(String[] args) {
+    if (shouldRunCli(args)) {
+      return new CLUserInterface(goku);
+    } else {
+      return new FXGUI(goku);
+    }
+  }
+
+  private static boolean shouldRunCli(String[] args) {
+    if (args.length == 0) {
+      return false;
+    }
+    return args[0].equalsIgnoreCase("cli");
+  }
+
+}
+
+	// End of segment: .\src\goku\GokuMain.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\storage\LoadTasksException.java
+	 */
+
+package goku.storage;
+
+import goku.TaskList;
+
+import java.util.List;
+
+@SuppressWarnings("serial")
+public class LoadTasksException extends Exception {
+  private TaskList loadedTasks;
+  private String message;
+
+  public LoadTasksException(List<Integer> errorLines, TaskList tasklist) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Failed to load some tasks at lines\n");
+    for (Integer lineNumber : errorLines) {
+      sb.append(lineNumber + ",");
+    }
+    sb.append(" please look at \"store.goku\".\n");
+    sb.append("A backup has been made at store.goku.backup");
+    message = sb.toString();
+    loadedTasks = tasklist;
+  }
+
+  public TaskList getLoadedTasks() {
+    return loadedTasks;
+  }
+
+  @Override
+  public String getMessage() {
+    return message;
+  }
+}
+
+	// End of segment: .\src\goku\storage\LoadTasksException.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\storage\LocalFileStorage.java
+	 */
+
+package goku.storage;
+
+import goku.Task;
+import goku.TaskList;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
+/**
+ * LocalFileStorage saves objects into a file on the local file system. By
+ * default the file has the name "store.goku".
+ */
+public class LocalFileStorage implements Storage {
+  private static final String ERR_NULL_STOREABLE_ARRAY = "Storeable[] cannot be null!";
+  private static final String DEFAULT_FILENAME = "store.goku";
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+  private static File file;
+
+  public LocalFileStorage() {
+    file = new File(DEFAULT_FILENAME);
+  }
+
+  public LocalFileStorage(String filename) {
+    if (filename == null) {
+      filename = DEFAULT_FILENAME;
+    }
+    file = new File(filename);
+  }
+
+  @Override
+  public String getName() {
+    return file.getAbsolutePath();
+  }
+
+  /*
+   * This has the exact same implementation as saveAll(TaskList tasklist)
+   * because this is mainly used for testing purposes.
+   * Since the internals of these 2 methods are the same,
+   * when this test passes, we can be sure that the other will pass as well.
+   * This allows us to mock the objects and remove any knowledge of how toStorageFormat
+   * actually looks like.
+   * (non-Javadoc)
+   * @see goku.storage.Storage#saveAll(java.lang.Iterable)
+   */
+  @Override
+  public void saveAll(Iterable<Storeable> list) throws IOException {
+    if (list == null) {
+      throw new NullPointerException(ERR_NULL_STOREABLE_ARRAY);
+    }
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+      for (Storeable t : list) {
+        bw.write(t.toStorageFormat());
+        bw.write(System.lineSeparator());
+      }
+    }
+    LOGGER.info("Save to file: " + file.getName());
+  }
+
+  @Override
+  public void saveAll(TaskList tasklist) throws IOException {
+    if (tasklist == null) {
+      throw new NullPointerException(ERR_NULL_STOREABLE_ARRAY);
+    }
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+      for (Task t : tasklist) {
+        bw.write(t.toStorageFormat());
+        bw.write(System.lineSeparator());
+      }
+    }
+    LOGGER.info("Save to file: " + file.getName());
+  }
+
+  @Override
+  public void delete() {
+    assert file != null;
+    String name = file.getName();
+    file.delete();
+    LOGGER.warning("Delete file: " + name);
+  }
+
+  @Override
+  public TaskList loadStorage() throws LoadTasksException,
+      FileNotFoundException, IOException {
+    List<Integer> errorLines = new ArrayList<Integer>();
+    int currentLine = 1;
+    LOGGER.info("Loading from file: " + file.getName());
+    TaskList tasklist = new TaskList();
+    try (BufferedReader br = new BufferedReader(new FileReader("store.goku"))) {
+      String line = br.readLine();
+      while (line != null) {
+        Gson gson = new Gson();
+        try {
+          Task task = gson.fromJson(line, Task.class);
+          tasklist.addTask(task);
+        } catch (JsonSyntaxException e) {
+          LOGGER.warning("Error loading on json on line " + currentLine + ": "
+              + line + "\n" + e.getMessage());
+          errorLines.add(currentLine);
+        }
+        line = br.readLine();
+        currentLine++;
+      }
+    }
+    if (errorLines.size() != 0) {
+      makeBackupFile();
+      throw new LoadTasksException(errorLines, tasklist);
+    }
+    return tasklist;
+  }
+
+  private void makeBackupFile() {
+    File backup = new File("store.goku.backup");
+    LOGGER.info("Making a backup for " + file.getName() + " at "
+        + backup.getName());
+    try (BufferedReader br = new BufferedReader(new FileReader("store.goku"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(backup))) {
+      String line = br.readLine();
+      while (line != null) {
+        bw.write(line);
+        bw.write(System.lineSeparator());
+        line = br.readLine();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+}
+
+	// End of segment: .\src\goku\storage\LocalFileStorage.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\storage\LocalFileStorageTest.java
+	 */
+
+package goku.storage;
+
+import static org.junit.Assert.assertEquals;
+import goku.storage.MockStoreableList.MockStoreable;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class LocalFileStorageTest {
+  private static final String TEST_FILENAME = "LocalFileStorageTest.goku";
+
+  private Storage storage;
+
+  @Before
+  public void setup() {
+    storage = new LocalFileStorage(TEST_FILENAME);
+  }
+
+  @After
+  public void cleanup() {
+    storage.delete();
+  }
+
+  @Test
+  public void testSaveStoreableArray() throws FileNotFoundException,
+      IOException {
+    MockStoreableList list = new MockStoreableList();
+    MockStoreable mock = list.new MockStoreable(1, "mock 1");
+    list.add(mock);
+    storage.saveAll(list);
+    String all = readAllFromFile();
+    assertEquals(all, mock.toStorageFormat() + System.lineSeparator());
+  }
+
+  private String readAllFromFile() throws FileNotFoundException, IOException {
+    StringBuilder sb = new StringBuilder();
+    try (BufferedReader br = new BufferedReader(new FileReader(new File(
+        TEST_FILENAME)))) {
+      String line = br.readLine();
+      while (line != null) {
+        sb.append(line);
+        sb.append(System.lineSeparator());
+        line = br.readLine();
+      }
+    }
+    return sb.toString();
+  }
+
+}
+
+	// End of segment: .\src\goku\storage\LocalFileStorageTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\storage\MockStoreableList.java
+	 */
+
+package goku.storage;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class MockStoreableList implements Iterable<Storeable> {
+  private List<Storeable> _list = new ArrayList<Storeable>();
+
+  public void add(MockStoreable storeable) {
+    _list.add(storeable);
+  }
+
+  public void clear() {
+    _list.clear();
+  }
+
+  /*
+   * A simple concrete implementation of Storeable for testing.
+   */
+  class MockStoreable implements Storeable {
+    private Integer id;
+    private String title;
+
+    public MockStoreable(Integer id, String title) {
+      this.id = id;
+      this.title = title;
+    }
+
+    @Override
+    public String toStorageFormat() {
+      return "" + this.id + " : " + this.title;
+    }
+  }
+
+  @Override
+  public Iterator<Storeable> iterator() {
+    return _list.iterator();
+  }
+}
+
+	// End of segment: .\src\goku\storage\MockStoreableList.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\storage\Storage.java
+	 */
+
+package goku.storage;
+
+import goku.TaskList;
+
+import java.io.IOException;
+
+/**
+ * A Storage is an abstraction of a place where Storeable items can be stored.
+ */
+public interface Storage {
+
+  public String getName();
+
+  public void saveAll(Iterable<Storeable> list) throws IOException;
+
+  /*
+   * Saves all tasks in the TaskList to the underlying storage.
+   */
+  public void saveAll(TaskList tasklist) throws IOException;
+
+  public void delete();
+
+  /*
+   * Loads information from a Storage into a TaskList.
+   * An IOException is thrown when somehow the loading is interrupted.
+   * A LoadTaskException occurs when the underlying storage is corrupted and
+   * Storage is not able to read in the tasks accurately. In that case,
+   * loadStorag() does a best effort recovery:
+   * 1. Any lines that are corrupted are skipped over
+   * 2. Lines that are fine are loaded into the TaskList
+   * 3. Line numbers of the lines that are corrupted are recorded
+   * 4. A backup of the old storage medium, with corrupted data, is made
+   * 5. Line numbers of corrupted tasks are reported to the user, together
+   * with the file name of the backup file
+   * The backup file allows users to manually recover the corrupted tasks,
+   * and the line numbers allow them to easily see which lines are corrupted.
+   * 
+   */
+  public TaskList loadStorage() throws LoadTasksException, IOException;
+}
+
+	// End of segment: .\src\goku\storage\Storage.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\storage\StorageFactory.java
+	 */
+
+package goku.storage;
+
+/**
+ * Factory class to get concrete implementations of the Storage interface
+ */
+public class StorageFactory {
+  /*
+   * For CS2103T project, the default storage method is a text file on local
+   * disk. This could possibly be expanded to include storage in the cloud, e.g.
+   * Dropbox, Google Drive, as a form of backup.
+   */
+  public static Storage getDefaultStorage() {
+    return new LocalFileStorage();
+  }
+}
+
+	// End of segment: .\src\goku\storage\StorageFactory.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\storage\Storeable.java
+	 */
+
+package goku.storage;
+
+/**
+ * A Storable is an object that can be placed into a Storage
+ */
+public interface Storeable {
+  public String toStorageFormat();
+}
+
+	// End of segment: .\src\goku\storage\Storeable.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\TaskTest.java
+	 */
+
+  @Test
+  public void titleMatchesExactly_matchesTitle() throws Exception {
+    Task a = new Task();
+    a.setTitle("ABcD");
+
+    assertTrue(a.titleMatchesExactly("a"));
+    assertTrue(a.titleMatchesExactly("C"));
+    assertTrue(a.titleMatchesExactly("ab"));
+    assertTrue(a.titleMatchesExactly("bCd"));
+    assertTrue(a.titleMatchesExactly("abcd"));
+    assertFalse(a.titleMatchesExactly("acd"));
+    assertFalse(a.titleMatchesExactly("x"));
+  }
+}
+
+	// End of segment: .\src\goku\TaskTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\CLUserInterface.java
+	 */
+
+package goku.ui;
+
+import goku.GOKU;
+import goku.Result;
+import goku.action.Action;
+import goku.action.ExitAction;
+import goku.action.MakeActionException;
+import goku.storage.LoadTasksException;
+import goku.storage.Storage;
+import goku.storage.StorageFactory;
+import goku.util.InvalidDateRangeException;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.logging.Logger;
+
+/**
+ * User interface that acts as the intermediate component between the user
+ * interface and the main logic of GOKU.
+ */
+public class CLUserInterface implements UserInterface {
+  private static final String GOKU_PROMPT = ">> ";
+  private static final String GOKU_WELCOME_MESSAGE = "This is GOKU. How can I help?";
+  private static final String GOKU_EXIT_MESSAGE = "Thanks for using G.O.K.U.!";
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+  private GOKU goku;
+  private InputParser parser;
+  private Scanner sc = new Scanner(System.in);
+  private Storage storage = StorageFactory.getDefaultStorage();
+
+  public CLUserInterface(GOKU goku) {
+    this.goku = goku;
+    parser = new InputParser(goku);
+  }
+
+  private void doAction(Action action) throws MakeActionException {
+    assert action != null;
+    Result result = action.doIt();
+    feedBack(result);
+    save();
+  }
+
+  @Override
+  public void feedBack(Result result) {
+    if (result == null) {
+      return;
+    }
+  }
+
+	// End of segment: .\src\goku\ui\CLUserInterface.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\CompletionController.java
+	 */
+
+package goku.ui;
+
+import goku.Task;
+import goku.autocomplete.AutoCompleteEngine;
+
+import java.util.List;
+
+import javafx.collections.ListChangeListener;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
+
+import com.google.common.base.Splitter;
+
+/**
+ * Handles the completion of user input
+ */
+public class CompletionController extends Controller {
+  /* Engine to handle auto completion */
+  private AutoCompleteEngine auto;
+  /* TextField where the user enters input */
+  private TextField inputField;
+  /* Pane where the list of suggestion is displayed */
+  private StackPane suggestionBox;
+  /* VBox to insert suggestions into */
+  private VBox suggestionList;
+  private List<String> completions;
+  private int selectedSuggestion = -1;
+  private static final Paint SELECTED_SUGGESTION_FILL = Color.web("#8711BD");
+  private static final Paint UNSELECTED_SUGGESTION_FILL = Color.web("#323232");
+
+  public CompletionController(TextField inputField, StackPane suggestionBox,
+      VBox suggestionList) {
+    auto = new AutoCompleteEngine();
+    this.inputField = inputField;
+    this.suggestionBox = suggestionBox;
+    this.suggestionList = suggestionList;
+  }
+
+  /**
+   * Handle various KeyEvents. 1. Tab - will insert the best suggestion, if
+   * there are 2. Space - will cancel the suggestion 3. Any other character that
+   * can be displayed, plus backspace - will show possible completions
+   */
+  @Override
+  public void handle(KeyEvent event) {
+    KeyCode code = event.getCode();
+    if (isCompletionCommitKey(code)) {
+      cycleSuggestion(event.isShiftDown());
+    } else if (isCancelCompletionKey(code)) {
+      cancelSuggestion();
+    } else if (shouldGetCompletion(code)) {
+      completions = retrieveCompletions();
+      showCompletions();
+    }
+  }
+
+  private void cycleSuggestion(boolean reverse) {
+    int numSuggestions = suggestionList.getChildrenUnmodifiable().size();
+    // cycle through the list of suggestions
+    if (numSuggestions == 0) {
+      // no suggestions
+      return;
+    } else if (numSuggestions == 1) {
+      // only 1 suggestion ,just fill it in
+      Text sel = (Text) suggestionList.getChildren().get(0);
+      fillSuggestion(sel.getText() + " ");
+      cancelSuggestion();
+    } else {
+      // many suggestions, cycle through them
+      if (selectedSuggestion < 0) {
+        // no suggestion was selected, select the first suggestion
+        selectedSuggestion = 0;
+      } else {
+        // cycle to the next available suggestion
+        Text prev = (Text) suggestionList.getChildren().get(selectedSuggestion);
+        int toAdd = reverse ? numSuggestions - 1 : 1;
+        selectedSuggestion = (selectedSuggestion + toAdd)
+            % suggestionList.getChildrenUnmodifiable().size();
+        unhighlightSuggestion(prev);
+      }
+      Text sel = (Text) suggestionList.getChildren().get(selectedSuggestion);
+      highglightSuggestion(sel);
+      fillSuggestion(sel.getText());
+    }
+  }
+
+  private void highglightSuggestion(Text sel) {
+    sel.setFill(SELECTED_SUGGESTION_FILL);
+    sel.setUnderline(true);
+  }
+
+  private void unhighlightSuggestion(Text sel) {
+    sel.setFill(UNSELECTED_SUGGESTION_FILL);
+    sel.setUnderline(false);
+  }
+
+  private void fillSuggestion(String suggestion) {
+    inputField.setText(suggestion);
+    inputField.end();
+  }
+
+  /**
+   * Get all possible completions based on the current context. There are 2
+   * different kinds of context, 1. Entering a command, 2. Others Commands must
+   * be the first word that is entered, so the way to decide what is context is
+   * to check if the current word is the first word.
+   */
+  private List<String> retrieveCompletions() {
+    int context = 1;
+    if (getPositionOfNearestWhitespaceBeforeCaret() < 0) {
+      context = AutoCompleteEngine.commandContext;
+    }
+    return auto.complete(getPrefixToBeCompleted(), context);
+  }
+
+  private boolean isCompletionCommitKey(KeyCode code) {
+    return code == KeyCode.TAB;
+  }
+
+  private boolean isCancelCompletionKey(KeyCode code) {
+    return code.isWhitespaceKey() || code == KeyCode.ENTER;
+  }
+
+  private boolean shouldGetCompletion(KeyCode code) {
+    return code.isDigitKey() || code.isLetterKey()
+        || code == KeyCode.BACK_SPACE;
+  }
+
+  /**
+   * Shows a list of completion to the user
+   */
+  private void showCompletions() {
+    if (completions.size() == 0) {
+      cancelSuggestion();
+    } else {
+      clearSuggestions();
+      for (String completion : completions) {
+        // completions are only word completions for the current prefix,
+        // so we need to calculate and only add those letters that were not
+        // typed
+        String completionSuffix = completion.substring(getPrefixToBeCompleted()
+            .length());
+        addSuggestionToBeShown(inputField.getText() + completionSuffix);
+      }
+      showSuggestions();
+    }
+  }
+
+  private String getPrefixToBeCompleted() {
+    int start = getPositionOfNearestWhitespaceBeforeCaret() + 1;
+    String content = inputField.getText();
+    return content.substring(start, inputField.getCaretPosition())
+        .toLowerCase();
+  }
+
+  /**
+   * Gets the index of the nearest whitespace just before the current caret
+   * position.
+   * 
+   * @returns w -1 if there is no whitespace before, else the index of the
+   *          whitespace in the content string
+   */
+  private int getPositionOfNearestWhitespaceBeforeCaret() {
+    int caretPos = inputField.getCaretPosition();
+    String content = inputField.getText();
+    int w;
+    for (w = caretPos - 1; w >= 0; w--) {
+      if (!Character.isLetter(content.charAt(w))) {
+        break;
+      }
+    }
+    return w;
+  }
+
+  /**
+   * Shows the list of suggestions
+   */
+  private void showSuggestions() {
+    suggestionBox.setVisible(true);
+  }
+
+  /**
+   * Clears all suggestions from the list of suggestions
+   */
+  private void clearSuggestions() {
+    suggestionList.getChildren().clear();
+    selectedSuggestion = -1;
+  }
+
+  /**
+   * Hides the list of suggestion
+   */
+  private void hideSuggestions() {
+    suggestionBox.setVisible(false);
+  }
+
+  private void cancelSuggestion() {
+    clearSuggestions();
+    hideSuggestions();
+  }
+
+  /**
+   * Adds a suggestion to the list of suggestions
+   */
+  private void addSuggestionToBeShown(String suggestion) {
+    suggestionList.getChildren().add(new Text(suggestion));
+  }
+
+  /**
+   * Listens to the list of tasks in GOKU for additions of Tasks. It then adds
+   * the title to the corpus for auto completion.
+   */
+  public ListChangeListener<? super Task> getCompletionListener() {
+    return new ListChangeListener<Task>() {
+      @Override
+      public void onChanged(ListChangeListener.Change<? extends Task> change) {
+        while (change.next()) {
+          if (change.wasAdded()) {
+            addTasksToCompletion(change.getAddedSubList());
+          }
+        }
+      }
+
+      private void addTasksToCompletion(List<? extends Task> tasks) {
+        for (Task task : tasks) {
+          addTaskTitleToCompletion(task.getTitle());
+        }
+      }
+
+      private void addTaskTitleToCompletion(String title) {
+        List<String> titleList = Splitter.on(' ').omitEmptyStrings()
+            .trimResults().splitToList(title);
+        for (String tokens : titleList) {
+          auto.addCompletion(tokens);
+        }
+      }
+    };
+  }
+
+  @Override
+  boolean isHandling(KeyEvent key) {
+    KeyCode code = key.getCode();
+    return isCompletionCommitKey(code) || isCancelCompletionKey(code)
+        || shouldGetCompletion(code);
+  }
+}
+
+	// End of segment: .\src\goku\ui\CompletionController.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\Controller.java
+	 */
+
+package goku.ui;
+
+import javafx.scene.input.KeyEvent;
+
+/**
+ * A Controller reacts to some particular keys and does an action based on the
+ * key that was pressed.
+ */
+public abstract class Controller {
+  abstract boolean isHandling(KeyEvent key);
+
+  abstract void handle(KeyEvent key);
+}
+
+	// End of segment: .\src\goku\ui\Controller.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\FeedbackPane.java
+	 */
+
+package goku.ui;
+
+import goku.DateRange;
+import goku.Result;
+import goku.Task;
+import goku.util.DateOutput;
+
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.TextAlignment;
+
+import com.google.common.base.Splitter;
+
+import de.jensd.fx.fontawesome.AwesomeDude;
+import de.jensd.fx.fontawesome.AwesomeIcon;
+
+/**
+ * FeedbackController takes care of outputting feedback to user. The area where
+ * feedback is shown to user is a JavaFX VBox. The VBox acts like a console,
+ * printing lines of input. Each line is a child of the VBox.
+ */
+public class FeedbackPane {
+  public static double width = 800 - 20;
+
+  private static final Paint ERROR_COLOUR = Color.rgb(255, 10, 0);
+  private static final Paint IMPT_COLOUR = Color.rgb(235, 40, 30);
+  private static final Paint DONE_COLOUR = Color.LIME;
+  private static final Paint SUCCESS_COLOUR = Color.rgb(13, 255, 166);
+  private static final Paint NORMAL_COLOUR = Color.web("F9F8F1");
+  private static final Paint HEADER_COLOUR = Color.web("EE3474");
+  private static final Paint DATE_COLOUR = Color.web("F8981C");
+  private static final Paint ID_COLOUR = Color.web("73CEE4");
+
+  private static final int numColumns = 3;
+  private static int lines = 0;
+
+  private ScrollPane scrollPane;
+
+  private GridPane output;
+
+  public FeedbackPane(ScrollPane scrollPane) {
+    this.scrollPane = scrollPane;
+    clearArea();
+  }
+
+  public void clearArea() {
+    this.output = makeNewPage();
+    scrollPane.setContent(output);
+    lines = 0;
+  }
+
+  public GridPane makeNewPage() {
+    GridPane grid = new GridPane();
+    AnchorPane.setLeftAnchor(grid, 40.0);
+    AnchorPane.setRightAnchor(grid, 40.0);
+    grid.setPrefWidth(800 - 40);
+    grid.setPadding(new Insets(0, 10, 50, 40));
+    grid.setVgap(5);
+
+    ColumnConstraints idColumn = new ColumnConstraints();
+    idColumn.setPercentWidth(12);
+    ColumnConstraints titleColumn = new ColumnConstraints();
+    titleColumn.setPercentWidth(100 - 12 - 23);
+    ColumnConstraints dateColumn = new ColumnConstraints();
+    dateColumn.setPercentWidth(23);
+
+    grid.getColumnConstraints().addAll(idColumn, titleColumn, dateColumn);
+    return grid;
+  }
+
+  public void displayLines(List<String> messages) {
+    for (String message : messages) {
+      displayLine(message);
+    }
+  }
+
+  public void displayLine(String message) {
+    if (message.contains("\n")) {
+      displayLines(Splitter.on('\n').trimResults().omitEmptyStrings()
+          .splitToList(message));
+    } else {
+      displayLine(message, NORMAL_COLOUR);
+    }
+  }
+
+  /*
+   * Prints a string to output
+   * 
+   * @param message the string to be printed
+   */
+  public void displayLine(String message, Paint color) {
+    if (message.length() <= 60) {
+      Label l = new Label(message);
+      l.setTextFill(color);
+      output.add(l, 0, lines, numColumns + 1, 1);
+      lines++;
+    } else {
+      displayLine(message.substring(0, 60));
+      displayLine(message.substring(61));
+    }
+  }
+
+  /*
+   * Displays a simple error message to the user
+   * 
+   * @param message error message to be displayed
+   */
+  public void displayErrorMessage(String message) {
+    clearArea();
+    displayLine("Error! ", ERROR_COLOUR);
+    displayLine(message, NORMAL_COLOUR);
+  }
+
+  /*
+   * Displays the Result of an Action. Shows the success/error message, then
+   * displays any tasks that are in the result.
+   */
+  public void displayResult(Result result) {
+    clearArea();
+
+    if (result.isSuccess()) {
+      displayLine("Yay!", SUCCESS_COLOUR);
+      displayLine(result.getSuccessMsg());
+      if (result.getClashMsg() != null) {
+        displayLine(result.getClashMsg(), ERROR_COLOUR);
+      }
+      if (result.getListMsg() != null) {
+        displayLines(result.getListMsg());
+      }
+    } else {
+      displayLine("Error!", ERROR_COLOUR);
+      displayLine(result.getErrorMsg());
+    }
+    displayTasks(result.getTasks());
+  }
+
+  /*
+   * Displays a list of task. Shows header, and then list the tasks under that
+   * header. This is very coupled to TaskListDisplayer, as the header that is
+   * displayed depends on it.
+   */
+  private void displayTasks(List<Task> tasks) {
+    if (tasks == null) {
+      return;
+    }
+    TaskListDisplayer tld = new TaskListDisplayer(System.out);
+    Hashtable<String, List<Task>> ht = tld.build(tasks);
+    String[] headers = { "overdue", "today", "tomorrow", "remaining",
+        "completed" };
+    for (String header : Arrays.asList(headers)) {
+      if (ht.get(header).size() != 0) {
+        displayTaskListHeader(header);
+        for (Task task : ht.get(header)) {
+          if (header.equals("remaining") || header.equals("overdue")) {
+            displayRemainingTask(task);
+          } else if (header.equals("completed")) {
+            displayCompleteTask(task);
+          } else {
+            displayTask(task);
+          }
+        }
+      }
+    }
+  }
+
+	// End of segment: .\src\goku\ui\FeedbackPane.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\FXGUI.java
+	 */
+
+package goku.ui;
+
+import goku.GOKU;
+import goku.Result;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+/**
+ * FXGUI is the JavaFX Application sub-class that is started and shows a window
+ * to the user. FXGUI has a number of empty method implementations of
+ * UserInterface because of the big differences in the way a CLI and GUI in
+ * JavaFX does things.
+ */
+public class FXGUI extends Application implements UserInterface {
+  private static GOKU goku;
+  private static Stage stage;
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+  public FXGUI() {
+  }
+
+  public FXGUI(GOKU goku) {
+    FXGUI.goku = goku;
+  }
+
+  public static GOKU getGokuInstance() {
+    return goku;
+  }
+
+  @Override
+  public void start(Stage primaryStage) {
+    try {
+      FXGUI.stage = primaryStage;
+      stage.initStyle(StageStyle.UNDECORATED);
+      stage.getIcons().add(
+          new Image(FXGUI.class.getResource("icon.png").toExternalForm()));
+      Font.loadFont(
+          FXGUI.class.getResource("Inconsolata.otf").toExternalForm(), 20);
+      AnchorPane page = (AnchorPane) FXMLLoader.load(FXGUI.class
+          .getResource("Main.fxml"));
+      Scene scene = new Scene(page);
+      scene.getStylesheets().add(
+          getClass().getResource("app.css").toExternalForm());
+      stage.setScene(scene);
+      stage.setTitle("GOKU");
+      stage.show();
+    } catch (IOException e) {
+      LOGGER
+          .log(Level.SEVERE, "Unable to start GOKU Graphical User Interface.");
+      System.err.println("GOKU has failed to start.");
+      e.printStackTrace();
+    }
+  }
+
+  public static Stage getStage() {
+    return stage;
+  }
+
+  @Override
+  public String getUserInput() {
+    return null;
+  }
+
+  @Override
+  public void feedBack(Result result) {
+  }
+
+  @Override
+  public void run() {
+    launch(FXGUI.class);
+  }
+}
+
+	// End of segment: .\src\goku\ui\FXGUI.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\GokuController.java
+	 */
+
+package goku.ui;
+
+import goku.GOKU;
+import goku.Result;
+import goku.action.Action;
+import goku.action.ExitAction;
+import goku.action.MakeActionException;
+import goku.storage.Storage;
+import goku.storage.StorageFactory;
+import goku.util.InvalidDateRangeException;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
+/**
+ * GokuController is the middle-man between the GUI and GOKU. It beings with the
+ * press of an Enter key. The sequence of events then happen: 1. User presses
+ * Enter key 2. Calls on InputParser to parse the user's input into an Action
+ * 3a. Close application if the user wants to exit 3b. Executes the command by
+ * calling doAction(Action). 4. Feedback to the user the Result of the Action,
+ * via the FeedbackController
+ */
+public class GokuController extends Controller {
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
+  @FXML
+  private TextField inputField;
+  private GOKU goku;
+  private InputParser parser;
+  private Storage storage;
+  private FeedbackPane feedback;
+
+  public GokuController(GOKU goku, TextField inputField,
+      FeedbackPane feedbackController) {
+    this.inputField = inputField;
+    this.goku = goku;
+    parser = new InputParser(goku);
+    storage = StorageFactory.getDefaultStorage();
+    this.feedback = feedbackController;
+  }
+
+  @Override
+  boolean isHandling(KeyEvent key) {
+    return key.getCode() == KeyCode.ENTER || isUndoOrRedo(key);
+  }
+
+  /*
+   * An undo or redo is indicated by the Ctrl+Z or Ctrl+Y key combination,
+   * respectively
+   */
+  boolean isUndoOrRedo(KeyEvent key) {
+    return key.isControlDown()
+        && (key.getCode() == KeyCode.Z || key.getCode() == KeyCode.Y);
+  }
+
+  @Override
+  public void handle(KeyEvent key) {
+    if (isUndoOrRedo(key)) {
+      inputField.setText(key.getCode() == KeyCode.Z ? "undo" : "redo");
+    }
+    commitInput();
+  }
+
+  private void commitInput() {
+    if (inputField.getText().isEmpty()) {
+      return;
+    }
+    try {
+      Action action = parser.parse(getUserInput());
+      if (action instanceof ExitAction) {
+        feedback.sayGoodbye();
+        Platform.exit();
+      }
+      Result result = doAction(action);
+      feedBack(result);
+    } catch (MakeActionException | InvalidDateRangeException e) {
+      LOGGER.log(Level.WARNING, "Bad user command.");
+      feedback.displayErrorMessage(e.getMessage());
+    }
+    clearInput();
+  }
+
+  /*
+   * Retrieves user's input from the TextField
+   */
+  private String getUserInput() {
+    return inputField.getText().trim();
+  }
+
+  /*
+   * Clears the TextField where user can enter input
+   */
+  private void clearInput() {
+    inputField.clear();
+  }
+
+  Result doAction(Action action) {
+    Result result = action.doIt();
+    if (action.shouldSave()) {
+      save();
+    }
+    return result;
+  }
+
+  /*
+   * Informs the user of a result of doing an action
+   */
+  void feedBack(Result result) {
+    if (result == null) {
+      return;
+    } else {
+      feedback.displayResult(result);
+    }
+  }
+
+  public void save() {
+    try {
+      storage.saveAll(goku.getTaskList());
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Error saving tasks.");
+    }
+  }
+
+}
+
+	// End of segment: .\src\goku\ui\GokuController.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\HistoryController.java
+	 */
+
+package goku.ui;
+
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
+/**
+ * Takes care of the user's input history, allowing the user to recall previous
+ * inputs.
+ */
+public class HistoryController extends Controller {
+  private InputHistory history;
+  private TextField inputField;
+
+  public HistoryController(TextField inputField) {
+    this.history = new InputHistory();
+    this.inputField = inputField;
+  }
+
+  @Override
+  boolean isHandling(KeyEvent key) {
+    return key.getCode() == KeyCode.UP || key.getCode() == KeyCode.DOWN
+        || key.getCode() == KeyCode.ENTER;
+  }
+
+  @Override
+  public void handle(KeyEvent event) {
+    if (event.getCode() == KeyCode.ENTER) {
+      addInput(inputField.getText());
+    } else if (event.getCode() == KeyCode.UP) {
+      inputField.setText(history.getPrevious());
+      inputField.end();
+    } else if (event.getCode() == KeyCode.DOWN) {
+      inputField.setText(history.getNext());
+      inputField.end();
+    }
+  }
+
+  /**
+   * Adds a string to the underlying structure that keeps the user's input
+   * history
+   * 
+   * @param input
+   *          user's input to be stored in history
+   */
+  public void addInput(String input) {
+    history.write(input);
+  }
+
+}
+
+	// End of segment: .\src\goku\ui\HistoryController.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\InputHistory.java
+	 */
+
+package goku.ui;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Stores a history of user input as strings and allows callers to look through
+ * this list in order.
+ */
+public class InputHistory {
+  List<String> history;
+  public int current; // index of current history pointed to
+
+  public InputHistory() {
+    history = new ArrayList<>();
+    history.add("");
+    history.add("");
+    current = 1;
+  }
+
+  public int size() {
+    return history.size() - 2;
+  }
+
+  public void write(String string) {
+    history.add(history.size() - 1, string);
+    current = history.size() - 1;
+  }
+
+  public String getPrevious() {
+    if (current == 0) {
+      return "";
+    } else {
+      return history.get(--current);
+    }
+  }
+
+  public String getNext() {
+    if (current == history.size() - 1) {
+      return "";
+    } else {
+      return history.get(++current);
+    }
+  }
+}
+
+	// End of segment: .\src\goku\ui\InputHistory.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\InputHistoryTest.java
+	 */
+
+package goku.ui;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+public class InputHistoryTest {
+  InputHistory history = new InputHistory();
+
+  @Test
+  public void history_remembersHistory() {
+    history.write("1");
+    history.write("2");
+    history.write("3");
+    assertEquals(3, history.size());
+  }
+
+  @Test
+  public void history_empty() throws Exception {
+    assertEquals("", history.getPrevious());
+    assertEquals("", history.getNext());
+  }
+
+  @Test
+  public void history_getLastestFew() throws Exception {
+    history.write("1");
+    history.write("2");
+    history.write("3");
+    assertEquals("3", history.getPrevious());
+    assertEquals("2", history.getPrevious());
+    assertEquals("1", history.getPrevious());
+    assertEquals("", history.getPrevious());
+    assertEquals("", history.getPrevious());
+    assertEquals("1", history.getNext());
+    assertEquals("2", history.getNext());
+    assertEquals("3", history.getNext());
+    assertEquals("", history.getNext());
+    assertEquals("3", history.getPrevious());
+    history.write("4");
+    assertEquals("4", history.getPrevious());
+    assertEquals("3", history.getPrevious());
+  }
+}
+
+	// End of segment: .\src\goku\ui\InputHistoryTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\InputParser.java
+	 */
+
+  /*
+   * EditAction requires minimally 2 parameters 1) id for task to edit 2) an
+   * edit, which could be the title, deadline, period etc.
+   * 
+   * @return null if we cannot decide which task to edit
+   */
+  private EditAction makeEditAction(boolean isImpt, String input)
+      throws MakeActionException, InvalidDateRangeException {
+    if (params.length < 1) {
+      throw new MakeActionException(EditAction.ERR_INSUFFICIENT_ARGS);
+    }
+
+    EditAction editAction = new EditAction(goku);
+    editAction.input = input;
+
+    try {
+
+      int id = Integer.parseInt(params[0]);
+      editAction.id = id;
+
+      if (isImpt == true) {
+        editAction.shouldToggleImportant = true;
+
+        if (params.length == 1) {
+          return editAction;
+        }
+      }
+
+      params = Arrays.copyOfRange(params, 1, params.length);
+      lowerParams = Arrays.copyOfRange(lowerParams, 1, lowerParams.length);
+
+      if (params[0].equalsIgnoreCase("remove") && params.length > 1) {
+        // removing a certain field of task
+        switch (params[1]) {
+          case "deadline" :
+            editAction.shouldRemoveDeadline = true;
+            params = Arrays.copyOfRange(params, 2, params.length);
+            break;
+          case "period" :
+            editAction.shouldRemovePeriod = true;
+            params = Arrays.copyOfRange(params, 2, params.length);
+            break;
+        }
+      }
+
+      DateTime dl = extractDeadline();
+      DateRange dr = extractPeriod();
+      editAction.dline = dl;
+      editAction.period = dr;
+
+      String title = extractTitle();
+      if (!title.isEmpty()) {
+        editAction.title = title;
+      }
+    } catch (NumberFormatException e) {
+      throw new MakeActionException(EditAction.ERR_NO_ID_GIVEN);
+    }
+    return editAction;
+  }
+
+  /*
+   * All inputs to search are taken to be the title of the Task to find
+   */
+  private SearchAction makeSearchAction(boolean isSearchFree)
+      throws MakeActionException, InvalidDateRangeException {
+    if (params.length == 0) {
+      throw new MakeActionException(SearchAction.ERR_INSUFFICIENT_ARGS);
+    }
+
+    SearchAction searchAction = new SearchAction(goku);
+
+    // determine if search is to find free slots
+    if (isSearchFree == true) {
+      // test if datetime received is free of tasks
+      searchAction.isSearchFree = isSearchFree;
+      searchAction.freeDateQuery = parseDate();
+      if (searchAction.freeDateQuery == null) {
+        throw new MakeActionException(SearchAction.ERR_NO_VALID_DATE_FOUND);
+      }
+    } else {
+      // search normally
+      DateTime dq = extractDateQuery();
+      DateTime dl = extractDeadline();
+      DateRange dr = extractPeriod();
+      searchAction.onDateQuery = dq;
+      searchAction.dline = dl;
+      searchAction.period = dr;
+
+      // if datequery, deadline or periods are null, ignore keywords
+      // "on, by, from, to"
+      if (dq == null) {
+        paramsOnIndex = null;
+      }
+      if (dl == null) {
+        paramsByIndex = null;
+      }
+      if (dr == null) {
+        paramsFromIndex = null;
+      }
+
+      String title = extractTitle();
+      if (!title.isEmpty()) {
+        searchAction.title = title;
+      }
+    }
+
+    return searchAction;
+  }
+
+  /*
+   * @return NoAction if there is no input, UnknownAction if the command is not
+   * known
+   */
+  public Action parse(String input) throws MakeActionException,
+      InvalidDateRangeException {
+    reset();
+    Action action = null;
+
+    if (input == null || input.isEmpty()) {
+      return new NoAction(goku);
+    }
+
+    List<String> inputList = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList(input);
+    String[] inputArray = inputList.toArray(new String[inputList.size()]);
+    String stringInput = Joiner.on(" ").join(inputArray);
+    String command = inputArray[0].toLowerCase();
+    params = inputArray.length > 1 ? Arrays.copyOfRange(inputArray, 1,
+        inputArray.length) : new String[0];
+    lowerParams = new String[params.length];
+    for (int i = 0; i < params.length; i++) {
+      lowerParams[i] = params[i].toLowerCase();
+    }
+
+    if (Arrays.asList(addKeywords).contains(command)) {
+      // determine importance
+      if (command.equals("add!")) {
+        action = makeAddAction(true, stringInput);
+      } else {
+        action = makeAddAction(false, stringInput);
+      }
+    } else if (Arrays.asList(deleteKeywords).contains(command)) {
+      action = makeDeleteAction(stringInput);
+    } else if (Arrays.asList(editKeywords).contains(command)) {
+      // toggle importance
+      if (command.equals("edit!")) {
+        action = makeEditAction(true, stringInput);
+      } else {
+        action = makeEditAction(false, stringInput);
+      }
+    } else if (Arrays.asList(completeKeywords).contains(command)) {
+      action = makeCompleteAction(stringInput);
+    } else if (Arrays.asList(displayKeywords).contains(command)) {
+      action = makeDisplayAction();
+    } else if (Arrays.asList(searchKeywords).contains(command)) {
+      if (command.equals("free")) {
+        action = makeSearchAction(true);
+      } else {
+        action = makeSearchAction(false);
+      }
+    } else if (Arrays.asList(exitKeywords).contains(command)) {
+      action = new ExitAction(goku);
+    } else if (Arrays.asList(undoKeywords).contains(command)) {
+      action = new UndoAction(goku);
+    } else if (Arrays.asList(redoKeywords).contains(command)) {
+      action = new RedoAction(goku);
+    } else if (Arrays.asList(helpKeywords).contains(command)) {
+      action = new HelpAction(goku);
+    } else if (Arrays.asList(clearKeywords).contains(command)) {
+      action = new ClearAction(goku);
+    } else {
+      action = new UnknownAction(goku, command);
+    }
+    if (action == null) {
+      action = new NoAction(goku);
+    }
+    return action;
+  }
+}
+
+	// End of segment: .\src\goku\ui\InputParser.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\InputParserTest.java
+	 */
+
+  @Test
+  public void extractPeriod_SpecificDatesSpecificTimes()
+      throws MakeActionException, InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today 10am to tmr 2pm");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNowDate().getStartOfDay()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1).getStartOfDay()
+            .plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND).truncate(DateTime.Unit.SECOND),
+        resultRange.getEndDate());
+
+    resetParamIndex();
+  }
+
+  @Test
+  public void extractPeriod_SpecificTimesOnly()
+      throws InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from 10am to 2pm");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+  }
+
+  @Test
+  public void extractPeriod_SpecificDatesStartTimeOnly()
+      throws MakeActionException, InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today 10am to tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1)
+            .plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+  }
+
+  @Test
+  public void extractPeriod_SpecificDatesEndTimeOnly()
+      throws MakeActionException, InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today to tmr 2pm");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNowDate().getStartOfDay().truncate(DateTime.Unit.SECOND),
+        resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1)
+            .plus(0, 0, 0, 14, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+
+    resetParamIndex();
+  }
+
+  @Test
+  public void extractPeriod_SpecificStartTimeSpecificEndDate()
+      throws InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from 10am to tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNowDate()
+            .plus(0, 0, 0, 10, 0, 0, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNowDate().plusDays(1)
+            .plus(0, 0, 0, 23, 59, 59, 0, DateTime.DayOverflow.Spillover)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+  }
+
+  @Test(expected = InvalidDateRangeException.class)
+  public void extractPeriod_InvalidPeriodStartDateAfterEndDate()
+      throws InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today 10am to today 8am");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    @SuppressWarnings("unused")
+    DateRange resultRange = p.extractPeriod();
+  }
+
+  @Test
+  public void extractPeriod_NoValidInput() throws InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from aaa to bbb");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateRange resultRange = p.extractPeriod();
+
+    assertNull(resultRange);
+  }
+
+  @Ignore
+  public void extractDeadlineAndPeriod_PeriodThenDeadline()
+      throws InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("from today to tmr by tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND),
+        resultDate);
+    assertEquals(
+        DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND),
+        resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().plusDays(1)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+  }
+
+  @Test
+  public void extractDeadlineAndPeriod_DeadlineThenPeriod()
+      throws InvalidDateRangeException {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("by today from today to tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.lowerParams = inputArray;
+
+    DateTime resultDate = p.extractDeadline();
+    DateRange resultRange = p.extractPeriod();
+
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().truncate(DateTime.Unit.SECOND),
+        resultDate);
+    assertEquals(
+        DateUtil.getNow().getStartOfDay().truncate(DateTime.Unit.SECOND),
+        resultRange.getStartDate());
+    assertEquals(
+        DateUtil.getNow().getEndOfDay().plusDays(1)
+            .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
+  }
+
+  @Test
+  public void extractTitle_FromAndByNotInInput() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is...");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+
+    String resultTitle = p.extractTitle();
+    assertEquals("title is...", resultTitle);
+  }
+
+  @Test
+  public void extractTitle_FromOnly() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... from to tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+    p.paramsFromIndex = 2;
+
+    String resultTitle = p.extractTitle();
+    assertEquals("title is...", resultTitle);
+  }
+
+  @Test
+  public void extractTitle_ByOnly() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... by tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+    p.paramsByIndex = 2;
+
+    String resultTitle = p.extractTitle();
+    assertEquals("title is...", resultTitle);
+  }
+
+  @Test
+  public void extractTitle_FromBeforeBy() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... from today by tmr to tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+    p.paramsByIndex = 4;
+    p.paramsFromIndex = 2;
+
+    String resultTitle = p.extractTitle();
+
+    assertEquals("title is...", resultTitle);
+  }
+
+  @Test
+  public void extractTitle_ByBeforeFrom() {
+    List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
+        .splitToList("title is... by tmr from today to tmr");
+    String[] inputArray = input.toArray(new String[input.size()]);
+    p.params = inputArray;
+    p.paramsByIndex = 2;
+    p.paramsFromIndex = 4;
+
+    String resultTitle = p.extractTitle();
+
+    assertEquals("title is...", resultTitle);
+  }
+
+  private void resetParamIndex() {
+    p.paramsByIndex = null;
+    p.paramsFromIndex = null;
+  }
+}
+
+	// End of segment: .\src\goku\ui\InputParserTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\LiveSearch.java
+	 */
+
+package goku.ui;
+
+import goku.Commands;
+import goku.GOKU;
+import goku.Result;
+import goku.action.Action;
+import goku.action.MakeActionException;
+import goku.action.SearchAction;
+import goku.util.InvalidDateRangeException;
+
+import java.util.Arrays;
+
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+
+/**
+ * Provides live search capability to GOKU's GUI. LiveSearch handles every key
+ * press, but only reacts when the user is in a searching context. It identifies
+ * the context by looking at the first word in the input field. If that first
+ * word is part of a keyword that results in a SearchAction, it will then
+ * greedily parse the text in the input field and show the search results to the
+ * user.
+ */
+public class LiveSearch extends Controller {
+  public StringBuilder query;
+  private GOKU goku;
+  private TextField input;
+  private FeedbackPane feedback;
+
+  public LiveSearch(GOKU goku, TextField inputField, FeedbackPane feedbackPane) {
+    this.goku = goku;
+    this.input = inputField;
+    this.feedback = feedbackPane;
+  }
+
+  void search(String command) {
+    InputParser parser = new InputParser(goku);
+    Action a;
+    try {
+      a = parser.parse(command);
+    } catch (MakeActionException e) {
+      return;
+    } catch (InvalidDateRangeException e) {
+      return;
+    }
+    if (!(a instanceof SearchAction)) {
+      return;
+    }
+    SearchAction sa = (SearchAction) a;
+    Result r = sa.doIt();
+    feedback.displayResult(r);
+  }
+
+  @Override
+  boolean isHandling(KeyEvent key) {
+    return true;
+  }
+
+  @Override
+  void handle(KeyEvent key) {
+    String[] tokens = input.getText().split(" ");
+    if (tokens.length > 0
+        && Arrays.asList(Commands.searchKeywords).contains(tokens[0])) {
+      search(input.getText());
+    }
+
+  }
+}
+
+	// End of segment: .\src\goku\ui\LiveSearch.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\MainController.java
+	 */
+
+package goku.ui;
+
+import goku.DateRange;
+import goku.GOKU;
+import goku.Result;
+import goku.Task;
+import goku.action.Action;
+import goku.action.SearchAction;
+import goku.storage.LoadTasksException;
+import goku.storage.Storage;
+import goku.storage.StorageFactory;
+import goku.util.DateUtil;
+import goku.util.InvalidDateRangeException;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+/**
+ * MainController is the main coordinator of all user actions that happen on the
+ * GUI. It knows of other controllers and their duties. It also knows the
+ * mapping between Events and Controllers that handle them. Most of what
+ * GokuController is to look at an Event, and delegate it to the appropriate
+ * Controller to handle. For example, when the user presses the up arrow key,
+ * this event is sent to the HistoryController, which responsibility is to
+ * remember what the user has entered and to allow the user to scroll through
+ * the history.
+ */
+public class MainController {
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
+  private static final String ERR_PARSE_FILE_FAIL = "Error parsing JSON, loaded tasks to the best of my ability.";
+  private static final String ERR_LOAD_FILE_FAIL = "Error loading file, no tasks loaded.";
+  private static final String MSG_NEW_USER = "Seems like you're new!\nA file called \"store.goku\" has been created to save your tasks!\nType \"help\" to get a quick guide.";
+  private static final String MSG_FILE_NOT_FOUND = "File cannot be found, no tasks loaded.";
+
+  /* used for windows dragging */
+  private static double mousePressX;
+  private static double mousePressY;
+
+  /* JavaFX scene objects */
+  @FXML
+  private ResourceBundle resources;
+  @FXML
+  private URL location;
+  @FXML
+  private AnchorPane page;
+  @FXML
+  private HBox titleBar;
+  @FXML
+  private Label minimizeButton;
+  @FXML
+  private Label closeButton;
+  @FXML
+  private ScrollPane scrollPane;
+  @FXML
+  private TextField inputField;
+  @FXML
+  private StackPane suggestionBox;
+  @FXML
+  private VBox suggestionList;
+
+  private GOKU goku;
+  private Storage storage;
+  private FeedbackPane feedbackPane;
+  private List<Controller> controllers;
+
+  @FXML
+  void initialize() {
+    goku = FXGUI.getGokuInstance();
+    controllers = new ArrayList<>();
+    feedbackPane = new FeedbackPane(scrollPane);
+    storage = StorageFactory.getDefaultStorage();
+    setupControllers();
+    loadSavedFiled();
+  }
+
+  private void loadSavedFiled() {
+    try {
+      goku.addToTaskList(storage.loadStorage());
+      greetUser(new GreetAction(goku));
+    } catch (FileNotFoundException e) {
+      LOGGER.warning(MSG_FILE_NOT_FOUND);
+      feedbackPane.displayLine(MSG_NEW_USER);
+    } catch (IOException e) {
+      LOGGER.warning(ERR_LOAD_FILE_FAIL);
+      feedbackPane.displayErrorMessage(ERR_LOAD_FILE_FAIL);
+    } catch (LoadTasksException e) {
+      LOGGER.warning(ERR_PARSE_FILE_FAIL);
+      feedbackPane.displayErrorMessage(e.getMessage());
+      goku.addToTaskList(e.getLoadedTasks());
+    }
+  }
+
+  void greetUser(GreetAction greetAction) {
+    Result result = greetAction.doIt();
+    feedbackPane.displayResult(result);
+  }
+
+  private void notifyControllers(KeyEvent key) {
+    for (Controller c : controllers) {
+      if (c.isHandling(key)) {
+        c.handle(key);
+      }
+    }
+  }
+
+  private void setupControllers() {
+    CompletionController cc = new CompletionController(inputField,
+        suggestionBox, suggestionList);
+    // this listeners for tasks added to the list and extracts the title
+    // so that they can be autocompleted next time
+    goku.getObservable().addListener(cc.getCompletionListener());
+    controllers.add(cc);
+    controllers.add(new HistoryController(inputField));
+    controllers.add(new GokuController(goku, inputField, feedbackPane));
+    controllers.add(new LiveSearch(goku, inputField, feedbackPane));
+    controllers.add(new ScrollController(scrollPane));
+  }
+
+  /*
+   * This method is called when a keypress in inputField is detected. A "Enter"
+   * keypress means the user wants to run the command. Any other key will be
+   * handled by CompletionController, which will suggestion completions. User
+   * can then use tab to *select* a completion and have it fill up the
+   * inputField. Ctrl + Z and Ctrl + Y is a shortcut for Undo and Redo,
+   * respectively.
+   */
+  public void keyPressOnInputField(KeyEvent event) {
+    notifyControllers(event);
+  }
+
+  /*
+   * Called when the user clicks on the title bar, store the position of the
+   * mouse to allow for moving the entire window.
+   */
+  public void onTitleBarMousePress(MouseEvent event) {
+    mousePressX = event.getSceneX();
+    mousePressY = event.getSceneY();
+  }
+
+  /*
+   * Called when user drags on the title bar, then moves according to where the
+   * user drags
+   */
+  public void onTitleBarDrag(MouseEvent event) {
+    Stage stage = FXGUI.getStage();
+    stage.setX(event.getScreenX() - mousePressX);
+    stage.setY(event.getScreenY() - mousePressY);
+  }
+
+  public void exitButtonPress(MouseEvent event) {
+    Platform.exit();
+  }
+
+  public void minimizeButtonPress(MouseEvent event) {
+    Stage stage = FXGUI.getStage();
+    stage.setIconified(true);
+  }
+
+  /**
+   * Greets the user by showing upcoming tasks and events that are due or
+   * happening now.
+   * 
+   */
+  private class GreetAction extends Action {
+    private static final String MSG = "Welcome to GOKU!\nHere are your tasks for today!";
+    private static final String NO_TASK_MSG = "Welcome to GOKU!\nYou have no tasks today, be free! :D";
+
+    public GreetAction(GOKU goku) {
+      super(goku);
+    }
+
+    @Override
+    public Result doIt() {
+      SearchAction sa = new SearchAction(goku);
+      try {
+        sa.period = new DateRange(DateUtil.getNow(), DateUtil.getNow()
+            .getEndOfDay());
+        Result result = sa.doIt();
+        List<Task> tasks = result.getTasks();
+        if (tasks == null || tasks.size() == 0) {
+          return new Result(true, NO_TASK_MSG, null, null);
+        }
+
+        return new Result(true, MSG, null, tasks);
+      } catch (InvalidDateRangeException e) {
+        return new Result(false, MSG, null, null);
+      }
+    }
+  }
+}
+
+	// End of segment: .\src\goku\ui\MainController.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\ScrollController.java
+	 */
+
+package goku.ui;
+
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
+/**
+ * ScrollController takes care of scrolling the pane that displays feedback to
+ * the user
+ */
+public class ScrollController extends Controller {
+  ScrollPane scrollPane;
+
+  public ScrollController(ScrollPane scrollPane) {
+    this.scrollPane = scrollPane;
+  }
+
+  @Override
+  boolean isHandling(KeyEvent key) {
+    return key.getCode() == KeyCode.PAGE_DOWN
+        || key.getCode() == KeyCode.PAGE_UP;
+  }
+
+  @Override
+  void handle(KeyEvent key) {
+    System.out.println(this.getClass().toString());
+    if (key.getCode() == KeyCode.PAGE_DOWN) {
+      scrollPane.setVvalue(scrollPane.getVvalue() + 0.3);
+    } else {
+      scrollPane.setVvalue(scrollPane.getVvalue() - 0.3);
+    }
+  }
+
+}
+
+	// End of segment: .\src\goku\ui\ScrollController.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\TaskListDisplayer.java
+	 */
+
+package goku.ui;
+
+import goku.DateRange;
+import goku.Task;
+import goku.util.DateUtil;
+import hirondelle.date4j.DateTime;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.TimeZone;
+
+public class TaskListDisplayer {
+  PrintStream ps;
+
+  public TaskListDisplayer(PrintStream ps) {
+    this.ps = ps;
+  }
+
+  public Hashtable<String, List<Task>> build(List<Task> list) {
+    Hashtable<String, List<Task>> ht = new Hashtable<>();
+    if (list == null) {
+      return ht;
+    }
+
+    ArrayList<Task> overdue = new ArrayList<Task>();
+    ArrayList<Task> today = new ArrayList<Task>();
+    ArrayList<Task> tomorrow = new ArrayList<Task>();
+    ArrayList<Task> remaining = new ArrayList<Task>();
+    ArrayList<Task> completed = new ArrayList<Task>();
+
+    for (Task task : list) {
+      if (task.isDone() != null && task.isDone()) {
+        completed.add(task);
+      } else if (isOver(task)) {
+        overdue.add(task);
+      } else if (isToday(task)) {
+        today.add(task);
+      } else if (isTomorrow(task)) {
+        tomorrow.add(task);
+      } else {
+        remaining.add(task);
+      }
+    }
+
+    // sort lists for display
+    Collections.sort(completed);
+    Collections.sort(overdue);
+    Collections.sort(today);
+    Collections.sort(tomorrow);
+    Collections.sort(remaining);
+
+    ht.put("completed", completed);
+    ht.put("overdue", overdue);
+    ht.put("today", today);
+    ht.put("tomorrow", tomorrow);
+    ht.put("remaining", remaining);
+    return ht;
+  }
+
+	// End of segment: .\src\goku\ui\TaskListDisplayer.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\ui\TaskListDisplayerTest.java
+	 */
+
+  private Task makeTaskWithDeadline(String title, int daysAway) {
+    Task task = new Task();
+    task.setTitle(title);
+    if (daysAway < 0) {
+      DateTime deadline = DateUtil.getNow().minus(0, 0, -daysAway, 2, 0, 0, 0,
+          DateTime.DayOverflow.LastDay);
+      task.setDeadline(deadline);
+    } else {
+      DateTime deadline = DateUtil.getNow().plus(0, 0, daysAway, 2, 0, 0, 0,
+          DateTime.DayOverflow.LastDay);
+      task.setDeadline(deadline);
+    }
+    return task;
+  }
+}
+	// End of segment: .\src\goku\ui\TaskListDisplayerTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateOutput.java
+	 */
+
+  /*
+   * converts DateTime -> "today" or "4d later"
+   */
+  public static String formatDateOnlyDaysLater(DateTime date) {
+    DateTime now = DateUtil.getNow();
+    int daysDifference = now.numDaysFrom(date);
+    // if negative?
+    if (daysDifference == 0) {
+      return "today";
+    } else {
+      return daysDifference + "d later";
+    }
+  }
+
+  /*
+   * converts DateTime -> "4/10 1.15pm"
+   */
+  public static String formatDateTimeDayMonthHourMin(DateTime date) {
+    return formatDateOnlyDayMonth(date) + " " + formatTimeOnly12h(date);
+  }
+
+  /*
+   * converts DateTime -> "4/10 3pm"
+   */
+  public static String formatDateTimeDayMonthHourMinIgnoreZeroMinutes(
+      DateTime date) {
+    return formatDateOnlyDayMonth(date) + " "
+        + formatTimeOnly12hIgnoreZeroMinutes(date);
+  }
+
+  private static long getDifferenceInHours(DateTime now, DateTime date) {
+    return (now.numSecondsFrom(date) / 60 / 60);
+  }
+
+}
+
+	// End of segment: .\src\goku\util\DateOutput.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateOutputTest.java
+	 */
+
+  @Test
+  public void formatDateOnlyDayMonth_returnsDateWithDayMonth() throws Exception {
+    DateTime dateTime = DateTime.forDateOnly(2014, 4, 1);
+    String output = DateOutput.formatDateOnlyDayMonth(dateTime);
+    assertEquals("1/4", output);
+  }
+
+  @Test
+  public void formatDateOnlyDaysLater_returnsDaysLater() throws Exception {
+    DateTime dt = base.plusDays(2);
+    String actual = DateOutput.formatDateOnlyDaysLater(dt);
+    assertEquals("2" + DAYS_LATER, actual);
+
+    actual = DateOutput.formatDateOnlyDaysLater(base);
+    assertEquals("today", actual);
+
+    dt = base.plusDays(7);
+    actual = DateOutput.formatDateOnlyDaysLater(dt);
+    assertEquals("7" + DAYS_LATER, actual);
+  }
+}
+
+	// End of segment: .\src\goku\util\DateOutputTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtil.java
+	 */
+
+package goku.util;
+
+import goku.DateRange;
+import hirondelle.date4j.DateTime;
+
+import java.util.Date;
+import java.util.TimeZone;
+
+public class DateUtil {
+  private static String[] weekdays = { null, "sunday", "monday", "tuesday",
+      "wednesday", "thursday", "friday", "saturday" };
+  private static String[] dayKeywords = { "tomorrow", "tml", "tmr", "today",
+      "monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
+      "sunday" };
+  private static String[] weekOffsets = { "coming" };
+
+  /*
+   * Converts a {@link java.util.Date} into {@ DateTime}
+   */
+  public static DateTime date4j(Date date) {
+    return DateTime.forInstant(date.getTime(), TimeZone.getDefault());
+  }
+
+  /*
+   * Returns the current date and time
+   */
+  public static DateTime getNow() {
+    return DateTime.now(TimeZone.getDefault());
+  }
+
+	// End of segment: .\src\goku\util\DateUtil.java
+
+
+
+
+
+	/**
+	 * origin: .\src\goku\util\DateUtilTest.java
+	 */
+
+  /*
+   * Combination heuristics. All inputs below are well-formed and should pass.
+   */
+  @Test
+  public void parseTime_success() throws Exception {
+    DateTime date, expected;
+
+    date = DateUtil.parseTime("1:45");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1.45");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("13:45");
+    expected = DateTime.forTimeOnly(13, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1pm");
+    expected = DateTime.forTimeOnly(13, 0, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("3am");
+    expected = DateTime.forTimeOnly(3, 0, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1:45am");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1:45pm");
+    expected = DateTime.forTimeOnly(13, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("1.45am");
+    expected = DateTime.forTimeOnly(1, 45, 0, 0);
+    assertEquals(expected.getHour(), date.getHour());
+    assertEquals(expected.getMinute(), date.getMinute());
+
+    date = DateUtil.parseTime("91.45am");
+    assertNull(date);
+  }
+
+  @Test
+  public void parseTime_invalidTime_returnsNull() throws Exception {
+    DateTime actual;
+    actual = DateUtil.parseTime("90pm");
+    assertNull(actual);
+    actual = DateUtil.parseTime("21.45am");
+    assertNull(actual);
+    actual = DateUtil.parseTime("2.4am");
+    assertNull(actual);
+    actual = DateUtil.parseTime("21:45pm");
+    assertNull(actual);
+  }
+
+  /*
+   * Combination heuristics. All inputs below are well-formed and should pass.
+   */
+  @Test
+  public void getNearestDateToWeekday_success() {
+    DateTime start, nearest, result;
+    start = DateTime.forDateOnly(2014, 3, 4);
+    result = DateUtil.getNearestDateToWeekday(start, 2);
+    nearest = DateTime.forDateOnly(2014, 3, 10);
+    assertTrue(nearest.isSameDayAs(result));
+
+    start = DateTime.forDateOnly(2014, 3, 4);
+    result = DateUtil.getNearestDateToWeekday(start, start.getWeekDay());
+    nearest = DateTime.forDateOnly(2014, 3, 11);
+    assertTrue(nearest.isSameDayAs(result));
+
+    start = DateTime.forDateOnly(2014, 3, 31);
+    result = DateUtil.getNearestDateToWeekday(start, start.getWeekDay() + 1);
+    nearest = DateTime.forDateOnly(2014, 4, 1);
+    assertTrue(nearest.isSameDayAs(result));
+  }
+
+  /*
+   * Combination heuristics. All inputs below are well-formed and should pass.
+   */
+  @Test
+  public void mergeDateAndTime_success() throws Exception {
+    DateTime date = null, time = null, result, expected;
+    date = DateTime.forDateOnly(2014, 3, 4);
+    expected = DateTime.forDateOnly(2014, 3, 4);
+    result = DateUtil.mergeDateAndTime(date, null, 0);
+    assertTrue(expected.isSameDayAs(result));
+
+    time = DateTime.forTimeOnly(12, 13, 14, 0);
+    expected = DateUtil.getNow();
+    result = DateUtil.mergeDateAndTime(null, time, 0);
+    assertTrue(expected.isSameDayAs(result));
+    assertTrue(result.getHour() == 12);
+    assertTrue(result.getMinute() == 13);
+    assertTrue(result.getSecond() == 14);
+
+    date = DateTime.forDateOnly(2014, 3, 4);
+    time = DateTime.forTimeOnly(12, 13, 14, 0);
+    expected = new DateTime(2014, 3, 4, 12, 13, 14, 0)
+        .truncate(DateTime.Unit.SECOND);
+    result = DateUtil.mergeDateAndTime(date, time, 0);
+    assertEquals(expected, result);
+  }
+
+	// End of segment: .\src\goku\util\DateUtilTest.java
+
+
+
+
+
+	/**
+	 * origin: .\src\test\GokuActionTestSuite.java
+	 */
+
+package test;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ goku.action.AddActionTest.class,
+    goku.action.DeleteActionTest.class, goku.action.EditActionTest.class,
+    goku.action.SearchActionTest.class, goku.action.UndoActionTest.class,
+    goku.action.DisplayActionTest.class })
+public class GokuActionTestSuite {
+
+}
+
+	// End of segment: .\src\test\GokuActionTestSuite.java
+
+
+
+
+
+	/**
+	 * origin: .\src\test\GokuStorageTestSuite.java
+	 */
+
+package test;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ goku.storage.LocalFileStorageTest.class })
+public class GokuStorageTestSuite {
+
+}
+
+	// End of segment: .\src\test\GokuStorageTestSuite.java
+
+
+
+
+
+	/**
+	 * origin: .\src\test\GokuTestSuite.java
+	 */
+
+package test;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ goku.TaskTest.class, goku.TaskListTest.class,
+    goku.util.DateUtilTest.class })
+public class GokuTestSuite {
+
+}
+
+	// End of segment: .\src\test\GokuTestSuite.java
+
+
+
+
+
+	/**
+	 * origin: .\src\test\GokuUtilTestSuite.java
+	 */
+
+package test;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+@RunWith(Suite.class)
+@SuiteClasses({ goku.util.DateUtilTest.class, goku.util.DateOutputTest.class })
+public class GokuUtilTestSuite {
+
+}
+
+	// End of segment: .\src\test\GokuUtilTestSuite.java
+
+
+
+
+
+	/**
+	 * origin: .\src\test\TestRunner.java
+	 */
+
+package test;
+
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
+
+public class TestRunner {
+  public static void main(String[] args) {
+    Result result = JUnitCore.runClasses(GokuTestSuite.class,
+        GokuUtilTestSuite.class, GokuActionTestSuite.class,
+        GokuStorageTestSuite.class, IntegrationTest.class);
+    for (Failure failure : result.getFailures()) {
+      System.out.println(failure.toString());
+    }
+  }
+}
+
+	// End of segment: .\src\test\TestRunner.java
+
+
+
+
+
