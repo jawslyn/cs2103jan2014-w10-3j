@@ -34,6 +34,8 @@ import de.jensd.fx.fontawesome.AwesomeIcon;
  * printing lines of input. Each line is a child of the VBox.
  */
 public class FeedbackPane {
+  public static double width = 800 - 20;
+
   private static final Paint ERROR_COLOUR = Color.rgb(255, 10, 0);
   private static final Paint IMPT_COLOUR = Color.rgb(235, 40, 30);
   private static final Paint DONE_COLOUR = Color.LIME;
@@ -44,7 +46,6 @@ public class FeedbackPane {
   private static final Paint ID_COLOUR = Color.web("73CEE4");
 
   private static final int numColumns = 3;
-  public static double width = 800 - 20;
   private static int lines = 0;
 
   private ScrollPane scrollPane;
@@ -203,7 +204,7 @@ public class FeedbackPane {
 
   private void displayRemainingTask(Task task) {
     Label id = new Label("[" + task.getId().toString() + "]");
-    if (!task.getImpt()) {
+    if (task.isImpt() == null || !task.isImpt()) {
       id.setTextFill(ID_COLOUR);
     } else {
       id.setTextFill(IMPT_COLOUR);
@@ -221,7 +222,7 @@ public class FeedbackPane {
     title.setMinWidth(50.0);
     VBox dateVBox = makeDateVbox(task, true);
 
-    if (!task.getImpt()) {
+    if (task.isImpt() == null || !task.isImpt()) {
       output.add(id, 0, lines);
     } else {
       output.add(idWithImpt, 0, lines);
@@ -233,7 +234,7 @@ public class FeedbackPane {
 
   private void displayTask(Task task) {
     Label id = new Label("[" + task.getId().toString() + "]");
-    if (!task.getImpt()) {
+    if (task.isImpt() == null || !task.isImpt()) {
       id.setTextFill(ID_COLOUR);
     } else {
       id.setTextFill(IMPT_COLOUR);
@@ -254,7 +255,7 @@ public class FeedbackPane {
     VBox dateVBox = makeDateVbox(task, false);
 
     // output.add(id, 0, lines);
-    if (!task.getImpt()) {
+    if (task.isImpt() == null || task.isImpt()) {
       output.add(id, 0, lines);
     } else {
       output.add(idWithImpt, 0, lines);
@@ -264,13 +265,13 @@ public class FeedbackPane {
     lines++;
   }
 
-  private VBox makeDateVbox(Task task, boolean remaining) {
+  private VBox makeDateVbox(Task task, boolean isRemainingTask) {
     VBox vbox = new VBox();
     if (task.getDeadline() != null) {
-      HBox dl = makeDeadline(task, remaining);
+      HBox dl = makeDeadline(task, isRemainingTask);
       vbox.getChildren().add(dl);
     } else if (task.getDateRange() != null) {
-      HBox[] pr = makeDateRange(task, remaining);
+      HBox[] pr = makeDateRange(task, isRemainingTask);
       vbox.getChildren().addAll(pr[0], pr[1]);
     }
     return vbox;
@@ -291,7 +292,7 @@ public class FeedbackPane {
    * 
    * @param t task to be shown
    */
-  private HBox[] makeDateRange(Task t, boolean remaining) {
+  private HBox[] makeDateRange(Task t, boolean isRemainingTask) {
     HBox[] hbox = new HBox[2];
     hbox[0] = new HBox();
     hbox[1] = new HBox();
@@ -308,7 +309,7 @@ public class FeedbackPane {
     DateRange period = t.getDateRange();
     Label s, e;
 
-    if (remaining) {
+    if (isRemainingTask) {
       s = new Label(
           DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(period
               .getStartDate()));
@@ -333,10 +334,10 @@ public class FeedbackPane {
    * 
    * @param t task to be shown
    */
-  private HBox makeDeadline(Task t, boolean remaining) {
+  private HBox makeDeadline(Task t, boolean isRemainingTask) {
     HBox hbox = new HBox();
     Label deadline;
-    if (remaining) {
+    if (isRemainingTask) {
       deadline = new Label(""
           + DateOutput.formatDateTimeDayMonthHourMinIgnoreZeroMinutes(t
               .getDeadline()));

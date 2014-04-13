@@ -14,16 +14,8 @@ import java.util.List;
 
 public class SearchAction extends Action {
 
-  public String title;
-  public String deadline;
-  public String from;
-  public String to;
-  public DateTime dline;
-  public DateRange period;
-  public DateTime onDateQuery;
-  public boolean testFree = false;
-  public DateTime freeDateQuery;
-
+  public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
+  public static final String ERR_NO_VALID_DATE_FOUND = "Can't search! Try entering a valid date after \"free\"";
   private static final String MSG_SUCCESS_BY_TITLE = "Found tasks for \"%s\"...";
   private static final String MSG_FAIL_BY_TITLE = "No relevant tasks for \"%s\".";
   private static final String MSG_SUCCESS_BY_DATE = "Found tasks for %s...";
@@ -32,10 +24,18 @@ public class SearchAction extends Action {
   private static final String NOT_FREE = "%s is not available.";
   private static final String FREE_SLOTS = "Here are your free timings for %s.";
   private static final String NO_FREE_SLOTS = "%s is fully packed!";
-  public static final String ERR_INSUFFICIENT_ARGS = "Can't search! Try \"search title\"";
-  public static final String ERR_NO_VALID_DATE_FOUND = "Can't search! Try entering a valid date after \"free\"";
   private static final String ERR_DEADLINE_PERIOD_CONFLICT = "Can't search! Conflicting deadline and period.";
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
+
+  public String title;
+  public String deadline;
+  public String from;
+  public String to;
+  public DateTime dline;
+  public DateRange period;
+  public DateTime onDateQuery;
+  public boolean isSearchFree = false;
+  public DateTime freeDateQuery;
 
   public SearchAction(GOKU goku) {
     super(goku);
@@ -206,7 +206,7 @@ public class SearchAction extends Action {
    */
   public Result searchTitle() {
     List<Task> foundTasks;
-    if (searchForExact()) {
+    if (isSearchForExact()) {
       title = title.substring(1, title.length() - 1);
       foundTasks = list.findTaskByTitleExactly(title);
     } else {
@@ -223,9 +223,10 @@ public class SearchAction extends Action {
 
   /**
    * If a exact match for the task title is required
+   * 
    * @return true if the title begins and ends with a double quote
    */
-  private boolean searchForExact() {
+  private boolean isSearchForExact() {
     return (title.length() > 2 && title.charAt(0) == '"' && title.charAt(title
         .length() - 1) == '"');
   }

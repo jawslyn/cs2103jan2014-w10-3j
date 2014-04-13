@@ -2,7 +2,6 @@
 package goku;
 
 import goku.storage.Storeable;
-import goku.util.DateOutput;
 import goku.util.DateUtil;
 import goku.util.DiffMatchPath;
 import hirondelle.date4j.DateTime;
@@ -22,8 +21,8 @@ public class Task implements Storeable, Comparable<Task> {
   private DateRange period;
   private String[] tags;
   private String notes;
-  private Boolean complete;
-  private Boolean impt;
+  private Boolean isComplete;
+  private Boolean isImpt;
 
   public Task() {
   }
@@ -38,11 +37,11 @@ public class Task implements Storeable, Comparable<Task> {
     period = task.period;
     tags = task.tags;
     notes = task.notes;
-    complete = task.complete;
-    impt = task.impt;
+    isComplete = task.isComplete;
+    isImpt = task.isImpt;
   }
 
-  public boolean titleMatches(String title) {
+  public Boolean titleMatches(String title) {
     if (getTitle() == null || title == null) {
       return false;
     }
@@ -52,7 +51,7 @@ public class Task implements Storeable, Comparable<Task> {
     return match != -1;
   }
 
-  public boolean titleMatchesExactly(String title) {
+  public Boolean titleMatchesExactly(String title) {
     if (getTitle() == null || title == null) {
       return false;
     }
@@ -65,43 +64,16 @@ public class Task implements Storeable, Comparable<Task> {
     title = other.title == null ? title : other.title;
     deadline = other.deadline == null ? deadline : other.deadline;
     period = other.period == null ? period : other.period;
-    complete = other.complete == null ? complete : other.complete;
+    isComplete = other.isComplete == null ? isComplete : other.isComplete;
     tags = other.tags == null ? tags : other.tags;
     notes = other.notes == null ? notes : other.notes;
-    impt = other.impt == null ? impt : other.impt;
+    isImpt = other.isImpt == null ? isImpt : other.isImpt;
   }
 
   @Override
   public String toStorageFormat() {
     Gson gson = new Gson();
     return gson.toJson(this);
-  }
-
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-
-    sb.append(impt == null ? "" : (impt ? "(!) " : ""));
-    sb.append("[" + id + "] ");
-
-    if (title != null) {
-      sb.append(title);
-    }
-
-    if (deadline != null) {
-      sb.append(" | by ");
-      sb.append(DateOutput.formatDateTimeDayMonthHourMin(deadline));
-    }
-
-    if (period != null) {
-      sb.append(" | from ");
-      sb.append(DateOutput.formatDateTimeDayMonthHourMin(period.getStartDate()));
-      sb.append(" to ");
-      sb.append(DateOutput.formatDateTimeDayMonthHourMin(period.getEndDate()));
-    }
-
-    return sb.toString();
-
   }
 
   @Override
@@ -143,24 +115,20 @@ public class Task implements Storeable, Comparable<Task> {
     return period.getEndDate();
   }
 
-  public Boolean getImpt() {
-    return impt;
-  }
-
-  public Boolean getStatus() {
-    return complete;
+  public Boolean isImpt() {
+    return isImpt;
   }
 
   // @author A0099585Y
   public Boolean isDone() {
-    return complete;
+    return isComplete;
   }
 
-  public boolean isDueOn(DateTime date) {
+  public Boolean isDueOn(DateTime date) {
     return deadline != null && DateUtil.isEarlierOrOn(deadline, date);
   }
 
-  public boolean isOn(DateTime date) {
+  public Boolean isOn(DateTime date) {
     return deadline != null && DateUtil.isSameDay(deadline, date);
   }
 
@@ -176,7 +144,7 @@ public class Task implements Storeable, Comparable<Task> {
     if (status == null) {
       return;
     }
-    complete = status;
+    isComplete = status;
   }
 
   public void setDeadline(DateTime deadline) {
@@ -187,25 +155,27 @@ public class Task implements Storeable, Comparable<Task> {
     this.period = period;
   }
 
-  public void setImpt(Boolean impt) {
-    if (impt == null) {
+  public void setImpt(Boolean isImpt) {
+    if (isImpt == null) {
       return;
     }
-    this.impt = impt;
+    this.isImpt = isImpt;
   }
 
   // @author A0096444X
   /*
-   * Case 1: If impt, task is higher on the list
-   * Case 2: Else by earliest start date or deadline
+   * Case 1: If impt, task is higher on the list Case 2: Else by earliest start
+   * date or deadline
    */
   @Override
   public int compareTo(Task thatTask) {
     // Case 1:
-    if (this.impt == true && thatTask.impt == false) {
-      return -1;
-    } else if (this.impt == false && thatTask.impt == true) {
-      return 1;
+    if (this.isImpt != null && thatTask.isImpt != null) {
+      if (this.isImpt == true && thatTask.isImpt == false) {
+        return -1;
+      } else if (this.isImpt == false && thatTask.isImpt == true) {
+        return 1;
+      }
     }
 
     // Case 2: compare by deadline or start date

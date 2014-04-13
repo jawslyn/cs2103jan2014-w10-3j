@@ -26,10 +26,11 @@ import org.junit.Test;
 
 public class IntegrationTest {
   private static final EditAction EditAction = null;
-  private GOKU goku;
-  private TaskList list;
+
   String userInput;
   InputParser parser;
+  private GOKU goku;
+  private TaskList list;
 
   @Before
   public void setup() {
@@ -40,8 +41,8 @@ public class IntegrationTest {
   }
 
   /*
-   * Integration test for user adding a task.
-   * This will test our parser, action, task list
+   * Integration test for user adding a task. This will test our parser, action,
+   * task list
    */
 
   /*
@@ -72,11 +73,11 @@ public class IntegrationTest {
       InvalidDateRangeException {
     AddAction aa = (AddAction) parser.parse("add! important task");
     aa.doIt();
-    assertTrue(list.getTaskById(1).getImpt());
+    assertTrue(list.getTaskById(1).isImpt());
 
     EditAction ea = (EditAction) parser.parse("edit! 1");
     ea.doIt();
-    assertFalse(list.getTaskById(1).getImpt());
+    assertFalse(list.getTaskById(1).isImpt());
   }
 
   @Test

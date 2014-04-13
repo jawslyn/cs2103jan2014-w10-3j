@@ -22,8 +22,6 @@ public class TaskListDisplayerTest {
     list.addTask(b);
     list.addTask(c);
     list.addTask(d);
-    tld.display(list.asList());
-    tld.display(list.asList());
   }
 
   // @author A0099903R

@@ -15,8 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class LocalFileStorageTest {
-  private Storage storage;
   private static final String TEST_FILENAME = "LocalFileStorageTest.goku";
+
+  private Storage storage;
 
   @Before
   public void setup() {

@@ -155,7 +155,7 @@ public class TaskList implements Iterable<Task> {
   public List<Task> getAllCompleted() {
     List<Task> completed = new ArrayList<Task>();
     for (Task task : _list) {
-      if (task.getStatus() != null && task.getStatus()) {
+      if (task.isDone() != null && task.isDone()) {
         completed.add(task);
       }
     }
@@ -166,7 +166,7 @@ public class TaskList implements Iterable<Task> {
     List<Task> incomplete = new ArrayList<Task>();
     DateTime now = DateUtil.getNow();
     for (Task task : _list) {
-      if ((((task.getStatus()) == null || !task.getStatus()))
+      if ((((task.isDone()) == null || !task.isDone()))
           && ((task.getDeadline() == null || DateUtil.isEarlierOrOn(now,
               task.getDeadline())) && (task.getDateRange() == null || DateUtil
               .isEarlierOrOn(now, task.getEndDate())))) {
@@ -192,7 +192,7 @@ public class TaskList implements Iterable<Task> {
     List<Task> incomplete = new ArrayList<Task>();
     DateTime now = DateUtil.getNow();
     for (Task task : _list) {
-      if ((((task.getStatus()) == null || !task.getStatus()))) {
+      if ((((task.isDone()) == null || !task.isDone()))) {
         incomplete.add(task);
       }
     }

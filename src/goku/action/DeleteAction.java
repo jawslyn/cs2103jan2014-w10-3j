@@ -21,16 +21,15 @@ import java.util.List;
  */
 
 public class DeleteAction extends Action {
+  public static final String ERR_INSUFFICIENT_ARGS = "Can't delete. Need an ID. Try \"delete 1\"";
   private static final String MSG_SUCCESS = "Deleted [%s] %s. *hint* undo to undo ;)";
   private static final String NO_MATCHES = "No matches found!";
   private static final String ERR_FAILURE = "Many matches found for \"%s\".";
   private static final String ERR_NOT_FOUND = "Cannot find \"%s\".";
-  public static final String ERR_INSUFFICIENT_ARGS = "Can't delete. Need an ID. Try \"delete 1\"";
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
 
   public Integer id;
   public String title;
-
   public String input;
 
   public DeleteAction(GOKU goku) {

@@ -145,7 +145,7 @@ public class EditActionTest {
 
     EditAction editAction = new EditAction(goku);
     editAction.id = id;
-    editAction.removeDeadline = true;
+    editAction.shouldRemoveDeadline = true;
 
     assertNotNull(toEdit.getDeadline());
     Result result = editAction.doIt();
@@ -167,7 +167,7 @@ public class EditActionTest {
 
     EditAction editAction = new EditAction(goku);
     editAction.id = id;
-    editAction.removePeriod = true;
+    editAction.shouldRemovePeriod = true;
 
     assertNotNull(toEdit.getDateRange());
     Result result = editAction.doIt();
@@ -188,13 +188,13 @@ public class EditActionTest {
 
     EditAction editAction = new EditAction(goku);
     editAction.id = id;
-    editAction.toggleImportant = true;
+    editAction.shouldToggleImportant = true;
 
-    assertTrue(toEdit.getImpt());
+    assertTrue(toEdit.isImpt());
     Result result = editAction.doIt();
     assertTrue(result.isSuccess());
     assertEquals("hello", toEdit.getTitle());
-    assertTrue(!toEdit.getImpt());
+    assertTrue(!toEdit.isImpt());
   }
 
 }

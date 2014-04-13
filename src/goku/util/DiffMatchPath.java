@@ -1309,8 +1309,8 @@ public class DiffMatchPath {
 
     /*
      * Second pass: look for single edits surrounded on both sides by equalities
-     * which can be shifted sideways to eliminate an equality.
-     * e.g: A<ins>BA</ins>C -> <ins>AB</ins>AC
+     * which can be shifted sideways to eliminate an equality. e.g:
+     * A<ins>BA</ins>C -> <ins>AB</ins>AC
      */
     boolean changes = false;
     // Create a new iterator at the start.

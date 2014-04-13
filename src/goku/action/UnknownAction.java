@@ -13,6 +13,7 @@ import goku.Result;
 public class UnknownAction extends Action {
   public static final String ERR_UNKNOWN_ACTION = "Command \"%s\" is unknown.";
   public static final String ERR_SUGGEST_ACTION = "Did you mean \"%s\"?";
+
   public String command;
 
   public UnknownAction(GOKU goku, String command) {

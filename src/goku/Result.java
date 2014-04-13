@@ -6,12 +6,12 @@ import java.util.List;
 public class Result {
   private static final String MSG_DEFAULT_SUCCESS = "Success!";
   private static final String MSG_DEFAULT_FAILURE = "Failed.";
+  public List<Task> listOfTask;
   private boolean isSuccess;
   private String successMsg;
   private String clashMsg;
   private String errorMsg;
   private List<String> listMsg;
-  public List<Task> listOfTask;
 
   public Result(boolean isSuccess, String successMsg, String errorMsg,
       List<Task> list) {

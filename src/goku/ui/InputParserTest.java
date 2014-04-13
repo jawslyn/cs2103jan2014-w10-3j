@@ -227,21 +227,21 @@ public class InputParserTest {
     ea = (EditAction) a;
     assertEquals(1, ea.id);
     assertEquals(ea.title, null);
-    assertTrue(ea.removeDeadline);
+    assertTrue(ea.shouldRemoveDeadline);
 
     a = p.parse("edit 1 remove period");
     assertTrue(a instanceof EditAction);
     ea = (EditAction) a;
     assertEquals(1, ea.id);
     assertEquals(ea.title, null);
-    assertTrue(ea.removePeriod);
+    assertTrue(ea.shouldRemovePeriod);
 
     a = p.parse("edit! 1");
     assertTrue(a instanceof EditAction);
     ea = (EditAction) a;
     assertEquals(1, ea.id);
     assertEquals(ea.title, null);
-    assertTrue(ea.toggleImportant);
+    assertTrue(ea.shouldToggleImportant);
 
     a = p.parse("do 1 abc");
     assertTrue(a instanceof EditAction);
@@ -344,7 +344,7 @@ public class InputParserTest {
     assertTrue(a instanceof SearchAction);
 
     SearchAction sa = (SearchAction) a;
-    assertTrue(sa.testFree);
+    assertTrue(sa.isSearchFree);
   }
 
   @Test
@@ -353,7 +353,7 @@ public class InputParserTest {
     assertTrue(a instanceof SearchAction);
 
     SearchAction sa = (SearchAction) a;
-    assertFalse(sa.testFree);
+    assertFalse(sa.isSearchFree);
   }
 
   @Test
@@ -400,7 +400,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by tmr 10am");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateTime resultDate = p.extractDeadline();
 
@@ -413,7 +413,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateTime resultDate = p.extractDeadline();
 
@@ -427,7 +427,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by 12pm");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateTime resultDate = p.extractDeadline();
     assertEquals(DateUtil.getNowDate().getDay(), resultDate.getDay());
@@ -440,7 +440,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by aaa");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateTime resultDate = p.extractDeadline();
 
@@ -460,7 +460,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateRange resultRange = p.extractPeriod();
 
@@ -479,7 +479,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today 10am to tmr 2pm");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateRange resultRange = p.extractPeriod();
 
@@ -502,7 +502,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from 10am to 2pm");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateRange resultRange = p.extractPeriod();
 
@@ -522,7 +522,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today 10am to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateRange resultRange = p.extractPeriod();
 
@@ -542,7 +542,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today to tmr 2pm");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateRange resultRange = p.extractPeriod();
 
@@ -563,7 +563,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from 10am to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateRange resultRange = p.extractPeriod();
 
@@ -583,7 +583,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today 10am to today 8am");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     @SuppressWarnings("unused")
     DateRange resultRange = p.extractPeriod();
@@ -594,7 +594,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from aaa to bbb");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateRange resultRange = p.extractPeriod();
 
@@ -607,7 +607,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("from today to tmr by tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateTime resultDate = p.extractDeadline();
     DateRange resultRange = p.extractPeriod();
@@ -629,7 +629,7 @@ public class InputParserTest {
     List<String> input = Splitter.on(' ').omitEmptyStrings().trimResults()
         .splitToList("by today from today to tmr");
     String[] inputArray = input.toArray(new String[input.size()]);
-    p.params = inputArray;
+    p.lowerParams = inputArray;
 
     DateTime resultDate = p.extractDeadline();
     DateRange resultRange = p.extractPeriod();

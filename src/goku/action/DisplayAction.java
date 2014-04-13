@@ -9,7 +9,7 @@ import hirondelle.date4j.DateTime;
 import java.util.List;
 
 public class DisplayAction extends Action {
-
+  public static final String ERR_INVALID_DISPLAY = "Invalid display option!";
   private static final String MSG_SUCCESS = "Here are your tasks!";
   private static final String MSG_SUCCESS_COMPLETED = "Here are your completed tasks!";
   private static final String MSG_SUCCESS_OVERDUE = "Here are your overdue tasks!";
@@ -17,7 +17,7 @@ public class DisplayAction extends Action {
   private static final String MSG_NO_COMPLETED = "You have not completed any tasks!\nEnter \"done [ID]\" to mark a task as completed!";
   private static final String MSG_NO_INCOMPLETE = "There is currently no upcoming tasks!\nAdd some tasks now :)";
   private static final String MSG_NO_OVERDUE = "No overdue tasks!";
-  public static final String ERR_INVALID_DISPLAY = "Invalid display option!";
+
   DateTime byDeadline;
   public boolean viewComplete;
   public boolean viewOverdue;

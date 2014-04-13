@@ -20,7 +20,7 @@ public class UndoAction extends Action {
 
   @Override
   public Result doIt() {
-    if (undoCommand() == false) {
+    if (canUndo() == false) {
       return new Result(false, null, editMsgIfHaveOverdue(ERR_FAIL), goku
           .getTaskList().getAllIncomplete());
     } else {
@@ -45,7 +45,7 @@ public class UndoAction extends Action {
     goku.getRedoList().offer(currList);
   }
 
-  private boolean undoCommand() {
+  private boolean canUndo() {
     if (goku.getUndoList().isEmpty() || goku.getUndoInputList().isEmpty()) {
       return isEmpty;
     }

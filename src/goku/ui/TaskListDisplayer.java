@@ -62,51 +62,6 @@ public class TaskListDisplayer {
   }
 
   // @author A0101232H
-  public void display(List<Task> list) {
-    if (list == null) {
-      return;
-    }
-    ArrayList<Task> past = new ArrayList<Task>();
-    ArrayList<Task> today = new ArrayList<Task>();
-    ArrayList<Task> tomorrow = new ArrayList<Task>();
-    ArrayList<Task> remaining = new ArrayList<Task>();
-
-    for (Task task : list) {
-      if (isOver(task)) {
-        past.add(task);
-      } else if (isToday(task)) {
-        today.add(task);
-      } else if (isTomorrow(task)) {
-        tomorrow.add(task);
-      } else {
-        remaining.add(task);
-      }
-    }
-
-    // sort lists for display
-    Collections.sort(today);
-    Collections.sort(tomorrow);
-    Collections.sort(remaining);
-    Collections.sort(past);
-
-    System.out.println("---Today---");
-    for (Task task : today) {
-      System.out.println(task.toString());
-    }
-    System.out.println("---Tomorrow---");
-    for (Task task : tomorrow) {
-      System.out.println(task.toString());
-    }
-    System.out.println("---Coming Up---");
-    for (Task task : remaining) {
-      System.out.println(task.toString());
-    }
-    System.out.println("---Previously---");
-    for (Task task : past) {
-      System.out.println(task.toString());
-    }
-  }
-
   private boolean isOver(DateRange dateRange) {
     if (dateRange == null) {
       return false;

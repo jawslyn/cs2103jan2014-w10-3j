@@ -18,24 +18,20 @@ import java.util.List;
  * analogous to real life tasks which the user wishes to note down.
  */
 public class EditAction extends Action {
+  public static final String ERR_NO_ID_GIVEN = "Can't edit, need ID! Try \"edit 1 new title!\"";
   public static final String ERR_INSUFFICIENT_ARGS = "Can't edit, need ID! Try \"edit 1 new title!\"";
-  public static final String ERR_INSUFFICIENT_ARGS_FOR_COMPLETION = "Can't complete, need ID! Try \"do 1\"";
+  public static final String ERR_INSUFFICIENT_ARGS_FOR_COMPLETION = "Can't complete, need ID! Try \"done 1\"";
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
-
-  public static final String ERR_NO_ID_GIVEN = ERR_INSUFFICIENT_ARGS;
-
   private final String MSG_SUCCESS = "Edited task %d\n";
 
   public int id;
-
   public String title;
   public DateTime dline;
   public DateRange period;
   public Boolean isComplete;
-  public boolean removeDeadline;
-  public boolean removePeriod;
-  public boolean toggleImportant;
-
+  public boolean shouldRemoveDeadline;
+  public boolean shouldRemovePeriod;
+  public boolean shouldToggleImportant;
   public String input;
 
   public EditAction(GOKU goku) {
@@ -46,11 +42,11 @@ public class EditAction extends Action {
   @Override
   public Result doIt() {
     addToUndoList();
-    if (removeDeadline) {
+    if (shouldRemoveDeadline) {
       doRemoveDeadline();
-    } else if (toggleImportant) {
+    } else if (shouldToggleImportant) {
       doToggleImportant();
-    } else if (removePeriod) {
+    } else if (shouldRemovePeriod) {
       doRemovePeriod();
     }
     return updateTask();
@@ -63,7 +59,7 @@ public class EditAction extends Action {
 
   private void doToggleImportant() {
     Task t = list.getTaskById(id);
-    t.setImpt(!t.getImpt());
+    t.setImpt(!t.isImpt());
   }
 
   private void doRemovePeriod() {

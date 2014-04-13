@@ -27,7 +27,7 @@ public class RedoAction extends Action {
 
   @Override
   public Result doIt() {
-    if (redoCommand() == false) {
+    if (canRedo() == false) {
       return new Result(false, null, editMsgIfHaveOverdue(ERR_FAIL), goku
           .getTaskList().getAllIncomplete());
     } else {
@@ -45,7 +45,7 @@ public class RedoAction extends Action {
     goku.getUndoInputList().offer(input);
   }
 
-  private boolean redoCommand() {
+  private boolean canRedo() {
     if (goku.getRedoList().isEmpty() || goku.getRedoInputList().isEmpty()) {
       return isEmpty;
     }

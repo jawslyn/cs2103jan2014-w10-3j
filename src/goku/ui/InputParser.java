@@ -37,6 +37,8 @@ import com.google.common.base.Splitter;
  * when any of the Actions are null, a NoAction is returned.
  */
 public class InputParser {
+  String[] params, lowerParams;
+  Integer paramsByIndex, paramsFromIndex, paramsOnIndex;
   /*
    * Keywords that are used to associate an input to a particular action.
    */
@@ -51,10 +53,7 @@ public class InputParser {
   private String[] redoKeywords = Commands.redoKeywords;
   private String[] helpKeywords = Commands.helpKeywords;
   private String[] clearKeywords = Commands.clearKeywords;
-
   private GOKU goku;
-  String[] params, lowerParams;
-  Integer paramsByIndex, paramsFromIndex, paramsOnIndex;
 
   public InputParser(GOKU goku) {
     this.goku = goku;
@@ -82,8 +81,8 @@ public class InputParser {
       paramsByIndex = indexOfBy;
     }
     // get the rest of the params after "by"
-    String[] candidates = Arrays.copyOfRange(params, indexOfBy + 1,
-        params.length);
+    String[] candidates = Arrays.copyOfRange(lowerParams, indexOfBy + 1,
+        lowerParams.length);
     DateTime parsed = DateUtil.parse(candidates);
     if (parsed == null) {
       return parsed;
@@ -105,7 +104,7 @@ public class InputParser {
       paramsOnIndex = indexOfOn;
     }
     // get the rest of the params after "on"
-    String[] candidates = Arrays.copyOfRange(params, indexOfOn + 1,
+    String[] candidates = Arrays.copyOfRange(lowerParams, indexOfOn + 1,
         params.length);
     DateTime parsed = DateUtil.parse(candidates);
     if (parsed == null) {
@@ -228,7 +227,7 @@ public class InputParser {
    * @return null if no parameters are specified, else an AddAction with the
    * title, due date, or deadline.
    */
-  private AddAction makeAddAction(boolean impt, String input)
+  private AddAction makeAddAction(boolean isImpt, String input)
       throws MakeActionException, InvalidDateRangeException {
     if (params.length == 0) {
       throw new MakeActionException(AddAction.ERR_INSUFFICIENT_ARGS);
@@ -236,7 +235,7 @@ public class InputParser {
     AddAction addAction = new AddAction(goku);
     addAction.input = input;
 
-    if (impt == true) {
+    if (isImpt == true) {
       addAction.isImpt = true;
     }
     DateTime dl = extractDeadline();
@@ -320,7 +319,7 @@ public class InputParser {
    * 
    * @return null if we cannot decide which task to edit
    */
-  private EditAction makeEditAction(boolean impt, String input)
+  private EditAction makeEditAction(boolean isImpt, String input)
       throws MakeActionException, InvalidDateRangeException {
     if (params.length < 1) {
       throw new MakeActionException(EditAction.ERR_INSUFFICIENT_ARGS);
@@ -334,8 +333,8 @@ public class InputParser {
       int id = Integer.parseInt(params[0]);
       editAction.id = id;
 
-      if (impt == true) {
-        editAction.toggleImportant = true;
+      if (isImpt == true) {
+        editAction.shouldToggleImportant = true;
 
         if (params.length == 1) {
           return editAction;
@@ -349,11 +348,11 @@ public class InputParser {
         // removing a certain field of task
         switch (params[1]) {
           case "deadline" :
-            editAction.removeDeadline = true;
+            editAction.shouldRemoveDeadline = true;
             params = Arrays.copyOfRange(params, 2, params.length);
             break;
           case "period" :
-            editAction.removePeriod = true;
+            editAction.shouldRemovePeriod = true;
             params = Arrays.copyOfRange(params, 2, params.length);
             break;
         }
@@ -377,7 +376,7 @@ public class InputParser {
   /*
    * All inputs to search are taken to be the title of the Task to find
    */
-  private SearchAction makeSearchAction(boolean testFree)
+  private SearchAction makeSearchAction(boolean isSearchFree)
       throws MakeActionException, InvalidDateRangeException {
     if (params.length == 0) {
       throw new MakeActionException(SearchAction.ERR_INSUFFICIENT_ARGS);
@@ -386,9 +385,9 @@ public class InputParser {
     SearchAction searchAction = new SearchAction(goku);
 
     // determine if search is to find free slots
-    if (testFree == true) {
+    if (isSearchFree == true) {
       // test if datetime received is free of tasks
-      searchAction.testFree = testFree;
+      searchAction.isSearchFree = isSearchFree;
       searchAction.freeDateQuery = parseDate();
       if (searchAction.freeDateQuery == null) {
         throw new MakeActionException(SearchAction.ERR_NO_VALID_DATE_FOUND);

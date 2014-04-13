@@ -29,15 +29,13 @@ import javafx.scene.input.KeyEvent;
  * via the FeedbackController
  */
 public class GokuController extends Controller {
-
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
   @FXML
   private TextField inputField;
-
   private GOKU goku;
   private InputParser parser;
   private Storage storage;
-  private static final Logger LOGGER = Logger
-      .getLogger(Logger.GLOBAL_LOGGER_NAME);
   private FeedbackPane feedback;
 
   public GokuController(GOKU goku, TextField inputField,
@@ -55,8 +53,8 @@ public class GokuController extends Controller {
   }
 
   /*
-   * An undo or redo is indicated by the Ctrl+Z or Ctrl+Y
-   * key combination, respectively
+   * An undo or redo is indicated by the Ctrl+Z or Ctrl+Y key combination,
+   * respectively
    */
   boolean isUndoOrRedo(KeyEvent key) {
     return key.isControlDown()

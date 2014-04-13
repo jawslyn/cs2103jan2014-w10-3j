@@ -196,9 +196,9 @@ public class DateUtil {
    * @return null when parsing fails, i.e. no date or time can be interpreted
    * from the inputs.
    * 
-   * Caution: For each component, day, date, time, once found, the rest of the input
-   * will NOT be tested for possibility of that component. Test priority in order of
-   * offset, day > date, then time.
+   * Caution: For each component, day, date, time, once found, the rest of the
+   * input will NOT be tested for possibility of that component. Test priority
+   * in order of offset, day > date, then time.
    */
   public static DateTime parse(final String[] inputs) {
     DateTime date = null, time = null;
@@ -324,8 +324,9 @@ public class DateUtil {
   }
 
   /*
-   * Gets the nearest date closest to a weekday.
-   * If the string is not recognized, a null object is returned
+   * Gets the nearest date closest to a weekday. If the string is not
+   * recognized, a null object is returned
+   * 
    * @params weekday a recognized string that represents a weekday
    */
   private static DateTime getNearestDateToWeekday(String weekday) {

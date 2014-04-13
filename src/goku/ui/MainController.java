@@ -45,11 +45,17 @@ import javafx.stage.Stage;
  * the history.
  */
 public class MainController {
-
+  private static final Logger LOGGER = Logger
+      .getLogger(Logger.GLOBAL_LOGGER_NAME);
   private static final String ERR_PARSE_FILE_FAIL = "Error parsing JSON, loaded tasks to the best of my ability.";
   private static final String ERR_LOAD_FILE_FAIL = "Error loading file, no tasks loaded.";
   private static final String MSG_NEW_USER = "Seems like you're new!\nA file called \"store.goku\" has been created to save your tasks!\nType \"help\" to get a quick guide.";
   private static final String MSG_FILE_NOT_FOUND = "File cannot be found, no tasks loaded.";
+
+  /* used for windows dragging */
+  private static double mousePressX;
+  private static double mousePressY;
+
   /* JavaFX scene objects */
   @FXML
   private ResourceBundle resources;
@@ -72,14 +78,8 @@ public class MainController {
   @FXML
   private VBox suggestionList;
 
-  /* used for windows dragging */
-  private static double mousePressX;
-  private static double mousePressY;
-
   private GOKU goku;
   private Storage storage;
-  private static final Logger LOGGER = Logger
-      .getLogger(Logger.GLOBAL_LOGGER_NAME);
   private FeedbackPane feedbackPane;
   private List<Controller> controllers;
 
@@ -149,8 +149,8 @@ public class MainController {
   }
 
   /*
-   * Called when the user clicks on the title bar,
-   * store the position of the mouse to allow for moving the entire window.
+   * Called when the user clicks on the title bar, store the position of the
+   * mouse to allow for moving the entire window.
    */
   public void onTitleBarMousePress(MouseEvent event) {
     mousePressX = event.getSceneX();
@@ -158,8 +158,8 @@ public class MainController {
   }
 
   /*
-   * Called when user drags on the title bar,
-   * then moves according to where the user drags
+   * Called when user drags on the title bar, then moves according to where the
+   * user drags
    */
   public void onTitleBarDrag(MouseEvent event) {
     Stage stage = FXGUI.getStage();

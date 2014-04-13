@@ -13,9 +13,9 @@ import hirondelle.date4j.DateTime;
  * analogous to real life tasks which the user wishes to note down.
  */
 public class AddAction extends Action {
+  public static final String ERR_INSUFFICIENT_ARGS = "Can't add! Need title. Try \"add my task! by tomorrow\"";
   private static final String MSG_SUCCESS = "Added: \"%s\"";
   private static final String ERR_FAIL = "Fail to add: \"%s\"";
-  public static final String ERR_INSUFFICIENT_ARGS = "Can't add! Need title. Try \"add my task! by tomorrow\"";
   private static final String MSG_HAS_OVERDUE = "[!] You have overdue tasks, \"view overdue\" to see them.";
   private static final String MSG_CLASH = "Attention: The task added clashes with other tasks!";
 
@@ -27,7 +27,6 @@ public class AddAction extends Action {
   public DateTime dline;
   public DateRange period;
   public boolean isImpt;
-
   public String input;
 
   public AddAction(GOKU goku) {

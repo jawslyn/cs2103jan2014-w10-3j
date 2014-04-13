@@ -10,8 +10,7 @@ import org.junit.Test;
 
 public class DateUtilTest {
   /*
-   * Combination heuristics. All inputs below are well-formed
-   * and should pass.
+   * Combination heuristics. All inputs below are well-formed and should pass.
    */
   @Test
   public void parseDay_success() throws Exception {
@@ -30,8 +29,7 @@ public class DateUtilTest {
   }
 
   /*
-   * Combination heuristics. All inputs below are well-formed
-   * and should pass.
+   * Combination heuristics. All inputs below are well-formed and should pass.
    */
   @Test
   public void parseDate_success() throws Exception {
@@ -118,8 +116,7 @@ public class DateUtilTest {
 
   // @author A0099903R
   /*
-   * Combination heuristics. All inputs below are well-formed
-   * and should pass.
+   * Combination heuristics. All inputs below are well-formed and should pass.
    */
   @Test
   public void parseTime_success() throws Exception {
@@ -183,8 +180,7 @@ public class DateUtilTest {
   }
 
   /*
-   * Combination heuristics. All inputs below are well-formed
-   * and should pass.
+   * Combination heuristics. All inputs below are well-formed and should pass.
    */
   @Test
   public void getNearestDateToWeekday_success() {
@@ -206,8 +202,7 @@ public class DateUtilTest {
   }
 
   /*
-   * Combination heuristics. All inputs below are well-formed
-   * and should pass.
+   * Combination heuristics. All inputs below are well-formed and should pass.
    */
   @Test
   public void mergeDateAndTime_success() throws Exception {

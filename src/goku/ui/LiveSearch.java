@@ -23,10 +23,10 @@ import javafx.scene.input.KeyEvent;
  * user.
  */
 public class LiveSearch extends Controller {
+  public StringBuilder query;
   private GOKU goku;
   private TextField input;
   private FeedbackPane feedback;
-  public StringBuilder query;
 
   public LiveSearch(GOKU goku, TextField inputField, FeedbackPane feedbackPane) {
     this.goku = goku;

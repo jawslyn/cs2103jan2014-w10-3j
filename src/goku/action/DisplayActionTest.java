@@ -22,21 +22,22 @@ public class DisplayActionTest {
   }
 
   @Test
-  //This tests whether selectively displaying incomplete and/or complete tasks works
+  // This tests whether selectively displaying incomplete and/or complete tasks
+  // works
   public void doIt_success() {
     Task completedTask = new Task();
     completedTask.setTitle("complete task");
     completedTask.setStatus(true);
-    
+
     Task overdueTask = new Task();
     overdueTask.setTitle("overdue task");
-    overdueTask.setDeadline(DateUtil.getNow().minusDays(3));   
+    overdueTask.setDeadline(DateUtil.getNow().minusDays(3));
 
-    Task previousTask= new Task();
+    Task previousTask = new Task();
     previousTask.setTitle("previous task");
     previousTask.setStatus(true);
     previousTask.setDeadline(DateUtil.getNow().minusDays(3));
-    
+
     Task task = new Task();
     task.setTitle("task");
 
