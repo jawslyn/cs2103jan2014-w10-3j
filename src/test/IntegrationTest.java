@@ -2,6 +2,7 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -64,19 +65,19 @@ public class IntegrationTest {
     aa.doIt();
     assertEquals(list.size(), 1);
   }
-  
+
   @Test
-  //This tests whether adding an important task works
-  public void user_addImportantTask() 
-      throws MakeActionException, InvalidDateRangeException {
+  // This tests whether adding an important task works
+  public void user_addImportantTask() throws MakeActionException,
+      InvalidDateRangeException {
     AddAction aa = (AddAction) parser.parse("add! important task");
     aa.doIt();
-    assertTrue(list.getTaskById(1).getImpt()); 
-    
+    assertTrue(list.getTaskById(1).getImpt());
+
     EditAction ea = (EditAction) parser.parse("edit! 1");
     ea.doIt();
     assertFalse(list.getTaskById(1).getImpt());
-  } 
+  }
 
   @Test
   // This tests whether adding multiple tasks works
@@ -103,7 +104,7 @@ public class IntegrationTest {
   }
 
   @Test
-  //This tests whether editing an existing task's title works 
+  // This tests whether editing an existing task's title works
   public void user_addAndEditTasksTitle() throws Exception {
     AddAction aa = (AddAction) parser.parse("add original by today");
     aa.doIt();
@@ -118,60 +119,60 @@ public class IntegrationTest {
     ea = (EditAction) parser.parse("done 1");
     ea.doIt();
   }
-  
+
   @Test
-  //This tests whether editing a task's deadline and period works
+  // This tests whether editing a task's deadline and period works
   public void user_EditTasksDeadlineAndPeriod() throws Exception {
     AddAction aa = (AddAction) parser.parse("add deadline by today");
     aa.doIt();
-    
+
     SearchAction sa = (SearchAction) parser.parse("search by today");
     Result deadline = sa.doIt();
     assertEquals(deadline.getTasks().size(), 1);
-    
+
     EditAction ea = (EditAction) parser.parse("edit 1 by tmr");
     ea.doIt();
     deadline = sa.doIt();
     assertNull(deadline.getTasks());
-    
+
     ea = (EditAction) parser.parse("edit 1 by today");
     ea.doIt();
     deadline = sa.doIt();
     assertEquals(deadline.getTasks().size(), 1);
-    
+
     ea = (EditAction) parser.parse("edit 1 remove deadline");
     ea.doIt();
     deadline = sa.doIt();
     assertNull(deadline.getTasks());
-    
+
     DeleteAction da = (DeleteAction) parser.parse("delete 1");
     da.doIt();
-    
+
     aa = (AddAction) parser.parse("add period from 1pm to 5pm");
     aa.doIt();
-    
+
     sa = (SearchAction) parser.parse("search from 1pm to 5pm");
     Result period = sa.doIt();
     assertEquals(period.getTasks().size(), 1);
-    
+
     ea = (EditAction) parser.parse("edit 1 from 6pm to 9pm");
     ea.doIt();
     period = sa.doIt();
     assertNull(period.getTasks());
-    
+
     ea = (EditAction) parser.parse("edit 1 from 1pm to 5pm");
     ea.doIt();
     period = sa.doIt();
     assertEquals(period.getTasks().size(), 1);
-    
+
     ea = (EditAction) parser.parse("edit 1 remove period");
     ea.doIt();
     period = sa.doIt();
     assertNull(deadline.getTasks());
   }
-  
+
   @Test
-  //This tests whether deleting tasks works
+  // This tests whether deleting tasks works
   public void user_deleteTasks() throws Exception {
     AddAction aa = (AddAction) parser.parse("add task one");
     aa.doIt();
@@ -180,19 +181,19 @@ public class IntegrationTest {
     aa = (AddAction) parser.parse("add task three");
     aa.doIt();
     assertEquals(list.size(), 3);
-    
+
     DeleteAction da = (DeleteAction) parser.parse("delete 1");
     da.doIt();
     assertEquals(list.size(), 2);
-    
+
     da = (DeleteAction) parser.parse("delete 3");
     da.doIt();
     assertEquals(list.size(), 1);
-    
+
     da = (DeleteAction) parser.parse("delete 2");
     da.doIt();
     assertEquals(list.size(), 0);
-    
+
   }
 
   @Test
@@ -221,7 +222,7 @@ public class IntegrationTest {
   }
 
   @Test
-  //This tests whether searching by title works
+  // This tests whether searching by title works
   public void user_addAndSearchTasks() throws Exception {
     AddAction aa = (AddAction) parser.parse("add original by today");
     aa.doIt();
@@ -238,65 +239,67 @@ public class IntegrationTest {
   }
 
   @Test
-  //This tests whether searching by deadline and period works
+  // This tests whether searching by deadline and period works
   public void user_searchDeadlineAndPeriod() throws Exception {
     AddAction aa = (AddAction) parser.parse("add deadline by today");
     aa.doIt();
     aa = (AddAction) parser.parse("add period from 1pm to 5pm");
     aa.doIt();
-    aa = (AddAction) parser.parse("add deadline and period by tmr from tmr 8am to tmr 10am");
+    aa = (AddAction) parser
+        .parse("add deadline and period by tmr from tmr 8am to tmr 10am");
     aa.doIt();
-    
+
     Result search;
-    
+
     SearchAction sa = (SearchAction) parser.parse("search by today");
     search = sa.doIt();
     assertEquals(search.getTasks().size(), 1);
-    
+
     sa = (SearchAction) parser.parse("search from 10am to 9pm");
     search = sa.doIt();
     assertEquals(search.getTasks().size(), 1);
-    
+
     sa = (SearchAction) parser.parse("search by tmr ");
-    search =  sa.doIt();
+    search = sa.doIt();
     assertEquals(search.getTasks().size(), 2);
-    
+
     sa = (SearchAction) parser.parse("search from tmr 8am to tmr 11pm");
-    search =  sa.doIt();
+    search = sa.doIt();
     assertEquals(search.getTasks().size(), 1);
-    
+
     DeleteAction da = (DeleteAction) parser.parse("delete 1");
-    da.doIt();  
+    da.doIt();
     sa = (SearchAction) parser.parse("search by today");
     search = sa.doIt();
     assertNull(search.getTasks());
-    
+
     da = (DeleteAction) parser.parse("delete 2");
     da.doIt();
     sa = (SearchAction) parser.parse("search by tmr");
     search = sa.doIt();
     assertEquals(search.getTasks().size(), 1);
-    
+
     da = (DeleteAction) parser.parse("delete 3");
     da.doIt();
     sa = (SearchAction) parser.parse("search by tmr");
     search = sa.doIt();
     assertNull(search.getTasks());
   }
-  
+
   @Test
-  //This tests whether an invalid add input fails
+  // This tests whether an invalid add input fails
   public void user_InvalidCommand() throws Exception {
     UnknownAction ua = (UnknownAction) parser.parse("addd fail");
     Result fail = ua.doIt();
     assertNull(fail.getTasks());
-  } 
-  
-  //Invalid period detected while running this test
-  //This tests whether adding a task with invalid period fails
-  //public void user_addInvalidPeriod() throws MakeActionException {
-  //  AddAction aa = (AddAction) parser.parse("add fail from 9pm to 5pm") throw InvalidDateRangeException,;
-  //  Result fail = aa.doIt();
-  //  assertNull(fail.getTasks());
-  //} 
+  }
+
+  // Invalid period detected while running this test
+  // This tests whether adding a task with invalid period fails
+  // public void user_addInvalidPeriod() throws MakeActionException {
+  // AddAction aa = (AddAction) parser.parse("add fail from 9pm to 5pm") throw
+  // InvalidDateRangeException,;
+  // Result fail = aa.doIt();
+  // assertNull(fail.getTasks());
+  // }
 }
