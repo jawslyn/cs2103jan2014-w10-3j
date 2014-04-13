@@ -27,7 +27,7 @@ public class ClearAction extends Action {
     return new Result(true, editMsgIfHaveOverdue(MSG_SUCCESS), null, null);
   }
 
-  public void addToUndoList() {
+  private void addToUndoList() {
     TaskList currList = new TaskList();
     currList = list.clone();
 
