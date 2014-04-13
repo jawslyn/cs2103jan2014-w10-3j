@@ -69,7 +69,8 @@ public class CompletionController extends Controller {
     } else if (suggestionList.getChildren().size() == 1) {
       // only 1 suggestion ,just fill it in
       Text sel = (Text) suggestionList.getChildren().get(0);
-      fillSuggestion(sel.getText());
+      fillSuggestion(sel.getText() + " ");
+      cancelSuggestion();
     } else {
       // many suggestions, cycle through them
       if (selectedSuggestion < 0) {
@@ -99,7 +100,7 @@ public class CompletionController extends Controller {
   }
 
   private void fillSuggestion(String suggestion) {
-    inputField.setText(suggestion + " ");
+    inputField.setText(suggestion);
     inputField.end();
   }
 
