@@ -119,7 +119,7 @@ public class Task implements Storeable, Comparable<Task> {
     return isImpt;
   }
 
-  // @author A0099585Y
+  // @author a0099858y
   public Boolean isDone() {
     return isComplete;
   }

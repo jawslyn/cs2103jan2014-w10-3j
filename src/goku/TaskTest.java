@@ -1,4 +1,4 @@
-//@author A0099585Y
+//@author a0099858y
 package goku;
 
 import static org.junit.Assert.assertEquals;

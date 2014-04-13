@@ -180,8 +180,6 @@ public class MainController {
    * Greets the user by showing upcoming tasks and events that are due or
    * happening now.
    * 
-   * @author ZhiAn
-   * 
    */
   private class GreetAction extends Action {
     private static final String MSG = "Welcome to GOKU!\nHere are your tasks for today!";

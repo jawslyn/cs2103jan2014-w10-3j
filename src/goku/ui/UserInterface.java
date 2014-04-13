@@ -8,7 +8,6 @@ import goku.Result;
  * GokuMain. It acts as the parser from UI to Main and processes the result from
  * Main to UI
  * 
- * @author jchiam
  **/
 public interface UserInterface {
 

@@ -280,7 +280,7 @@ public class TaskList implements Iterable<Task> {
     return resultList;
   }
 
-  // @author A0099585Y
+  // @author a0099858y
   private List<String> findFreeSlots(ArrayList<DateRange> periodList,
       DateTime date) throws InvalidDateRangeException {
     List<String> result = new ArrayList<String>();

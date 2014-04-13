@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * Computes the difference between two texts to create a patch.
  * Applies the patch onto another text, allowing for errors.
  *
- * @author fraser@google.com (Neil Fraser)
+ * author fraser@google.com (Neil Fraser)
  */
 
 /**

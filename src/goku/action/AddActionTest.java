@@ -1,6 +1,8 @@
-//@A0099858Y
+//@author A0099858Y
 package goku.action;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
@@ -11,7 +13,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class AddActionTest {
   TaskList list;
@@ -56,7 +57,7 @@ public class AddActionTest {
     assertTrue(actualResult.isSuccess());
     assertEquals(1, list.size());
   }
-  
+
   @Test
   // This tests whether adding tasks with long names to the task list works
   public void doIt_TaskWithLongName_returnsSuccessfulResult() throws Exception {
@@ -74,7 +75,7 @@ public class AddActionTest {
     assertTrue(actualResult.isSuccess());
     assertEquals(1, list.size());
   }
-  
+
   @Test
   // This tests whether adding different tasks works
   public void doIt_MultipleTasksWithName() throws Exception {

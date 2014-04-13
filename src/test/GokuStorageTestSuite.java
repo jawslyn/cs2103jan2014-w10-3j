@@ -1,4 +1,4 @@
-//@author A0099903
+//@author A0099903R
 package test;
 
 import org.junit.runner.RunWith;

@@ -1,18 +1,13 @@
-//@author A0099585Y
+//@author a0099858y
 package goku.util;
 
 import hirondelle.date4j.DateTime;
 
 import java.util.Locale;
 
-/*
- * Formats dates into a more readable string
- * Mainly wrappers around DateTime.format.
- */
 /**
- * @author Justin
- * @author ZhiAn
- * 
+ * Formats dates into a more readable string Mainly wrappers around
+ * DateTime.format.
  */
 public class DateOutput {
 
