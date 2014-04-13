@@ -1,6 +1,10 @@
+//@author A0099585Y
 package test;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import goku.GOKU;
 import goku.Result;
 import goku.Task;
@@ -16,8 +20,6 @@ import goku.util.InvalidDateRangeException;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class IntegrationTest {
   private static final EditAction EditAction = null;
@@ -50,7 +52,7 @@ public class IntegrationTest {
   }
 
   @Test
-  //This tests whether adding a single task increases task list size
+  // This tests whether adding a single task increases task list size
   public void user_addTaskWithTitle_increaseSizeOfList()
       throws MakeActionException, InvalidDateRangeException {
     Action a = parser.parse("add asdf");
@@ -62,7 +64,7 @@ public class IntegrationTest {
   }
 
   @Test
-  //This tests whether adding multiple tasks works
+  // This tests whether adding multiple tasks works
   public void user_addMultipleTasks() throws Exception {
     AddAction aa = (AddAction) parser.parse("add task 1");
     aa.doIt();
@@ -84,67 +86,66 @@ public class IntegrationTest {
     assertEquals(taskThree.getEndDate().getDay(), new Integer(28));
     assertEquals(taskThree.getEndDate().getMonth(), new Integer(4));
   }
-  
+
   @Test
-  //This tests whether editing an existing task works 
+  // This tests whether editing an existing task works
   public void user_addAndEditTasks() throws Exception {
     AddAction aa = (AddAction) parser.parse("add original by today");
     aa.doIt();
     assertEquals(list.size(), 1);
     assertEquals(list.getTaskById(1).getTitle(), "original");
-    
+
     EditAction ea = (EditAction) parser.parse("edit 1 edited");
     ea.doIt();
     assertEquals(list.getTaskById(1).getTitle(), "edited");
-    
-    assertNotNull(list.getTaskById(1)) ;
+
+    assertNotNull(list.getTaskById(1));
     ea = (EditAction) parser.parse("done 1");
     ea.doIt();
-   // assertTrue(list.getTaskById(0).getStatus());
+    // assertTrue(list.getTaskById(0).getStatus());
 
   }
-  
+
   @Test
-  //This tests whether viewing all/completed tasks  works
+  // This tests whether viewing all/completed tasks works
   public void user_addAndViewTasks() throws Exception {
     AddAction aa = (AddAction) parser.parse("add complete");
     aa.doIt();
     aa = (AddAction) parser.parse("add incomplete");
     aa.doIt();
-    
+
     DisplayAction da = (DisplayAction) parser.parse("view");
-    Result all = da.doIt();  
-    
+    Result all = da.doIt();
+
     assertEquals(all.getTasks().size(), 2);
-    
+
     EditAction ea = (EditAction) parser.parse("do 1");
     ea.doIt();
-    
+
     da = (DisplayAction) parser.parse("view");
-    Result all2 = da.doIt();  
+    Result all2 = da.doIt();
     da = (DisplayAction) parser.parse("view completed");
     Result completed = da.doIt();
-    
+
     assertEquals(all2.getTasks().size(), 1);
-    assertEquals(completed.getTasks().size(), 1);   
+    assertEquals(completed.getTasks().size(), 1);
   }
-  
-  
+
   @Test
-  //This tests whether searching for an existing task(s) works
+  // This tests whether searching for an existing task(s) works
   public void user_addAndSearchTasks() throws Exception {
     AddAction aa = (AddAction) parser.parse("add original by today");
     aa.doIt();
     assertEquals(list.size(), 1);
     assertEquals(list.getTaskById(1).getTitle(), "original");
-    
+
     SearchAction sa = (SearchAction) parser.parse("search blah");
     Result zeroFound = sa.doIt();
     sa = (SearchAction) parser.parse("search origina");
     Result oneFound = sa.doIt();
-    
+
     assertNull(zeroFound.getTasks());
     assertEquals(oneFound.getTasks().size(), 1);
   }
-  
+
 }
