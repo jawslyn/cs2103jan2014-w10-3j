@@ -20,11 +20,17 @@ import org.junit.Test;
 public class EditActionTest {
   GOKU goku;
   TaskList list;
+  Task toEdit;
+  Integer toEditId;
+  EditAction editAction;
+  Result result;
 
   @Before
   public void setup() {
     goku = new GOKU();
     list = goku.getTaskList();
+    toEdit = new Task();
+    editAction = new EditAction(goku);
   }
 
   @After
@@ -33,46 +39,46 @@ public class EditActionTest {
   }
 
   @Test
-  // This tests whether editing works by checking the edited results
-  public void editTask_returnsEditedResult() throws Exception {
-    Task toEdit, changedTask;
-    Integer id;
-    EditAction editAction;
-    Result result;
-
-    toEdit = new Task();
+  public void editTask_changeTaskName() throws Exception {
     toEdit.setTitle("hello");
-    id = list.addTask(toEdit);
+    toEditId = list.addTask(toEdit);
 
-    changedTask = new Task(toEdit);
-    changedTask.setTitle("byebye");
-
-    editAction = new EditAction(goku);
-    editAction.id = id;
+    editAction.id = toEditId;
     editAction.title = "byebye";
     result = editAction.doIt();
 
     assertTrue(result.isSuccess());
     assertEquals("byebye", toEdit.getTitle());
+  }
 
-    editAction = new EditAction(goku);
-    editAction.id = id;
+  @Test
+  public void editTask_makeComplete() throws Exception {
+    toEdit.setTitle("hello");
+    toEditId = list.addTask(toEdit);
+
+    editAction.id = toEditId;
     editAction.isComplete = true;
     assertNull(toEdit.isDone());
     result = editAction.doIt();
-    assertTrue(result.isSuccess());
-    assertEquals("byebye", toEdit.getTitle());
-    assertTrue(toEdit.isDone());
 
-    editAction = new EditAction(goku);
-    editAction.id = id;
+    assertTrue(result.isSuccess());
+    assertEquals("hello", toEdit.getTitle());
+    assertTrue(toEdit.isDone());
+  }
+
+  @Test
+  // This tests whether editing works by checking the edited results
+  public void editTask_changeDeadline() throws Exception {
+    toEdit.setTitle("hello");
+    toEditId = list.addTask(toEdit);
+
+    editAction.id = toEditId;
     DateTime deadline = DateUtil.getNow();
     editAction.dline = deadline;
     assertNull(toEdit.getDeadline());
     result = editAction.doIt();
     assertTrue(result.isSuccess());
-    assertEquals("byebye", toEdit.getTitle());
-    assertTrue(toEdit.isDone());
+    assertEquals("hello", toEdit.getTitle());
     assertEquals(deadline, toEdit.getDeadline());
   }
 

@@ -2,6 +2,7 @@
 package goku;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import goku.util.DateUtil;
@@ -249,22 +250,14 @@ public class TaskListTest {
     Task b = new Task();
     b.setPeriod(new DateRange(DateUtil.parse("12pm"), DateUtil.parse("1pm")));
     list.addTask(a);
-    assertTrue(!list.hasClash(b));
+    assertFalse(list.hasClash(b));
     list.addTask(b);
     Task c = new Task();
     c.setPeriod(new DateRange(DateUtil.parse("7am"), DateUtil.parse("11pm")));
-    assertTrue(!list.hasClash(c));
+    assertTrue(list.hasClash(c));
   }
 
   // @author A0096444X
-  @Test(expected = AssertionError.class)
-  public void findFreeSlots_AssertionErrorDateShouldNotHaveTime()
-      throws InvalidDateRangeException {
-    DateTime now = DateUtil.getNow();
-
-    list.findFreeSlots(now);
-  }
-
   @Test
   public void findFreeSlots_DateHasNoTasks() throws InvalidDateRangeException {
     DateTime today = DateUtil.getNowDate();
