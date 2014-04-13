@@ -58,7 +58,6 @@ public class AddAction extends Action {
 
   @Override
   public Result doIt() {
-    System.out.println(input);
     return addTask();
   }
 
