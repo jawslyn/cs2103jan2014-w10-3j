@@ -1,3 +1,4 @@
+//@author A0099903R
 package goku;
 
 import goku.util.DateOutput;
@@ -56,7 +57,7 @@ public class DateRange {
         && endDate.lteq(range.getEndDate());
   }
 
-  //@author A0096444X
+  // @author A0096444X
   @Override
   public String toString() {
     return DateOutput.formatDateTimeDayMonthHourMin(startDate) + " to "

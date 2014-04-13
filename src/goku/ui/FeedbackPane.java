@@ -1,3 +1,4 @@
+//@author A0099903R
 package goku.ui;
 
 import goku.DateRange;
@@ -178,6 +179,7 @@ public class FeedbackPane {
     }
   }
 
+  // @author A0101232H
   private void displayCompleteTask(Task task) {
     Label tick = AwesomeDude.createIconLabel(AwesomeIcon.CHECK);
     Label b1 = new Label("[");

@@ -1,3 +1,4 @@
+//@author A0099585Y
 package goku.util;
 
 import hirondelle.date4j.DateTime;
@@ -61,6 +62,7 @@ public class DateOutput {
     return dateTime.format("D/M").toLowerCase();
   }
 
+  // @author A0099903R
   /*
    * converts DateTime -> "today" or "4d later"
    */

@@ -1,3 +1,4 @@
+//@author A0096444X
 package goku.util;
 
 import static org.junit.Assert.assertEquals;
@@ -134,6 +135,7 @@ public class DateUtilTest {
     assertNull(actual);
   }
 
+  // @author A0099903R
   /*
    * Combination heuristics. All inputs below are well-formed
    * and should pass.
@@ -250,7 +252,7 @@ public class DateUtilTest {
     assertEquals(expected, result);
   }
 
-  //@author A0096444X
+  // @author A0096444X
   @Test
   public void isSameDay_success() {
     DateTime aDate = DateTime.forDateOnly(2014, 3, 4);

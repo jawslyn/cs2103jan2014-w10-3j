@@ -1,3 +1,4 @@
+//@author A0096444X
 package goku.ui;
 
 import static org.junit.Assert.assertEquals;
@@ -476,6 +477,7 @@ public class InputParserTest {
             .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
+  // @author A0099903R
   @Test
   public void extractPeriod_SpecificDatesSpecificTimes()
       throws MakeActionException, InvalidDateRangeException {

@@ -1,3 +1,4 @@
+//@author A0099585Y
 package goku;
 
 import java.util.List;
@@ -70,6 +71,7 @@ public class Result {
     return listMsg;
   }
 
+  // @author A0096444X
   public List<Task> getTasks() {
     return listOfTask;
   }

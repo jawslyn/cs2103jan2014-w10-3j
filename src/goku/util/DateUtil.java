@@ -1,3 +1,4 @@
+//@author A0099903R
 package goku.util;
 
 import goku.DateRange;
@@ -33,7 +34,7 @@ public class DateUtil {
     return DateTime.now(TimeZone.getDefault());
   }
 
-  //@author A0096444X
+  // @author A0096444X
   /*
    * Returns the current date (day) only
    */
@@ -157,7 +158,7 @@ public class DateUtil {
     }
   }
 
-  //@author A0096444X
+  // @author A0096444X
   // compare up to day
   public static boolean isSameDay(DateTime aDate, DateTime otherDate) {
     assert otherDate != null;
@@ -173,7 +174,7 @@ public class DateUtil {
     }
   }
 
-  //@author A0096444X
+  // @author A0096444X
   // compare up to minutes
   public static boolean isSameDayAndTime(DateTime aDate, DateTime otherDate) {
     assert otherDate != null;
@@ -241,6 +242,7 @@ public class DateUtil {
     return mergeDateAndTime(date, time, daysOffsets);
   }
 
+  // @author A0096444X
   /*
    * Parses a string into a DateTime where only the date matters. We can handled
    * cases: 1) Day and Month specified, 2) Day and Month and Year specified

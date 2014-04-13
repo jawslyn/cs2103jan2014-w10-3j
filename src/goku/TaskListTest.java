@@ -1,3 +1,4 @@
+//@author A0096444X
 package goku;
 
 import static org.junit.Assert.assertEquals;
@@ -193,6 +194,7 @@ public class TaskListTest {
     assertReturnListIsSize(1);
   }
 
+  // @author A0099585Y
   @Test
   public void deleteTaskByTitle_multipleMatches_doesNotChangeList() {
     Task aTask = makeTaskWithTitle("abc");
@@ -254,7 +256,7 @@ public class TaskListTest {
     assertTrue(!list.hasClash(c));
   }
 
-  //@author A0096444X
+  // @author A0096444X
   @Test(expected = AssertionError.class)
   public void findFreeSlots_AssertionErrorDateShouldNotHaveTime()
       throws InvalidDateRangeException {

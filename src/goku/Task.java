@@ -1,3 +1,4 @@
+//@author A0101232H
 package goku;
 
 import goku.storage.Storeable;
@@ -150,6 +151,7 @@ public class Task implements Storeable, Comparable<Task> {
     return complete;
   }
 
+  // @author A0099585Y
   public Boolean isDone() {
     return complete;
   }
@@ -192,7 +194,7 @@ public class Task implements Storeable, Comparable<Task> {
     this.impt = impt;
   }
 
-  //@author A0096444X
+  // @author A0096444X
   /*
    * Case 1: If impt, task is higher on the list
    * Case 2: Else by earliest start date or deadline

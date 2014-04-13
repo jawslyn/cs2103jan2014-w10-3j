@@ -1,3 +1,4 @@
+//@author A0096444X
 package goku.util;
 
 import static org.junit.Assert.assertEquals;
@@ -53,6 +54,7 @@ public class DateOutputTest {
     }
   }
 
+  // @author A0099903R
   @Test
   public void formatDateOnlyDayMonth_returnsDateWithDayMonth() throws Exception {
     DateTime dateTime = DateTime.forDateOnly(2014, 4, 1);

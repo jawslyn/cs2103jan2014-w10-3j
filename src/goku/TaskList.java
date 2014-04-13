@@ -1,3 +1,4 @@
+//@author A0101232H
 package goku;
 
 import goku.util.DateUtil;
@@ -279,6 +280,7 @@ public class TaskList implements Iterable<Task> {
     return resultList;
   }
 
+  // @author A0099585Y
   private List<String> findFreeSlots(ArrayList<DateRange> periodList,
       DateTime date) throws InvalidDateRangeException {
     List<String> result = new ArrayList<String>();

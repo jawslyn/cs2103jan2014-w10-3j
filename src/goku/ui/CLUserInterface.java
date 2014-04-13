@@ -1,3 +1,4 @@
+//@author A0099903R
 package goku.ui;
 
 import goku.GOKU;
@@ -69,6 +70,7 @@ public class CLUserInterface implements UserInterface {
     }
   }
 
+  // @author A0096444X
   /**
    * @return string that user entered
    */
