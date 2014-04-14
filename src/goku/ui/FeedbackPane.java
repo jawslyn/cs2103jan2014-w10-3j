@@ -194,7 +194,6 @@ public class FeedbackPane {
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
     VBox dateVBox = makeDateVbox(task, true);
-    // dateVBox.setStyle("-fx-background-color:rgba(85, 255, 68,0.2)");
 
     output.add(tickHbox, 0, lines);
     output.add(title, 1, lines);
@@ -245,17 +244,14 @@ public class FeedbackPane {
     impt.setTextFill(IMPT_COLOUR);
     idWithImpt.getChildren().addAll(id, impt);
     idWithImpt.setAlignment(Pos.CENTER_LEFT);
-    // if (task.getImpt()) {
-    // id.setTextFill(IMPT_COLOUR);
-    // }
+
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
     title.setMinWidth(50.0);
     VBox dateVBox = makeDateVbox(task, false);
 
-    // output.add(id, 0, lines);
-    if (task.isImpt() == null || task.isImpt()) {
+    if (task.isImpt() == null || !task.isImpt()) {
       output.add(id, 0, lines);
     } else {
       output.add(idWithImpt, 0, lines);
