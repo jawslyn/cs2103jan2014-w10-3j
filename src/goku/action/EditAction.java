@@ -59,7 +59,11 @@ public class EditAction extends Action {
 
   private void doToggleImportant() {
     Task t = list.getTaskById(id);
-    t.setImpt(!t.isImpt());
+    if (t.isImpt() == null) {
+      t.setImpt(true);
+    } else {
+      t.setImpt(!t.isImpt());
+    }
   }
 
   private void doRemovePeriod() {
