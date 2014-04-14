@@ -3,7 +3,7 @@
 
 
 	/**
-	 * origin: .\src\goku\action\SearchAction.java
+	 * origin: src\goku\action\SearchAction.java
 	 */
 
 package goku.action;
@@ -238,14 +238,14 @@ public class SearchAction extends Action {
         .length() - 1) == '"');
   }
 
-	// End of segment: .\src\goku\action\SearchAction.java
+	// End of segment: src\goku\action\SearchAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\SearchActionTest.java
+	 * origin: src\goku\action\SearchActionTest.java
 	 */
 
 package goku.action;
@@ -634,14 +634,14 @@ public class SearchActionTest {
 
 }
 
-	// End of segment: .\src\goku\action\SearchActionTest.java
+	// End of segment: src\goku\action\SearchActionTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\DateRange.java
+	 * origin: src\goku\DateRange.java
 	 */
 
   @Override
@@ -651,14 +651,14 @@ public class SearchActionTest {
   }
 }
 
-	// End of segment: .\src\goku\DateRange.java
+	// End of segment: src\goku\DateRange.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\Result.java
+	 * origin: src\goku\Result.java
 	 */
 
   public List<Task> getTasks() {
@@ -686,14 +686,14 @@ public class SearchActionTest {
   }
 }
 
-	// End of segment: .\src\goku\Result.java
+	// End of segment: src\goku\Result.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\Task.java
+	 * origin: src\goku\Task.java
 	 */
 
   /*
@@ -758,14 +758,14 @@ public class SearchActionTest {
   }
 }
 
-	// End of segment: .\src\goku\Task.java
+	// End of segment: src\goku\Task.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\TaskListTest.java
+	 * origin: src\goku\TaskListTest.java
 	 */
 
 package goku;
@@ -964,14 +964,14 @@ public class TaskListTest {
     assertReturnListIsSize(1);
   }
 
-	// End of segment: .\src\goku\TaskListTest.java
+	// End of segment: src\goku\TaskListTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\TaskListTest.java
+	 * origin: src\goku\TaskListTest.java
 	 */
 
   @Test
@@ -1138,14 +1138,14 @@ public class TaskListTest {
   }
 }
 
-	// End of segment: .\src\goku\TaskListTest.java
+	// End of segment: src\goku\TaskListTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\CLUserInterface.java
+	 * origin: src\goku\ui\CLUserInterface.java
 	 */
 
   /**
@@ -1214,14 +1214,14 @@ public class TaskListTest {
   }
 }
 
-	// End of segment: .\src\goku\ui\CLUserInterface.java
+	// End of segment: src\goku\ui\CLUserInterface.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\InputParser.java
+	 * origin: src\goku\ui\InputParser.java
 	 */
 
 package goku.ui;
@@ -1537,14 +1537,14 @@ public class InputParser {
     return da;
   }
 
-	// End of segment: .\src\goku\ui\InputParser.java
+	// End of segment: src\goku\ui\InputParser.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\InputParserTest.java
+	 * origin: src\goku\ui\InputParserTest.java
 	 */
 
 package goku.ui;
@@ -2020,14 +2020,14 @@ public class InputParserTest {
             .truncate(DateTime.Unit.SECOND), resultRange.getEndDate());
   }
 
-	// End of segment: .\src\goku\ui\InputParserTest.java
+	// End of segment: src\goku\ui\InputParserTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\UserInterface.java
+	 * origin: src\goku\ui\UserInterface.java
 	 */
 
 package goku.ui;
@@ -2060,14 +2060,14 @@ public interface UserInterface {
 
 }
 
-	// End of segment: .\src\goku\ui\UserInterface.java
+	// End of segment: src\goku\ui\UserInterface.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateOutputTest.java
+	 * origin: src\goku\util\DateOutputTest.java
 	 */
 
 package goku.util;
@@ -2120,14 +2120,14 @@ public class DateOutputTest {
     }
   }
 
-	// End of segment: .\src\goku\util\DateOutputTest.java
+	// End of segment: src\goku\util\DateOutputTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtil.java
+	 * origin: src\goku\util\DateUtil.java
 	 */
 
   /*
@@ -2253,14 +2253,14 @@ public class DateOutputTest {
     }
   }
 
-	// End of segment: .\src\goku\util\DateUtil.java
+	// End of segment: src\goku\util\DateUtil.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtil.java
+	 * origin: src\goku\util\DateUtil.java
 	 */
 
   // compare up to day
@@ -2278,14 +2278,14 @@ public class DateOutputTest {
     }
   }
 
-	// End of segment: .\src\goku\util\DateUtil.java
+	// End of segment: src\goku\util\DateUtil.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtil.java
+	 * origin: src\goku\util\DateUtil.java
 	 */
 
   // compare up to minutes
@@ -2355,14 +2355,14 @@ public class DateOutputTest {
     return mergeDateAndTime(date, time, daysOffsets);
   }
 
-	// End of segment: .\src\goku\util\DateUtil.java
+	// End of segment: src\goku\util\DateUtil.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtil.java
+	 * origin: src\goku\util\DateUtil.java
 	 */
 
   /*
@@ -2562,14 +2562,14 @@ public class DateOutputTest {
     }
   }
 }
-	// End of segment: .\src\goku\util\DateUtil.java
+	// End of segment: src\goku\util\DateUtil.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtilTest.java
+	 * origin: src\goku\util\DateUtilTest.java
 	 */
 
 package goku.util;
@@ -2687,14 +2687,14 @@ public class DateUtilTest {
     assertNull(actual);
   }
 
-	// End of segment: .\src\goku\util\DateUtilTest.java
+	// End of segment: src\goku\util\DateUtilTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtilTest.java
+	 * origin: src\goku\util\DateUtilTest.java
 	 */
 
   @Test
@@ -2711,14 +2711,14 @@ public class DateUtilTest {
   }
 }
 
-	// End of segment: .\src\goku\util\DateUtilTest.java
+	// End of segment: src\goku\util\DateUtilTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\InvalidDateRangeException.java
+	 * origin: src\goku\util\InvalidDateRangeException.java
 	 */
 
 package goku.util;
@@ -2731,7 +2731,7 @@ public class InvalidDateRangeException extends Exception {
   }
 }
 
-	// End of segment: .\src\goku\util\InvalidDateRangeException.java
+	// End of segment: src\goku\util\InvalidDateRangeException.java
 
 
 

@@ -3,7 +3,7 @@
 
 
 	/**
-	 * origin: .\src\goku\action\AddActionTest.java
+	 * origin: src\goku\action\AddActionTest.java
 	 */
 
 package goku.action;
@@ -113,14 +113,14 @@ public class AddActionTest {
 
 }
 
-	// End of segment: .\src\goku\action\AddActionTest.java
+	// End of segment: src\goku\action\AddActionTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\DeleteActionTest.java
+	 * origin: src\goku\action\DeleteActionTest.java
 	 */
 
 package goku.action;
@@ -265,14 +265,14 @@ public class DeleteActionTest {
     assertFalse(result.isSuccess());
   }
 }
-	// End of segment: .\src\goku\action\DeleteActionTest.java
+	// End of segment: src\goku\action\DeleteActionTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\DisplayActionTest.java
+	 * origin: src\goku\action\DisplayActionTest.java
 	 */
 
 package goku.action;
@@ -341,14 +341,14 @@ public class DisplayActionTest {
   }
 }
 
-	// End of segment: .\src\goku\action\DisplayActionTest.java
+	// End of segment: src\goku\action\DisplayActionTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\EditActionTest.java
+	 * origin: src\goku\action\EditActionTest.java
 	 */
 
 package goku.action;
@@ -551,14 +551,14 @@ public class EditActionTest {
 
 }
 
-	// End of segment: .\src\goku\action\EditActionTest.java
+	// End of segment: src\goku\action\EditActionTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\NoAction.java
+	 * origin: src\goku\action\NoAction.java
 	 */
 
 package goku.action;
@@ -581,14 +581,14 @@ public class NoAction extends Action {
   }
 }
 
-	// End of segment: .\src\goku\action\NoAction.java
+	// End of segment: src\goku\action\NoAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\RedoActionTest.java
+	 * origin: src\goku\action\RedoActionTest.java
 	 */
 
 package goku.action;
@@ -728,14 +728,14 @@ public class RedoActionTest {
   }
 }
 
-	// End of segment: .\src\goku\action\RedoActionTest.java
+	// End of segment: src\goku\action\RedoActionTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\Result.java
+	 * origin: src\goku\Result.java
 	 */
 
 package goku;
@@ -810,14 +810,14 @@ public class Result {
     return listMsg;
   }
 
-	// End of segment: .\src\goku\Result.java
+	// End of segment: src\goku\Result.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\Task.java
+	 * origin: src\goku\Task.java
 	 */
 
   public Boolean isDone() {
@@ -862,14 +862,14 @@ public class Result {
     this.isImpt = isImpt;
   }
 
-	// End of segment: .\src\goku\Task.java
+	// End of segment: src\goku\Task.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\TaskList.java
+	 * origin: src\goku\TaskList.java
 	 */
 
   private List<String> findFreeSlots(ArrayList<DateRange> periodList,
@@ -1013,14 +1013,14 @@ public class Result {
   }
 }
 
-	// End of segment: .\src\goku\TaskList.java
+	// End of segment: src\goku\TaskList.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\TaskListTest.java
+	 * origin: src\goku\TaskListTest.java
 	 */
 
   @Test
@@ -1084,14 +1084,14 @@ public class Result {
     assertTrue(list.hasClash(c));
   }
 
-	// End of segment: .\src\goku\TaskListTest.java
+	// End of segment: src\goku\TaskListTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\TaskTest.java
+	 * origin: src\goku\TaskTest.java
 	 */
 
 package goku;
@@ -1162,14 +1162,14 @@ public class TaskTest {
     assertEquals(task3, taskC);
   }
 
-	// End of segment: .\src\goku\TaskTest.java
+	// End of segment: src\goku\TaskTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateOutput.java
+	 * origin: src\goku\util\DateOutput.java
 	 */
 
 package goku.util;
@@ -1229,14 +1229,14 @@ public class DateOutput {
     return dateTime.format("D/M").toLowerCase();
   }
 
-	// End of segment: .\src\goku\util\DateOutput.java
+	// End of segment: src\goku\util\DateOutput.java
 
 
 
 
 
 	/**
-	 * origin: .\src\test\IntegrationTest.java
+	 * origin: src\test\IntegrationTest.java
 	 */
 
 package test;
@@ -1545,7 +1545,7 @@ public class IntegrationTest {
   // }
 }
 
-	// End of segment: .\src\test\IntegrationTest.java
+	// End of segment: src\test\IntegrationTest.java
 
 
 

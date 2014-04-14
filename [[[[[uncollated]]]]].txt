@@ -1,6 +1,6 @@
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 File Location:
-.\src\goku\util\DiffMatchPath.java
+src\goku\util\DiffMatchPath.java
 uncollated source code:
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 

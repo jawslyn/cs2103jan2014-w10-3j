@@ -3,7 +3,7 @@
 
 
 	/**
-	 * origin: .\src\goku\action\AddAction.java
+	 * origin: src\goku\action\AddAction.java
 	 */
 
   private void addToUndoList() {
@@ -30,14 +30,14 @@
     return result;
   }
 }
-	// End of segment: .\src\goku\action\AddAction.java
+	// End of segment: src\goku\action\AddAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\ClearAction.java
+	 * origin: src\goku\action\ClearAction.java
 	 */
 
 package goku.action;
@@ -88,14 +88,14 @@ public class ClearAction extends Action {
     return msg;
   }
 }
-	// End of segment: .\src\goku\action\ClearAction.java
+	// End of segment: src\goku\action\ClearAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\DeleteAction.java
+	 * origin: src\goku\action\DeleteAction.java
 	 */
 
   private void addToUndoList() {
@@ -115,14 +115,14 @@ public class ClearAction extends Action {
 
 }
 
-	// End of segment: .\src\goku\action\DeleteAction.java
+	// End of segment: src\goku\action\DeleteAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\DisplayAction.java
+	 * origin: src\goku\action\DisplayAction.java
 	 */
 
 package goku.action;
@@ -220,14 +220,14 @@ public class DisplayAction extends Action {
 
 }
 
-	// End of segment: .\src\goku\action\DisplayAction.java
+	// End of segment: src\goku\action\DisplayAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\EditAction.java
+	 * origin: src\goku\action\EditAction.java
 	 */
 
 package goku.action;
@@ -403,14 +403,14 @@ public class EditAction extends Action {
 
 }
 
-	// End of segment: .\src\goku\action\EditAction.java
+	// End of segment: src\goku\action\EditAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\RedoAction.java
+	 * origin: src\goku\action\RedoAction.java
 	 */
 
 package goku.action;
@@ -472,14 +472,14 @@ public class RedoAction extends Action {
   }
 }
 
-	// End of segment: .\src\goku\action\RedoAction.java
+	// End of segment: src\goku\action\RedoAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\SearchAction.java
+	 * origin: src\goku\action\SearchAction.java
 	 */
 
   private String editMsgIfHaveOverdue(String msg) {
@@ -490,14 +490,14 @@ public class RedoAction extends Action {
   }
 }
 
-	// End of segment: .\src\goku\action\SearchAction.java
+	// End of segment: src\goku\action\SearchAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\UndoAction.java
+	 * origin: src\goku\action\UndoAction.java
 	 */
 
 package goku.action;
@@ -559,14 +559,14 @@ public class UndoAction extends Action {
   }
 }
 
-	// End of segment: .\src\goku\action\UndoAction.java
+	// End of segment: src\goku\action\UndoAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\UndoActionTest.java
+	 * origin: src\goku\action\UndoActionTest.java
 	 */
 
 package goku.action;
@@ -708,14 +708,14 @@ public class UndoActionTest {
   }
 }
 
-	// End of segment: .\src\goku\action\UndoActionTest.java
+	// End of segment: src\goku\action\UndoActionTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\GOKU.java
+	 * origin: src\goku\GOKU.java
 	 */
 
 package goku;
@@ -780,14 +780,14 @@ public class GOKU {
   }
 }
 
-	// End of segment: .\src\goku\GOKU.java
+	// End of segment: src\goku\GOKU.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\Task.java
+	 * origin: src\goku\Task.java
 	 */
 
 package goku;
@@ -910,14 +910,14 @@ public class Task implements Storeable, Comparable<Task> {
     return isImpt;
   }
 
-	// End of segment: .\src\goku\Task.java
+	// End of segment: src\goku\Task.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\TaskList.java
+	 * origin: src\goku\TaskList.java
 	 */
 
 package goku;
@@ -1201,14 +1201,14 @@ public class TaskList implements Iterable<Task> {
     return resultList;
   }
 
-	// End of segment: .\src\goku\TaskList.java
+	// End of segment: src\goku\TaskList.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\FeedbackPane.java
+	 * origin: src\goku\ui\FeedbackPane.java
 	 */
 
   private void displayCompleteTask(Task task) {
@@ -1227,7 +1227,6 @@ public class TaskList implements Iterable<Task> {
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
     VBox dateVBox = makeDateVbox(task, true);
-    // dateVBox.setStyle("-fx-background-color:rgba(85, 255, 68,0.2)");
 
     output.add(tickHbox, 0, lines);
     output.add(title, 1, lines);
@@ -1278,17 +1277,14 @@ public class TaskList implements Iterable<Task> {
     impt.setTextFill(IMPT_COLOUR);
     idWithImpt.getChildren().addAll(id, impt);
     idWithImpt.setAlignment(Pos.CENTER_LEFT);
-    // if (task.getImpt()) {
-    // id.setTextFill(IMPT_COLOUR);
-    // }
+
     Label title = new Label(task.getTitle());
     title.setTextFill(NORMAL_COLOUR);
     title.setWrapText(true);
     title.setMinWidth(50.0);
     VBox dateVBox = makeDateVbox(task, false);
 
-    // output.add(id, 0, lines);
-    if (task.isImpt() == null || task.isImpt()) {
+    if (task.isImpt() == null || !task.isImpt()) {
       output.add(id, 0, lines);
     } else {
       output.add(idWithImpt, 0, lines);
@@ -1393,14 +1389,14 @@ public class TaskList implements Iterable<Task> {
   }
 }
 
-	// End of segment: .\src\goku\ui\FeedbackPane.java
+	// End of segment: src\goku\ui\FeedbackPane.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\TaskListDisplayer.java
+	 * origin: src\goku\ui\TaskListDisplayer.java
 	 */
 
   private boolean isOver(DateRange dateRange) {
@@ -1462,14 +1458,14 @@ public class TaskList implements Iterable<Task> {
   }
 }
 
-	// End of segment: .\src\goku\ui\TaskListDisplayer.java
+	// End of segment: src\goku\ui\TaskListDisplayer.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\TaskListDisplayerTest.java
+	 * origin: src\goku\ui\TaskListDisplayerTest.java
 	 */
 
 package goku.ui;
@@ -1497,7 +1493,7 @@ public class TaskListDisplayerTest {
     list.addTask(d);
   }
 
-	// End of segment: .\src\goku\ui\TaskListDisplayerTest.java
+	// End of segment: src\goku\ui\TaskListDisplayerTest.java
 
 
 

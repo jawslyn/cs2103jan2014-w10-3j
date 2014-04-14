@@ -3,7 +3,7 @@
 
 
 	/**
-	 * origin: .\src\goku\action\Action.java
+	 * origin: src\goku\action\Action.java
 	 */
 
 package goku.action;
@@ -30,14 +30,14 @@ public abstract class Action {
   public abstract Result doIt();
 }
 
-	// End of segment: .\src\goku\action\Action.java
+	// End of segment: src\goku\action\Action.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\AddAction.java
+	 * origin: src\goku\action\AddAction.java
 	 */
 
 package goku.action;
@@ -127,14 +127,14 @@ public class AddAction extends Action {
     return result;
   }
 
-	// End of segment: .\src\goku\action\AddAction.java
+	// End of segment: src\goku\action\AddAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\DeleteAction.java
+	 * origin: src\goku\action\DeleteAction.java
 	 */
 
 package goku.action;
@@ -209,14 +209,14 @@ public class DeleteAction extends Action {
     return list.deleteTaskById(id);
   }
 
-	// End of segment: .\src\goku\action\DeleteAction.java
+	// End of segment: src\goku\action\DeleteAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\ExitAction.java
+	 * origin: src\goku\action\ExitAction.java
 	 */
 
 package goku.action;
@@ -236,14 +236,14 @@ public class ExitAction extends Action {
   }
 }
 
-	// End of segment: .\src\goku\action\ExitAction.java
+	// End of segment: src\goku\action\ExitAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\HelpAction.java
+	 * origin: src\goku\action\HelpAction.java
 	 */
 
 package goku.action;
@@ -274,14 +274,14 @@ public class HelpAction extends Action {
   }
 }
 
-	// End of segment: .\src\goku\action\HelpAction.java
+	// End of segment: src\goku\action\HelpAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\MakeActionException.java
+	 * origin: src\goku\action\MakeActionException.java
 	 */
 
 package goku.action;
@@ -294,14 +294,14 @@ public class MakeActionException extends Exception {
   }
 }
 
-	// End of segment: .\src\goku\action\MakeActionException.java
+	// End of segment: src\goku\action\MakeActionException.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\action\UnknownAction.java
+	 * origin: src\goku\action\UnknownAction.java
 	 */
 
 package goku.action;
@@ -339,14 +339,14 @@ public class UnknownAction extends Action {
 
 }
 
-	// End of segment: .\src\goku\action\UnknownAction.java
+	// End of segment: src\goku\action\UnknownAction.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\autocomplete\AutoCompleteEngine.java
+	 * origin: src\goku\autocomplete\AutoCompleteEngine.java
 	 */
 
 package goku.autocomplete;
@@ -401,14 +401,14 @@ public class AutoCompleteEngine {
   }
 }
 
-	// End of segment: .\src\goku\autocomplete\AutoCompleteEngine.java
+	// End of segment: src\goku\autocomplete\AutoCompleteEngine.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\autocomplete\AutoCompleteEngineTest.java
+	 * origin: src\goku\autocomplete\AutoCompleteEngineTest.java
 	 */
 
 package goku.autocomplete;
@@ -446,14 +446,14 @@ public class AutoCompleteEngineTest {
 
 }
 
-	// End of segment: .\src\goku\autocomplete\AutoCompleteEngineTest.java
+	// End of segment: src\goku\autocomplete\AutoCompleteEngineTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\autocomplete\CommandAutoComplete.java
+	 * origin: src\goku\autocomplete\CommandAutoComplete.java
 	 */
 
 package goku.autocomplete;
@@ -484,14 +484,14 @@ public class CommandAutoComplete extends WordAutoComplete {
   }
 }
 
-	// End of segment: .\src\goku\autocomplete\CommandAutoComplete.java
+	// End of segment: src\goku\autocomplete\CommandAutoComplete.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\autocomplete\CommandAutoCompleteTest.java
+	 * origin: src\goku\autocomplete\CommandAutoCompleteTest.java
 	 */
 
 package goku.autocomplete;
@@ -551,14 +551,14 @@ public class CommandAutoCompleteTest extends WordAutoCompleteTest {
   }
 }
 
-	// End of segment: .\src\goku\autocomplete\CommandAutoCompleteTest.java
+	// End of segment: src\goku\autocomplete\CommandAutoCompleteTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\autocomplete\WordAutoComplete.java
+	 * origin: src\goku\autocomplete\WordAutoComplete.java
 	 */
 
 package goku.autocomplete;
@@ -634,14 +634,14 @@ public class WordAutoComplete {
   }
 }
 
-	// End of segment: .\src\goku\autocomplete\WordAutoComplete.java
+	// End of segment: src\goku\autocomplete\WordAutoComplete.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\autocomplete\WordAutoCompleteTest.java
+	 * origin: src\goku\autocomplete\WordAutoCompleteTest.java
 	 */
 
 package goku.autocomplete;
@@ -739,14 +739,14 @@ public class WordAutoCompleteTest {
 
 }
 
-	// End of segment: .\src\goku\autocomplete\WordAutoCompleteTest.java
+	// End of segment: src\goku\autocomplete\WordAutoCompleteTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\Commands.java
+	 * origin: src\goku\Commands.java
 	 */
 
 package goku;
@@ -787,14 +787,14 @@ public class Commands {
   }
 }
 
-	// End of segment: .\src\goku\Commands.java
+	// End of segment: src\goku\Commands.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\CommandsTest.java
+	 * origin: src\goku\CommandsTest.java
 	 */
 
 package goku;
@@ -813,14 +813,14 @@ public class CommandsTest {
 
 }
 
-	// End of segment: .\src\goku\CommandsTest.java
+	// End of segment: src\goku\CommandsTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\CommandSuggester.java
+	 * origin: src\goku\CommandSuggester.java
 	 */
 
 package goku;
@@ -894,14 +894,14 @@ public class CommandSuggester {
 
 }
 
-	// End of segment: .\src\goku\CommandSuggester.java
+	// End of segment: src\goku\CommandSuggester.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\CommandSuggesterTest.java
+	 * origin: src\goku\CommandSuggesterTest.java
 	 */
 
 package goku;
@@ -926,14 +926,14 @@ public class CommandSuggesterTest {
 
 }
 
-	// End of segment: .\src\goku\CommandSuggesterTest.java
+	// End of segment: src\goku\CommandSuggesterTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\DateRange.java
+	 * origin: src\goku\DateRange.java
 	 */
 
 package goku;
@@ -991,14 +991,14 @@ public class DateRange {
         && endDate.lteq(range.getEndDate());
   }
 
-	// End of segment: .\src\goku\DateRange.java
+	// End of segment: src\goku\DateRange.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\GokuMain.java
+	 * origin: src\goku\GokuMain.java
 	 */
 
 package goku;
@@ -1023,7 +1023,6 @@ public class GokuMain {
   }
 
   /*
-   * Determines which UserInterface to run based on the arguments to
    * the program.
    */
   private static UserInterface setUserInterface(String[] args) {
@@ -1043,14 +1042,14 @@ public class GokuMain {
 
 }
 
-	// End of segment: .\src\goku\GokuMain.java
+	// End of segment: src\goku\GokuMain.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\storage\LoadTasksException.java
+	 * origin: src\goku\storage\LoadTasksException.java
 	 */
 
 package goku.storage;
@@ -1086,14 +1085,14 @@ public class LoadTasksException extends Exception {
   }
 }
 
-	// End of segment: .\src\goku\storage\LoadTasksException.java
+	// End of segment: src\goku\storage\LoadTasksException.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\storage\LocalFileStorage.java
+	 * origin: src\goku\storage\LocalFileStorage.java
 	 */
 
 package goku.storage;
@@ -1238,14 +1237,14 @@ public class LocalFileStorage implements Storage {
   }
 }
 
-	// End of segment: .\src\goku\storage\LocalFileStorage.java
+	// End of segment: src\goku\storage\LocalFileStorage.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\storage\LocalFileStorageTest.java
+	 * origin: src\goku\storage\LocalFileStorageTest.java
 	 */
 
 package goku.storage;
@@ -1305,14 +1304,14 @@ public class LocalFileStorageTest {
 
 }
 
-	// End of segment: .\src\goku\storage\LocalFileStorageTest.java
+	// End of segment: src\goku\storage\LocalFileStorageTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\storage\MockStoreableList.java
+	 * origin: src\goku\storage\MockStoreableList.java
 	 */
 
 package goku.storage;
@@ -1356,14 +1355,14 @@ public class MockStoreableList implements Iterable<Storeable> {
   }
 }
 
-	// End of segment: .\src\goku\storage\MockStoreableList.java
+	// End of segment: src\goku\storage\MockStoreableList.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\storage\Storage.java
+	 * origin: src\goku\storage\Storage.java
 	 */
 
 package goku.storage;
@@ -1407,14 +1406,14 @@ public interface Storage {
   public TaskList loadStorage() throws LoadTasksException, IOException;
 }
 
-	// End of segment: .\src\goku\storage\Storage.java
+	// End of segment: src\goku\storage\Storage.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\storage\StorageFactory.java
+	 * origin: src\goku\storage\StorageFactory.java
 	 */
 
 package goku.storage;
@@ -1433,14 +1432,14 @@ public class StorageFactory {
   }
 }
 
-	// End of segment: .\src\goku\storage\StorageFactory.java
+	// End of segment: src\goku\storage\StorageFactory.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\storage\Storeable.java
+	 * origin: src\goku\storage\Storeable.java
 	 */
 
 package goku.storage;
@@ -1452,14 +1451,14 @@ public interface Storeable {
   public String toStorageFormat();
 }
 
-	// End of segment: .\src\goku\storage\Storeable.java
+	// End of segment: src\goku\storage\Storeable.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\TaskTest.java
+	 * origin: src\goku\TaskTest.java
 	 */
 
   @Test
@@ -1477,14 +1476,14 @@ public interface Storeable {
   }
 }
 
-	// End of segment: .\src\goku\TaskTest.java
+	// End of segment: src\goku\TaskTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\CLUserInterface.java
+	 * origin: src\goku\ui\CLUserInterface.java
 	 */
 
 package goku.ui;
@@ -1539,14 +1538,14 @@ public class CLUserInterface implements UserInterface {
     }
   }
 
-	// End of segment: .\src\goku\ui\CLUserInterface.java
+	// End of segment: src\goku\ui\CLUserInterface.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\CompletionController.java
+	 * origin: src\goku\ui\CompletionController.java
 	 */
 
 package goku.ui;
@@ -1802,14 +1801,14 @@ public class CompletionController extends Controller {
   }
 }
 
-	// End of segment: .\src\goku\ui\CompletionController.java
+	// End of segment: src\goku\ui\CompletionController.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\Controller.java
+	 * origin: src\goku\ui\Controller.java
 	 */
 
 package goku.ui;
@@ -1826,14 +1825,14 @@ public abstract class Controller {
   abstract void handle(KeyEvent key);
 }
 
-	// End of segment: .\src\goku\ui\Controller.java
+	// End of segment: src\goku\ui\Controller.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\FeedbackPane.java
+	 * origin: src\goku\ui\FeedbackPane.java
 	 */
 
 package goku.ui;
@@ -2014,14 +2013,14 @@ public class FeedbackPane {
     }
   }
 
-	// End of segment: .\src\goku\ui\FeedbackPane.java
+	// End of segment: src\goku\ui\FeedbackPane.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\FXGUI.java
+	 * origin: src\goku\ui\FXGUI.java
 	 */
 
 package goku.ui;
@@ -2109,14 +2108,14 @@ public class FXGUI extends Application implements UserInterface {
   }
 }
 
-	// End of segment: .\src\goku\ui\FXGUI.java
+	// End of segment: src\goku\ui\FXGUI.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\GokuController.java
+	 * origin: src\goku\ui\GokuController.java
 	 */
 
 package goku.ui;
@@ -2252,14 +2251,14 @@ public class GokuController extends Controller {
 
 }
 
-	// End of segment: .\src\goku\ui\GokuController.java
+	// End of segment: src\goku\ui\GokuController.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\HistoryController.java
+	 * origin: src\goku\ui\HistoryController.java
 	 */
 
 package goku.ui;
@@ -2313,14 +2312,14 @@ public class HistoryController extends Controller {
 
 }
 
-	// End of segment: .\src\goku\ui\HistoryController.java
+	// End of segment: src\goku\ui\HistoryController.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\InputHistory.java
+	 * origin: src\goku\ui\InputHistory.java
 	 */
 
 package goku.ui;
@@ -2369,14 +2368,14 @@ public class InputHistory {
   }
 }
 
-	// End of segment: .\src\goku\ui\InputHistory.java
+	// End of segment: src\goku\ui\InputHistory.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\InputHistoryTest.java
+	 * origin: src\goku\ui\InputHistoryTest.java
 	 */
 
 package goku.ui;
@@ -2423,14 +2422,14 @@ public class InputHistoryTest {
   }
 }
 
-	// End of segment: .\src\goku\ui\InputHistoryTest.java
+	// End of segment: src\goku\ui\InputHistoryTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\InputParser.java
+	 * origin: src\goku\ui\InputParser.java
 	 */
 
   /*
@@ -2613,14 +2612,14 @@ public class InputHistoryTest {
   }
 }
 
-	// End of segment: .\src\goku\ui\InputParser.java
+	// End of segment: src\goku\ui\InputParser.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\InputParserTest.java
+	 * origin: src\goku\ui\InputParserTest.java
 	 */
 
   @Test
@@ -2864,14 +2863,14 @@ public class InputHistoryTest {
   }
 }
 
-	// End of segment: .\src\goku\ui\InputParserTest.java
+	// End of segment: src\goku\ui\InputParserTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\LiveSearch.java
+	 * origin: src\goku\ui\LiveSearch.java
 	 */
 
 package goku.ui;
@@ -2943,14 +2942,14 @@ public class LiveSearch extends Controller {
   }
 }
 
-	// End of segment: .\src\goku\ui\LiveSearch.java
+	// End of segment: src\goku\ui\LiveSearch.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\MainController.java
+	 * origin: src\goku\ui\MainController.java
 	 */
 
 package goku.ui;
@@ -3163,14 +3162,14 @@ public class MainController {
   }
 }
 
-	// End of segment: .\src\goku\ui\MainController.java
+	// End of segment: src\goku\ui\MainController.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\ScrollController.java
+	 * origin: src\goku\ui\ScrollController.java
 	 */
 
 package goku.ui;
@@ -3208,14 +3207,14 @@ public class ScrollController extends Controller {
 
 }
 
-	// End of segment: .\src\goku\ui\ScrollController.java
+	// End of segment: src\goku\ui\ScrollController.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\TaskListDisplayer.java
+	 * origin: src\goku\ui\TaskListDisplayer.java
 	 */
 
 package goku.ui;
@@ -3280,14 +3279,14 @@ public class TaskListDisplayer {
     return ht;
   }
 
-	// End of segment: .\src\goku\ui\TaskListDisplayer.java
+	// End of segment: src\goku\ui\TaskListDisplayer.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\ui\TaskListDisplayerTest.java
+	 * origin: src\goku\ui\TaskListDisplayerTest.java
 	 */
 
   private Task makeTaskWithDeadline(String title, int daysAway) {
@@ -3305,14 +3304,14 @@ public class TaskListDisplayer {
     return task;
   }
 }
-	// End of segment: .\src\goku\ui\TaskListDisplayerTest.java
+	// End of segment: src\goku\ui\TaskListDisplayerTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateOutput.java
+	 * origin: src\goku\util\DateOutput.java
 	 */
 
   /*
@@ -3351,14 +3350,14 @@ public class TaskListDisplayer {
 
 }
 
-	// End of segment: .\src\goku\util\DateOutput.java
+	// End of segment: src\goku\util\DateOutput.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateOutputTest.java
+	 * origin: src\goku\util\DateOutputTest.java
 	 */
 
   @Test
@@ -3383,14 +3382,14 @@ public class TaskListDisplayer {
   }
 }
 
-	// End of segment: .\src\goku\util\DateOutputTest.java
+	// End of segment: src\goku\util\DateOutputTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtil.java
+	 * origin: src\goku\util\DateUtil.java
 	 */
 
 package goku.util;
@@ -3423,14 +3422,14 @@ public class DateUtil {
     return DateTime.now(TimeZone.getDefault());
   }
 
-	// End of segment: .\src\goku\util\DateUtil.java
+	// End of segment: src\goku\util\DateUtil.java
 
 
 
 
 
 	/**
-	 * origin: .\src\goku\util\DateUtilTest.java
+	 * origin: src\goku\util\DateUtilTest.java
 	 */
 
   /*
@@ -3546,14 +3545,14 @@ public class DateUtil {
     assertEquals(expected, result);
   }
 
-	// End of segment: .\src\goku\util\DateUtilTest.java
+	// End of segment: src\goku\util\DateUtilTest.java
 
 
 
 
 
 	/**
-	 * origin: .\src\test\GokuActionTestSuite.java
+	 * origin: src\test\GokuActionTestSuite.java
 	 */
 
 package test;
@@ -3570,14 +3569,14 @@ public class GokuActionTestSuite {
 
 }
 
-	// End of segment: .\src\test\GokuActionTestSuite.java
+	// End of segment: src\test\GokuActionTestSuite.java
 
 
 
 
 
 	/**
-	 * origin: .\src\test\GokuStorageTestSuite.java
+	 * origin: src\test\GokuStorageTestSuite.java
 	 */
 
 package test;
@@ -3591,14 +3590,14 @@ public class GokuStorageTestSuite {
 
 }
 
-	// End of segment: .\src\test\GokuStorageTestSuite.java
+	// End of segment: src\test\GokuStorageTestSuite.java
 
 
 
 
 
 	/**
-	 * origin: .\src\test\GokuTestSuite.java
+	 * origin: src\test\GokuTestSuite.java
 	 */
 
 package test;
@@ -3613,14 +3612,14 @@ public class GokuTestSuite {
 
 }
 
-	// End of segment: .\src\test\GokuTestSuite.java
+	// End of segment: src\test\GokuTestSuite.java
 
 
 
 
 
 	/**
-	 * origin: .\src\test\GokuUtilTestSuite.java
+	 * origin: src\test\GokuUtilTestSuite.java
 	 */
 
 package test;
@@ -3635,14 +3634,14 @@ public class GokuUtilTestSuite {
 
 }
 
-	// End of segment: .\src\test\GokuUtilTestSuite.java
+	// End of segment: src\test\GokuUtilTestSuite.java
 
 
 
 
 
 	/**
-	 * origin: .\src\test\TestRunner.java
+	 * origin: src\test\TestRunner.java
 	 */
 
 package test;
@@ -3662,7 +3661,7 @@ public class TestRunner {
   }
 }
 
-	// End of segment: .\src\test\TestRunner.java
+	// End of segment: src\test\TestRunner.java
 
 
 
